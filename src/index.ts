@@ -10,7 +10,7 @@ async function main() {
   const key: string = process.env.MINA_KEY || "";
   const stakingEpoch = Number(process.env.STAKING_EPOCH);
   const globalSlotStart = Number(process.env.GLOBAL_SLOT_START);
-  const chainId = Number(process.env.CHAIN_ID); // can be multiple epoch if hard fork - TODO this should use staking ledger hash
+  //const chainId = Number(process.env.CHAIN_ID); // can be multiple epoch if hard fork - TODO this should use staking ledger hash
   const minHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
 
   //TODO: Get K programatically
@@ -61,12 +61,11 @@ async function main() {
     let effectivePoolStakes: { [key: string]: number } = {};
 
     // Determine the supercharged weighting for the block
-    let txFees = block.txfees || 0;
-    let snarkFees = block.snarkfees || 0;
+    let txFees = block.usercommandtransactionfees || 0;
     let superchargedWeighting = 1 + 1 / (1 + txFees / block.coinbase);
 
     // What are the rewards for the block
-    let totalRewards = block.coinbase + txFees - snarkFees;
+    let totalRewards = block.blockpayoutamount
     let totalFees = commissionRate * totalRewards;
 
     allBlocksTotalRewards += totalRewards;
@@ -120,9 +119,9 @@ async function main() {
         totalRewards: totalRewards,
         payout: blockTotal,
         epoch: stakingEpoch,
-        chainId: chainId,
+        //chainId: chainId,
       };
-
+    };
       //TODO: Store data 
     });
   });
