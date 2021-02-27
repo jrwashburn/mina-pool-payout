@@ -8,12 +8,12 @@ const blockQuery = `
     b.global_slot_since_genesis AS globalSlotSinceGenesis,
     pkc.value AS creatorPublicKey, 
     pkw.value AS winnerPublicKey,
-    pk.value as recevierPublicKey,
-    bif.coinbase,
-    bif2.snarkfeesToReceiver,
-    bif.snarkfeesFromCoinbase,
-    bif.coinbase + bif2.snarkfeesToReceiver - bif.snarkfeesFromCoinbase as blockPayoutAmount,
-    btf.userCommandTransactionFees
+    pk.value AS recevierPublicKey,
+    coalesce( bif.coinbase, 0) AS coinbase,
+    coalesce( bif2.snarkfeesToReceiver, 0) AS snarkfeesToReceiver,
+    coalesce( bif.snarkfeesFromCoinbase, 0) AS snarkfeesFromCoinbase,
+    coalesce( bif.coinbase + bif2.snarkfeesToReceiver - bif.snarkfeesFromCoinbase, 0) AS blockPayoutAmount,
+    coalesce( btf.userCommandTransactionFees, 0) AS userCommandTransactionFees
     FROM blocks b
     INNER JOIN public_keys pkc ON b.creator_id = pkc.id
     INNER JOIN public_keys pkw ON b.block_winner_id = pkw.id
@@ -21,8 +21,8 @@ const blockQuery = `
         ( 
         SELECT
             bic.block_id,
-            sum( CASE WHEN ic.type = 'coinbase' THEN ic.fee ELSE 0 END ) AS coinbase,
-            sum( CASE WHEN ic.type = 'fee_transfer_via_coinbase' THEN ic.fee ELSE 0 END) AS snarkfeesFromCoinbase,
+            sum( CASE WHEN ic.type = 'coinbase' THEN coalesce( ic.fee, 0) ELSE 0 END ) AS coinbase,
+            sum( CASE WHEN ic.type = 'fee_transfer_via_coinbase' THEN coalesce( ic.fee, 0) ELSE 0 END) AS snarkfeesFromCoinbase,
             max( CASE WHEN ic.type = 'coinbase' THEN ic.receiver_id ELSE NULL END) AS coinbaseReceiverId
         FROM blocks_internal_commands bic 
         INNER JOIN internal_commands ic ON bic.internal_command_id = ic.id
@@ -34,7 +34,7 @@ const blockQuery = `
         ( 
         SELECT
             bic.block_id,
-            sum( CASE WHEN ic.type = 'fee_transfer' THEN ic.fee ELSE 0 END) AS snarkfeesToReceiver,
+            sum( CASE WHEN ic.type = 'fee_transfer' THEN coalesce( ic.fee, 0) ELSE 0 END) AS snarkfeesToReceiver,
             ic.receiver_id
         FROM blocks_internal_commands bic
         INNER JOIN internal_commands ic ON bic.internal_command_id = ic.id
@@ -44,7 +44,7 @@ const blockQuery = `
         ( 
         SELECT
             buc.block_id,
-            sum( uc.fee) AS userCommandTransactionFees
+            sum( coalesce( uc.fee, 0) ) AS userCommandTransactionFees
         FROM blocks_user_commands buc 
         INNER JOIN user_commands uc ON buc.user_command_id = uc.id
         WHERE  buc.status = 'applied' 

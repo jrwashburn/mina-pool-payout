@@ -37,12 +37,13 @@ export async function getPayouts(key: string, minHeight: number, stakingEpoch: n
       publicKey: stake.pk,
       total: 0,
       stakingBalance: balance,
-      timedWeighting: timedWeighting(stake, globalSlotStart, slotsPerEpoch),
+      timedWeighting: timedWeighting(stake, globalSlotStart, slotsPerEpoch)
     });
     totalStakingBalance += balance;
   });
 
   console.log(`The pool total staking balance is ${totalStakingBalance}`);
+  
 
   const blocks = await getBlocks(key, minHeight, maxHeight);
 
@@ -51,6 +52,7 @@ export async function getPayouts(key: string, minHeight: number, stakingEpoch: n
     // Keep a log of all blocks we processed
     blocksIncluded.push(block.blockheight);
 
+    // TODO: check for no coinbase - if no coinbase, skip the block?
     let sumEffectivePoolStakes = 0;
     let effectivePoolStakes: { [key: string]: number } = {};
 
@@ -61,6 +63,8 @@ export async function getPayouts(key: string, minHeight: number, stakingEpoch: n
     // What are the rewards for the block
     let totalRewards = block.blockpayoutamount
     let totalFees = commissionRate * totalRewards;
+
+    console.log(`txfees: ${txFees}, superchargedWeighting: ${superchargedWeighting}, totalRewards: ${totalRewards}, totalFees: ${totalFees}, coinbase: ${block.coinbase}`);
 
     allBlocksTotalRewards += totalRewards;
     allBlocksTotalFees += totalFees;
