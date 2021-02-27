@@ -124,7 +124,7 @@ async function main() {
     };
       //TODO: Store data 
     });
-  });
+  };
 
   // ################################################################
   // # Print some helpful data to the screen
