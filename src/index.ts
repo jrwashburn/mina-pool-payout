@@ -13,7 +13,7 @@ async function main() {
   const chainId = Number(process.env.CHAIN_ID); // can be multiple epoch if hard fork - TODO this should use staking ledger hash
   const minHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
 
-  //TODO: Get K programatically
+  // TODO: Get K programatically
   const k = Number(process.env.K);
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
   const commissionRate = Number(process.env.COMMISSION_RATE);
@@ -84,6 +84,8 @@ async function main() {
     // #    # There were some fee transfers so let's _really_ make sure we don't pay out more than we received
 
     // Loop through our list of delegates to determine the weighting per block
+
+    // TODO: need to handle rounding issues 
 
     payouts.forEach((payout: any) => {
       let superchargedContribution =
