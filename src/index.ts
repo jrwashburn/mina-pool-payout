@@ -13,14 +13,17 @@ async function main() {
   const chainId = Number(process.env.CHAIN_ID); // can be multiple epoch if hard fork - TODO this should use staking ledger hash
   const minHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
 
-  //TODO: Get K programatically
+  // TODO: Get K programatically
   const k = Number(process.env.K);
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
   const commissionRate = Number(process.env.COMMISSION_RATE);
 
   // TODO: handle block range stuff (minheight to maxheight)
   const latestBlock = await getLatestHeight();
-  const maxHeight = latestBlock - k;
+  
+  // TODO: reinstate finality check for max height - temporarily removing k for testing 
+  //const maxHeight = latestBlock - k;
+  const maxHeight = latestBlock ;
 
   console.log(`This script will payout from blocks ${minHeight} to ${maxHeight}`);
 
@@ -53,6 +56,8 @@ async function main() {
   console.log(`The pool total staking balance is ${totalStakingBalance}`);
 
   const blocks = await getBlocks(key, minHeight, maxHeight);
+
+  // TODO: extract to 2-3 functions
   blocks.forEach((block: Block) => {
     // Keep a log of all blocks we processed
     blocksIncluded.push(block.blockheight);
@@ -61,12 +66,11 @@ async function main() {
     let effectivePoolStakes: { [key: string]: number } = {};
 
     // Determine the supercharged weighting for the block
-    let txFees = block.txfees || 0;
-    let snarkFees = block.snarkfees || 0;
+    let txFees = block.usercommandtransactionfees || 0;
     let superchargedWeighting = 1 + 1 / (1 + txFees / block.coinbase);
 
     // What are the rewards for the block
-    let totalRewards = block.coinbase + txFees - snarkFees;
+    let totalRewards = block.blockpayoutamount
     let totalFees = commissionRate * totalRewards;
 
     allBlocksTotalRewards += totalRewards;
@@ -80,6 +84,8 @@ async function main() {
     // #    # There were some fee transfers so let's _really_ make sure we don't pay out more than we received
 
     // Loop through our list of delegates to determine the weighting per block
+
+    // TODO: need to handle rounding issues 
 
     payouts.forEach((payout: any) => {
       let superchargedContribution =
@@ -120,9 +126,8 @@ async function main() {
         totalRewards: totalRewards,
         payout: blockTotal,
         epoch: stakingEpoch,
-        chainId: chainId,
+        chainId: chainId
       };
-
       //TODO: Store data 
     });
   });
@@ -153,6 +158,7 @@ async function main() {
   console.log(payoutJson);
 }
 
+// TODO: reimplement timing check
 function timedWeighting(
   ledger: any,
   globalSlotStart: number,
