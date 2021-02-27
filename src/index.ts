@@ -10,7 +10,7 @@ async function main() {
   const key: string = process.env.MINA_KEY || "";
   const stakingEpoch = Number(process.env.STAKING_EPOCH);
   const globalSlotStart = Number(process.env.GLOBAL_SLOT_START);
-  //const chainId = Number(process.env.CHAIN_ID); // can be multiple epoch if hard fork - TODO this should use staking ledger hash
+  const chainId = Number(process.env.CHAIN_ID); // can be multiple epoch if hard fork - TODO this should use staking ledger hash
   const minHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
 
   //TODO: Get K programatically
@@ -20,8 +20,9 @@ async function main() {
 
   // TODO: handle block range stuff (minheight to maxheight)
   const latestBlock = await getLatestHeight();
-  const maxHeight = latestBlock - k;
-
+  //const maxHeight = latestBlock - k;
+  const maxHeight = latestBlock ;
+  
   console.log(`This script will payout from blocks ${minHeight} to ${maxHeight}`);
 
   // Initialize some stuff
@@ -119,12 +120,11 @@ async function main() {
         totalRewards: totalRewards,
         payout: blockTotal,
         epoch: stakingEpoch,
-        //chainId: chainId,
+        chainId: chainId
       };
-    };
       //TODO: Store data 
     });
-  };
+  });
 
   // ################################################################
   // # Print some helpful data to the screen
@@ -151,6 +151,7 @@ async function main() {
 
   console.log(payoutJson);
 }
+
 
 function timedWeighting(
   ledger: any,
