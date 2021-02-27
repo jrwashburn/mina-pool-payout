@@ -20,9 +20,11 @@ async function main() {
 
   // TODO: handle block range stuff (minheight to maxheight)
   const latestBlock = await getLatestHeight();
+  
+  // TODO: reinstate finality check for max height - temporarily removing k for testing 
   //const maxHeight = latestBlock - k;
   const maxHeight = latestBlock ;
-  
+
   console.log(`This script will payout from blocks ${minHeight} to ${maxHeight}`);
 
   // Initialize some stuff
@@ -54,6 +56,8 @@ async function main() {
   console.log(`The pool total staking balance is ${totalStakingBalance}`);
 
   const blocks = await getBlocks(key, minHeight, maxHeight);
+
+  // TODO: extract to 2-3 functions
   blocks.forEach((block: Block) => {
     // Keep a log of all blocks we processed
     blocksIncluded.push(block.blockheight);
@@ -152,7 +156,7 @@ async function main() {
   console.log(payoutJson);
 }
 
-
+// TODO: reimplement timing check
 function timedWeighting(
   ledger: any,
   globalSlotStart: number,
