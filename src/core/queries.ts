@@ -4,7 +4,8 @@ const blockQuery = `
     SELECT
     b.height AS blockHeight,
     b.state_hash AS stateHash, 
-    b.timestamp as blockDateTime,
+    b.timestamp AS blockDateTime,
+    b.global_slot AS slot,
     b.global_slot_since_genesis AS globalSlotSinceGenesis,
     pkc.value AS creatorPublicKey, 
     pkw.value AS winnerPublicKey,
@@ -85,12 +86,9 @@ type LatestHeight = {
 };
 
 export type Block = {
-//  block_archive_id: number;
   blockheight: number;
   statehash: string;
-//  parenthash: string;
   blockdatetime: number;
-//  slot: number;
   globalslotsincegenesis: number;
   creatorpublickey: string;
   winnerpublickey: string;
