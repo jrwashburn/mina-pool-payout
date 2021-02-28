@@ -16,7 +16,7 @@ export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: n
   let totalStakingBalance: number = 0;
   
   stakes.forEach((stake: any) => {
-    let balance = +stake.balance;
+    let balance = Number(stake.balance);
     stakers.push({
       publicKey: stake.pk,
       total: 0,
@@ -37,16 +37,15 @@ export function timedWeighting( stake: any): number {
     // Untimed for full epoch so we have the maximum weighting of 1
     return 0;
   } else {
-    let vestingPeriod: number = stake.timing.vesting_period.tonumber();
-    let vestingIncrement: number = stake.timing.vesting_increment.tonumber();
-    let cliffTime: number = stake.timing.cliff_time.tonumber();
-    let cliffAmount: number = stake.timing.cliff_amount.tonumber();
-    let initialMinimumBalance: number = stake.timing.initial_minimum_balance.tonumber();
+    let vestingPeriod: number = Number(stake.timing.vesting_period);
+    let vestingIncrement: number = Number(stake.timing.vesting_increment);
+    let cliffTime: number = Number(stake.timing.cliff_time);
+    let cliffAmount: number = Number(stake.timing.cliff_amount);
+    let initialMinimumBalance: number = Number(stake.timing.initial_minimum_balance);
 
     return (((( initialMinimumBalance - cliffAmount) / vestingIncrement ) * vestingPeriod) + cliffTime) ;
     // sample: 66k min, 16500 vest at 1 year, 1650 per month thereafter 
     // e.g. ((60000 - 12000 = 48000) / 150 = 320) * 6 = 1920 ) + 150 = 2070 
-    // = ~4.3 days 
     }
   }
 

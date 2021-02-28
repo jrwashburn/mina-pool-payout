@@ -11,10 +11,10 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
   const finalityHeight = await getLatestHeight() - k; 
 
   // get the stakes - but maybe move these dependencies up to index vs. payouts -> stakes and queries?
-  let stakers = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
+  let {stakers, totalStake} = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
 
 
-  //console.log(`The pool total staking balance is ${poolStake.totalStake}`);
+  console.log(`The pool total staking balance is ${totalStake}`);
   
 
   const blocks = await getBlocks(stakingPoolKey, minHeight, finalityHeight);
