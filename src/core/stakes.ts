@@ -27,50 +27,26 @@ export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: n
 }
 
 // TODO: reimplement timing check
+// Changed from original implementation to simply return the slot number at which account beomes untimed
 export function timedWeighting( stake: any): number {
   
   // account is not locked if there is no timing section at all
   if ( typeof(stake.timing) === 'undefined') {
     // Untimed for full epoch so we have the maximum weighting of 1
-    return 1;
+    return 0;
   } else {
-
     let vestingPeriod: number = stake.timing.vesting_period.tonumber();
     let vestingIncrement: number = stake.timing.vesting_increment.tonumber();
     let cliffTime: number = stake.timing.cliff_time.tonumber();
     let cliffAmount: number = stake.timing.cliff_amount.tonumber();
     let initialMinimumBalance: number = stake.timing.initial_minimum_balance.tonumber();
 
-    if (((( initialMinimumBalance - cliffAmount) / vestingIncrement ) * vestingPeriod) + cliffTime) < 
-    
-    ((initial minimum balance - cliff amount / vesting increment ) * vesting_period) + cliff_time)
-
-
-    //Account is not locked if the cliff has been reached and there is no more incremental vesting?
-    if ( stake.timing.vesting_period == "0" || stake.timing.vesting_increment =="0")
-
-    // This is timed at the end of the epoch so we always return 0
-    if (stake.timing.timed_epoch_end) {
-      return 0;
-    } else {
-      // This must be timed for only a portion of the epoch
-      let timedEnd = ledger.timing.
-      let globalSlotEnd = globalSlotStart + slotsPerEpoch;
-      // Need to get the global slot start and end of the epoch
-      return (globalSlotEnd - timedEnd / slotsPerEpoch);
+    return (((( initialMinimumBalance - cliffAmount) / vestingIncrement ) * vestingPeriod) + cliffTime) ;
+    // sample: 66k min, 16500 vest at 1 year, 1650 per month thereafter 
+    // e.g. ((60000 - 12000 = 48000) / 150 = 320) * 6 = 1920 ) + 150 = 2070 
+    // = ~4.3 days 
     }
   }
-  */
-/*
-def calculate_end_slot_timed_balance(timing):
-        vested_height_global_slot = int(timing["cliff_time"]) + (
-            (int(timing["initial_minimum_balance"]) -
-             int(timing["cliff_amount"])) /
-            int(timing["vesting_increment"])) * int(timing["vesting_period"])
-
-    return int(vested_height_global_slot)
-
-*/
 
   /* EXAMPLE w/ and w/out timing:
    {
@@ -123,6 +99,14 @@ def calculate_end_slot_timed_balance(timing):
       "vesting_period": "1",
       "vesting_increment": "0"
     },
+
+  Another example:
+    "timing": {
+      "initial_minimum_balance": "60000",
+      "cliff_time": "150",
+      "cliff_amount": "12000",
+      "vesting_period": "6",
+      "vesting_increment": "150"
 
   */
 }
