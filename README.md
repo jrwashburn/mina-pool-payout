@@ -32,7 +32,11 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
 4. Set your `COMMISSION_RATE`. This is initially default to the maximum rate of .05
 5. Set `MIN_HEIGHT` to the last known payout block.
 6. Set `MIN_CONFIRMATIONS` to the minimum number of confirmation before you will consider a block. Currently defaulted to k (290 blocks)
+7. Export staking ledger and place in src/data directory. You can export the current staking ledger with: 
 
+```
+coda ledger export staking-epoch-ledger > staking-epoch-ledger.json
+```
 ### Running the script
 
 1. Run `npm install` to install the project dependencies.
