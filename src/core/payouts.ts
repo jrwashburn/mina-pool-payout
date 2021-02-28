@@ -1,47 +1,26 @@
 import { Block, getBlocks, getLatestHeight } from "./queries";
-import { getStakes, timedWeighting } from "./stakes";
+import { StakingKeys, getStakes, timedWeighting } from "./stakes";
 
-export async function getPayouts(stakingPoolKey: string, minHeight: number, globalSlotStart: number, k: number, slotsPerEpoch: Number, commissionRate: Number) {
+export async function getPayouts(stakingPoolKey: string, minHeight: number, globalSlotStart: number, k: number, slotsPerEpoch: number, commissionRate: number) {
 
-  // TODO: handle block range stuff (minheight to maxheight)
-  const latestBlock = await getLatestHeight();
+  // finality understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork
+  const finalityHeight = await getLatestHeight() - k; 
   
-  // TODO: reinstate finality check for max height - temporarily removing k for testing 
-  //const maxHeight = latestBlock - k;
-  const maxHeight = latestBlock ;
-
-  console.log(`This script will payout from blocks ${minHeight} to ${maxHeight}`);
+  console.log(`This script will payout from blocks ${minHeight} to ${finalityHeight}`);
 
   // Initialize some stuff
-  let totalStakingBalance = 0;
-  let payouts: {
-    publicKey: string;
-    total: number;
-    stakingBalance: number;
-    timedWeighting: number;
-  }[] = [];
   let allBlocksTotalRewards = 0;
   let allBlocksTotalFees = 0;
   let blocksIncluded: any[] = [];
-
+  let poolStake: { stakers: StakingKeys[] , totalStake: number };
+  
   // get the stakes
-  let stakes = getStakes(stakingPoolKey);
+  poolStake = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
 
-  stakes.forEach((stake: any) => {
-    const balance = +stake.balance;
-    payouts.push({
-      publicKey: stake.pk,
-      total: 0,
-      stakingBalance: balance,
-      timedWeighting: timedWeighting(stake, globalSlotStart, slotsPerEpoch)
-    });
-    totalStakingBalance += balance;
-  });
-
-  console.log(`The pool total staking balance is ${totalStakingBalance}`);
+  console.log(`The pool total staking balance is ${poolStake.totalStake}`);
   
 
-  const blocks = await getBlocks(key, minHeight, maxHeight);
+  const blocks = await getBlocks(stakingPoolKey, minHeight, finalityHeight);
 
   // TODO: extract to 2-3 functions
   blocks.forEach((block: Block) => {
@@ -76,11 +55,11 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
 
     // TODO: need to handle rounding issues 
 
-    payouts.forEach((payout: any) => {
+    poolStake.stakers.forEach((staker: any) => {
       let superchargedContribution =
-        (superchargedWeighting - 1) * payout.timedWeighting + 1;
-      let effectiveStake = payout.stakingBalance * superchargedContribution;
-      effectivePoolStakes[payout.publicKey] = effectiveStake;
+        (superchargedWeighting - 1) * staker.timedWeighting + 1;
+      let effectiveStake = staker.stakingBalance * superchargedContribution;
+      effectivePoolStakes[staker.publicKey] = effectiveStake;
       sumEffectivePoolStakes += effectiveStake;
     });
 
@@ -88,9 +67,9 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
     //TODO: assert total_staking_balance <= sum_effective_pool_stakes <= 2 * total_staking_balance
 
     // Determine the effective pool weighting based on sum of effective stakes
-    payouts.forEach((payout: any) => {
+    poolStake.stakers.forEach((staker: any) => {
       let effectivePoolWeighting =
-        effectivePoolStakes[payout.publicKey] / sumEffectivePoolStakes;
+        effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
 
         // This must be less than 1 or we have a major issue
       //TODO: assert effective_pool_weighting <= 1
@@ -98,24 +77,22 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
       let blockTotal = Math.round(
         (totalRewards - totalFees) * effectivePoolWeighting
       );
-      payout.total += blockTotal;
+      staker.total += blockTotal;
 
       // Store this data in a structured format for later querying and for the payment script, handled seperately
       let storePayout = {
-        publicKey: payout.publicKey,
+        publicKey: staker.publicKey,
         blockHeight: block.blockheight,
         stateHash: block.statehash,
         effectivePoolWeighting: effectivePoolWeighting,
-        effectivePoolStakes: effectivePoolStakes[payout.publicKey],
-        stakingBalance: payout.stakingBalance,
+        effectivePoolStakes: effectivePoolStakes[staker.publicKey],
+        stakingBalance: staker.stakingBalance,
         sumEffectivePoolStakes: sumEffectivePoolStakes,
         superchargedWeighting: superchargedWeighting,
         dateTime: block.blockdatetime,
         coinbase: block.coinbase,
         totalRewards: totalRewards,
         payout: blockTotal,
-        epoch: stakingEpoch,
-        chainId: chainId
       };
       //TODO: Store data 
     });
@@ -137,10 +114,10 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
 
   let payoutJson: { publicKey: string; total: number }[] = [];
 
-  payouts.forEach((payout) => {
+  poolStake.stakers.forEach((staker) => {
     payoutJson.push({
-      publicKey: payout.publicKey,
-      total: payout.total,
+      publicKey: staker.publicKey,
+      total: staker.total,
     });
   });
 
