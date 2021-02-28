@@ -10,10 +10,8 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
   // finality understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork
   const finalityHeight = await getLatestHeight() - k; 
 
-  let stakers: StakingKeys[] = [];
-  
   // get the stakes - but maybe move these dependencies up to index vs. payouts -> stakes and queries?
-  stakers = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
+  let stakers = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
 
 
   console.log(`The pool total staking balance is ${poolStake.totalStake}`);
