@@ -10,7 +10,7 @@ export type StakingKeys = {
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // calculate timed weighting 
-export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: number ): StakingKeys {  //{StakingKeys, number}
+export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: number ): [StakingKeys, number] {
   let stakes = ledger.filter((x) => x.delegate == key);
   let stakers: StakingKeys = [];
   let totalStakingBalance: number = 0;
@@ -25,7 +25,7 @@ export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: n
     });
     totalStakingBalance += balance;
   });
-  return stakers; //{stakers, totalStakingBalance};
+  return [stakers, totalStakingBalance];
 }
 
 // TODO: reimplement timing check
