@@ -3,20 +3,19 @@ import { StakingKeys, getStakes, timedWeighting } from "./stakes";
 
 export async function getPayouts(stakingPoolKey: string, minHeight: number, globalSlotStart: number, k: number, slotsPerEpoch: number, commissionRate: number) {
 
-  // finality understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork
-  const finalityHeight = await getLatestHeight() - k; 
-  
-  console.log(`This script will payout from blocks ${minHeight} to ${finalityHeight}`);
-
   // Initialize some stuff
   let allBlocksTotalRewards = 0;
   let allBlocksTotalFees = 0;
   let blocksIncluded: any[] = [];
-  let poolStake: { stakers: StakingKeys[] , totalStake: number };
+  // finality understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork
+  const finalityHeight = await getLatestHeight() - k; 
+
+  let stakers: StakingKeys[] = [];
   
   // get the stakes
-  poolStake = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
+  stakers = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
 
+  
   console.log(`The pool total staking balance is ${poolStake.totalStake}`);
   
 

@@ -10,7 +10,6 @@ export type StakingKeys = {
 export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: number ) {
   let stakes = ledger.filter((x) => x.delegate == key);
   let stakers: StakingKeys = [];
-  let totalStakingBalance = 0;
   
   stakes.forEach((stake: any) => {
     let balance = +stake.balance;
@@ -20,9 +19,8 @@ export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: n
       stakingBalance: balance,
       timedWeighting: timedWeighting(stake, globalSlotStart, slotsPerEpoch)
     });
-    totalStakingBalance += balance;
   });
-  return {stakes, totalStakingBalance};
+  return stakers;
 }
 
 // TODO: reimplement timing check
