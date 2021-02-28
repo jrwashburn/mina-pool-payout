@@ -1,5 +1,5 @@
 import { Block, getBlocks, getLatestHeight } from "./queries";
-import { StakingKeys, getStakes, timedWeighting } from "./stakes";
+import { StakingKey, getStakes, timedWeighting } from "./stakes";
 
 export async function getPayouts(stakingPoolKey: string, minHeight: number, globalSlotStart: number, k: number, slotsPerEpoch: number, commissionRate: number) {
 
@@ -52,7 +52,7 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
 
     // TODO: need to handle rounding issues 
 
-    stakers.forEach((staker: any) => {
+    stakers.forEach((staker: StakingKey) => {
       let superchargedContribution =
         (superchargedWeighting - 1) * staker.timedWeighting + 1;
       let effectiveStake = staker.stakingBalance * superchargedContribution;
@@ -64,7 +64,7 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
     //TODO: assert total_staking_balance <= sum_effective_pool_stakes <= 2 * total_staking_balance
 
     // Determine the effective pool weighting based on sum of effective stakes
-    stakers.forEach((staker: any) => {
+    stakers.forEach((staker: StakingKey) => {
       let effectivePoolWeighting =
         effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
 

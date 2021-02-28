@@ -1,18 +1,19 @@
 // TODO: where should we get ledger from - currently expects export from 'coda ledger export staking-epoch-ledger'
 import ledger from "../data/staking-epoch-ledger.json";
 
-export type StakingKeys = { 
+export type StakingKey = { 
   publicKey: string;
   total: number;
   stakingBalance: number;
   untimedAfterSlot: number;
-  }[];
+  timedWeighting: number;
+  };
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // calculate timed weighting 
-export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: number ): [StakingKeys, number] {
+export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: number ): [StakingKey[], number] {
   let stakes = ledger.filter((x) => x.delegate == key);
-  let stakers: StakingKeys = [];
+  let stakers: StakingKey[] = [];
   let totalStakingBalance: number = 0;
   
   stakes.forEach((stake: any) => {
@@ -21,7 +22,8 @@ export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: n
       publicKey: stake.pk,
       total: 0,
       stakingBalance: balance,
-      untimedAfterSlot: timedWeighting(stake)
+      untimedAfterSlot: timedWeighting(stake),
+      timedWeighting: 1 // TODO: POPULATE THIS
     });
     totalStakingBalance += balance;
   });
