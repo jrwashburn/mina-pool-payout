@@ -1,11 +1,7 @@
 import { Block, getBlocks, getLatestHeight } from "./queries";
 import { getStakes, timedWeighting } from "./stakes";
 
-export async function getPayouts(key: string, minHeight: number, stakingEpoch: number, chainId: number, globalSlotStart: number) {
-    // TODO: Get K programatically
-  const k = Number(process.env.K);
-  const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
-  const commissionRate = Number(process.env.COMMISSION_RATE);
+export async function getPayouts(stakingPoolKey: string, minHeight: number, globalSlotStart: number, k: number, slotsPerEpoch: Number, commissionRate: Number) {
 
   // TODO: handle block range stuff (minheight to maxheight)
   const latestBlock = await getLatestHeight();
@@ -29,7 +25,7 @@ export async function getPayouts(key: string, minHeight: number, stakingEpoch: n
   let blocksIncluded: any[] = [];
 
   // get the stakes
-  let stakes = getStakes(key);
+  let stakes = getStakes(stakingPoolKey);
 
   stakes.forEach((stake: any) => {
     const balance = +stake.balance;
