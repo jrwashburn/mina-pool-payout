@@ -39,7 +39,7 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
 
       // What are the rewards for the block
       let totalRewards = block.blockpayoutamount
-      let totalPoolFees = commissionRate * totalRewards;
+      let totalPoolFees = Math.round(commissionRate * totalRewards);
 
       allBlocksTotalRewards += totalRewards;
       allBlocksTotalPoolFees += totalPoolFees;
@@ -95,12 +95,13 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
   console.log(`We won these blocks: ${blocksIncluded}`);
 
   console.log(
-    `We are paying out ${allBlocksTotalRewards} nanomina in this window.`
+    `We are paying out based on total rewards of ${allBlocksTotalRewards} nanomina in this window.`
   );
 
-  console.log(`That is ${allBlocksTotalRewards} mina`);
+  console.log(`That is ${allBlocksTotalRewards / 1000000000} mina`);
 
-  console.log(`Our fee is is ${allBlocksTotalPoolFees} mina`);
+  console.log(`The Pool Fee is is ${allBlocksTotalPoolFees / 1000000000} mina`);
+  console.log(`Total Payout shoudl be ${(allBlocksTotalRewards ) - (allBlocksTotalPoolFees )} nanomina`)
 
   let payoutJson: { publicKey: string; total: number }[] = [];
 
