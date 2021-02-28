@@ -14,7 +14,7 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
   let stakers = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
 
 
-  console.log(`The pool total staking balance is ${poolStake.totalStake}`);
+  //console.log(`The pool total staking balance is ${poolStake.totalStake}`);
   
 
   const blocks = await getBlocks(stakingPoolKey, minHeight, finalityHeight);
@@ -52,7 +52,7 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
 
     // TODO: need to handle rounding issues 
 
-    poolStake.stakers.forEach((staker: any) => {
+    stakers.forEach((staker: any) => {
       let superchargedContribution =
         (superchargedWeighting - 1) * staker.timedWeighting + 1;
       let effectiveStake = staker.stakingBalance * superchargedContribution;
@@ -64,7 +64,7 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
     //TODO: assert total_staking_balance <= sum_effective_pool_stakes <= 2 * total_staking_balance
 
     // Determine the effective pool weighting based on sum of effective stakes
-    poolStake.stakers.forEach((staker: any) => {
+    stakers.forEach((staker: any) => {
       let effectivePoolWeighting =
         effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
 
@@ -111,7 +111,7 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
 
   let payoutJson: { publicKey: string; total: number }[] = [];
 
-  poolStake.stakers.forEach((staker) => {
+  stakers.forEach((staker) => {
     payoutJson.push({
       publicKey: staker.publicKey,
       total: staker.total,
