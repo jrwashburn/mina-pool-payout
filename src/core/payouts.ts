@@ -88,20 +88,11 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
     }
   });
 
-  // ################################################################
-  // # Print some helpful data to the screen
-  // ################################################################
-
   console.log(`We won these blocks: ${blocksIncluded}`);
-
-  console.log(
-    `We are paying out based on total rewards of ${allBlocksTotalRewards} nanomina in this window.`
-  );
-
+  console.log(`We are paying out based on total rewards of ${allBlocksTotalRewards} nanomina in this window.`);
   console.log(`That is ${allBlocksTotalRewards / 1000000000} mina`);
-
   console.log(`The Pool Fee is is ${allBlocksTotalPoolFees / 1000000000} mina`);
-  console.log(`Total Payout shoudl be ${(allBlocksTotalRewards ) - (allBlocksTotalPoolFees )} nanomina`)
+  console.log(`Total Payout should be ${(allBlocksTotalRewards ) - (allBlocksTotalPoolFees )} nanomina`)
 
   let payoutJson: { publicKey: string; total: number }[] = [];
 
@@ -110,7 +101,6 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
       publicKey: staker.publicKey,
       total: staker.total,
     });
-    console.log(`publicKey ${staker.publicKey}, total: ${staker.total}`);
   });
 return payoutJson;
 }
