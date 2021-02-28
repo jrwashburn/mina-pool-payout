@@ -10,9 +10,9 @@ const blockQuery = `
     pkw.value AS winnerPublicKey,
     pk.value AS recevierPublicKey,
     coalesce( bif.coinbase, 0) AS coinbase,
-    coalesce( bif2.snarkfeesToReceiver, 0) AS snarkfeesToReceiver,
-    coalesce( bif.snarkfeesFromCoinbase, 0) AS snarkfeesFromCoinbase,
-    coalesce( bif.coinbase + bif2.snarkfeesToReceiver - bif.snarkfeesFromCoinbase, 0) AS blockPayoutAmount,
+    coalesce( bif2.feeTransferToReceiver, 0) AS feeTransferToReceiver,
+    coalesce( bif.feeTransferFromCoinbase, 0) AS feeTransferFromCoinbase,
+    coalesce( bif.coinbase + bif2.feeTransferToReceiver - bif.feeTransferFromCoinbase, 0) AS blockPayoutAmount,
     coalesce( btf.userCommandTransactionFees, 0) AS userCommandTransactionFees
     FROM blocks b
     INNER JOIN public_keys pkc ON b.creator_id = pkc.id
@@ -22,7 +22,7 @@ const blockQuery = `
         SELECT
             bic.block_id,
             sum( CASE WHEN ic.type = 'coinbase' THEN coalesce( ic.fee, 0) ELSE 0 END ) AS coinbase,
-            sum( CASE WHEN ic.type = 'fee_transfer_via_coinbase' THEN coalesce( ic.fee, 0) ELSE 0 END) AS snarkfeesFromCoinbase,
+            sum( CASE WHEN ic.type = 'fee_transfer_via_coinbase' THEN coalesce( ic.fee, 0) ELSE 0 END) AS feeTransferFromCoinbase,
             max( CASE WHEN ic.type = 'coinbase' THEN ic.receiver_id ELSE NULL END) AS coinbaseReceiverId
         FROM blocks_internal_commands bic 
         INNER JOIN internal_commands ic ON bic.internal_command_id = ic.id
@@ -34,7 +34,7 @@ const blockQuery = `
         ( 
         SELECT
             bic.block_id,
-            sum( CASE WHEN ic.type = 'fee_transfer' THEN coalesce( ic.fee, 0) ELSE 0 END) AS snarkfeesToReceiver,
+            sum( CASE WHEN ic.type = 'fee_transfer' THEN coalesce( ic.fee, 0) ELSE 0 END) AS feeTransferToReceiver,
             ic.receiver_id
         FROM blocks_internal_commands bic
         INNER JOIN internal_commands ic ON bic.internal_command_id = ic.id
@@ -96,8 +96,8 @@ export type Block = {
   winnerpublickey: string;
   receiverpublickey: string;
   coinbase: number;
-  snarkfeestoreceiver: number;
-  snarkfeesfromcoinbase: number;
+  feeTransferToReceiver: number;
+  feeTransferFromCoinbase: number;
   blockpayoutamount: number;
   usercommandtransactionfees: number;
 };
