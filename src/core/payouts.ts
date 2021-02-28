@@ -53,6 +53,7 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
 
       // Determine the effective pool weighting based on sum of effective stakes
       stakers.forEach((staker: StakingKey) => {
+        // TODO: evaluate changing supercharged timedWeighting to simple supercharged weighting if unlocked at this block
         let superchargedContribution = (superchargedWeighting - 1) * staker.timedWeighting + 1;
         let effectiveStake = staker.stakingBalance * superchargedContribution;
         effectivePoolStakes[staker.publicKey] = effectiveStake;
@@ -83,7 +84,6 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
           totalRewards: totalRewards,
           payout: blockTotal,
         };
-        //TODO: Store data 
       });
     }
   });
@@ -104,3 +104,12 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
   });
 return payoutJson;
 }
+
+//TODO: Store data 
+// 1 - write storePayout to payout_details_[ccyymmddhhmmss]_[lastBlockHeight].json
+// 2 - write payoutJson to payout_transactions_[ccyymmddhhmmss]_[lastBlockHeight].json 
+// 3 - write control file to log last block processed. payout_control.json format tbd. append-only {payoutDetails: hash, payoutTransactions: hash, lastBlockProcessed: blockHeight}
+// control file should be based on command line flag 
+// calculate will run the process and generate the files - append DRAFT to filename after [lastBlockHeight]
+// commit will run the process, hash the payoutjson, hash the storePayout file and save those to the control file along with the last block processed 
+

@@ -27,10 +27,10 @@ export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: n
     });
     totalStakingBalance += balance;
   });
+  
   return [stakers, totalStakingBalance];
 }
 
-// TODO: reimplement timing check
 // Changed from original implementation to simply return the slot number at which account beomes untimed
 function calculateUntimedSlot( stake: any): number {
   
