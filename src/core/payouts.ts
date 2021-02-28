@@ -12,10 +12,10 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
 
   let stakers: StakingKeys[] = [];
   
-  // get the stakes
+  // get the stakes - but maybe move these dependencies up to index vs. payouts -> stakes and queries?
   stakers = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
 
-  
+
   console.log(`The pool total staking balance is ${poolStake.totalStake}`);
   
 
