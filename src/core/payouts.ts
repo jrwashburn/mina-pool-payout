@@ -58,7 +58,8 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
         let effectiveStake = staker.stakingBalance * superchargedContribution;
         effectivePoolStakes[staker.publicKey] = effectiveStake;
         sumEffectivePoolStakes += effectiveStake;
-
+      });
+      stakers.forEach((staker: StakingKey) => {
         let effectivePoolWeighting = effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
 
         // This must be less than 1 or we have a major issue
