@@ -1,149 +1,116 @@
 import { Block, getBlocks, getLatestHeight } from "./queries";
-import { getStakes, timedWeighting } from "./stakes";
+import { StakingKey, getStakes } from "./stakes";
 
-export async function getPayouts(key: string, minHeight: number, stakingEpoch: number, chainId: number, globalSlotStart: number) {
-    // TODO: Get K programatically
-  const k = Number(process.env.K);
-  const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
-  const commissionRate = Number(process.env.COMMISSION_RATE);
-
-  // TODO: handle block range stuff (minheight to maxheight)
-  const latestBlock = await getLatestHeight();
-  
-  // TODO: reinstate finality check for max height - temporarily removing k for testing 
-  //const maxHeight = latestBlock - k;
-  const maxHeight = latestBlock ;
-
-  console.log(`This script will payout from blocks ${minHeight} to ${maxHeight}`);
+export async function getPayouts(stakingPoolKey: string, minHeight: number, globalSlotStart: number, k: number, slotsPerEpoch: number, commissionRate: number) {
 
   // Initialize some stuff
-  let totalStakingBalance = 0;
-  let payouts: {
-    publicKey: string;
-    total: number;
-    stakingBalance: number;
-    timedWeighting: number;
-  }[] = [];
   let allBlocksTotalRewards = 0;
-  let allBlocksTotalFees = 0;
+  let allBlocksTotalPoolFees = 0;
   let blocksIncluded: any[] = [];
+  // finality understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork
+  const finalityHeight = await getLatestHeight() - k; 
 
-  // get the stakes
-  let stakes = getStakes(key);
+  // get the stakes - but maybe move these dependencies up to index vs. payouts -> stakes and queries?
+  let [stakers, totalStake] = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
 
-  stakes.forEach((stake: any) => {
-    const balance = +stake.balance;
-    payouts.push({
-      publicKey: stake.pk,
-      total: 0,
-      stakingBalance: balance,
-      timedWeighting: timedWeighting(stake, globalSlotStart, slotsPerEpoch),
-    });
-    totalStakingBalance += balance;
-  });
+  console.log(`The pool total staking balance is ${totalStake}`);
+  
+  const blocks = await getBlocks(stakingPoolKey, minHeight, finalityHeight);
 
-  console.log(`The pool total staking balance is ${totalStakingBalance}`);
-
-  const blocks = await getBlocks(key, minHeight, maxHeight);
-
-  // TODO: extract to 2-3 functions
   blocks.forEach((block: Block) => {
+
     // Keep a log of all blocks we processed
     blocksIncluded.push(block.blockheight);
 
-    let sumEffectivePoolStakes = 0;
-    let effectivePoolStakes: { [key: string]: number } = {};
+    if ( typeof(block.coinbase) === 'undefined' || block.coinbase == 0 ) {
+      // TODO: confirm this is definitely true
+      // no coinbase, don't need to do anything?
+    } else {
 
-    // Determine the supercharged weighting for the block
-    let txFees = block.usercommandtransactionfees || 0;
-    let superchargedWeighting = 1 + 1 / (1 + txFees / block.coinbase);
+      let sumEffectivePoolStakes = 0;
+      let effectivePoolStakes: { [key: string]: number } = {};
 
-    // What are the rewards for the block
-    let totalRewards = block.blockpayoutamount
-    let totalFees = commissionRate * totalRewards;
+      // Determine the supercharged weighting for the block
+      // TODO: Should this be based on net fees, which is:
+      // block.feeTransferToReceiver - block.feeTransferFromCoinbase
+      // instead of txfees.
+      let txFees = block.usercommandtransactionfees || 0;
+      let superchargedWeighting = 1 + (1 / (1 + txFees / block.coinbase));
 
-    allBlocksTotalRewards += totalRewards;
-    allBlocksTotalFees += totalFees;
+      // What are the rewards for the block
+      let totalRewards = block.blockpayoutamount
+      let totalPoolFees = Math.round(commissionRate * totalRewards);
 
-    // #TODO this should match the fee transfer to the coinbase receiver. Add an assert it can't be larger.
-    // #if "feeTransfer" not in b["transactions"]:
-    // #    # Just coinbase so we can't pay out more than the coinbase. We also may have an orphaned block.
-    // #    #assert total_rewards <= int(b["transactions"]["coinbase"])
-    // #else:
-    // #    # There were some fee transfers so let's _really_ make sure we don't pay out more than we received
+      allBlocksTotalRewards += totalRewards;
+      allBlocksTotalPoolFees += totalPoolFees;
 
-    // Loop through our list of delegates to determine the weighting per block
+      // TODO: Add checks & balances
 
-    // TODO: need to handle rounding issues 
+      // Loop through our list of delegates to determine the weighting per block
+      // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
+      // TODO: assert total_staking_balance <= sum_effective_pool_stakes <= 2 * total_staking_balance
+      // TODO: need to handle rounding to elminate franctional nanomina
 
-    payouts.forEach((payout: any) => {
-      let superchargedContribution =
-        (superchargedWeighting - 1) * payout.timedWeighting + 1;
-      let effectiveStake = payout.stakingBalance * superchargedContribution;
-      effectivePoolStakes[payout.publicKey] = effectiveStake;
-      sumEffectivePoolStakes += effectiveStake;
-    });
-
-    // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
-    //TODO: assert total_staking_balance <= sum_effective_pool_stakes <= 2 * total_staking_balance
-
-    // Determine the effective pool weighting based on sum of effective stakes
-    payouts.forEach((payout: any) => {
-      let effectivePoolWeighting =
-        effectivePoolStakes[payout.publicKey] / sumEffectivePoolStakes;
+      // Determine the effective pool weighting based on sum of effective stakes
+      stakers.forEach((staker: StakingKey) => {
+        // TODO: evaluate changing supercharged timedWeighting to simple supercharged weighting if unlocked at this block
+        let superchargedContribution = (superchargedWeighting - 1) * staker.timedWeighting + 1;
+        let effectiveStake = staker.stakingBalance * superchargedContribution;
+        effectivePoolStakes[staker.publicKey] = effectiveStake;
+        sumEffectivePoolStakes += effectiveStake;
+      });
+      stakers.forEach((staker: StakingKey) => {
+        let effectivePoolWeighting = effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
 
         // This must be less than 1 or we have a major issue
-      //TODO: assert effective_pool_weighting <= 1
+        //TODO: assert effective_pool_weighting <= 1
 
-      let blockTotal = Math.round(
-        (totalRewards - totalFees) * effectivePoolWeighting
-      );
-      payout.total += blockTotal;
+        let blockTotal = Math.round(
+          (totalRewards - totalPoolFees) * effectivePoolWeighting
+        );
+        staker.total += blockTotal;
 
-      // Store this data in a structured format for later querying and for the payment script, handled seperately
-      let storePayout = {
-        publicKey: payout.publicKey,
-        blockHeight: block.blockheight,
-        stateHash: block.statehash,
-        effectivePoolWeighting: effectivePoolWeighting,
-        effectivePoolStakes: effectivePoolStakes[payout.publicKey],
-        stakingBalance: payout.stakingBalance,
-        sumEffectivePoolStakes: sumEffectivePoolStakes,
-        superchargedWeighting: superchargedWeighting,
-        dateTime: block.blockdatetime,
-        coinbase: block.coinbase,
-        totalRewards: totalRewards,
-        payout: blockTotal,
-        epoch: stakingEpoch,
-        chainId: chainId
-      };
-      //TODO: Store data 
-    });
+        // Store this data in a structured format for later querying and for the payment script, handled seperately
+        let storePayout = {
+          publicKey: staker.publicKey,
+          blockHeight: block.blockheight,
+          stateHash: block.statehash,
+          effectivePoolWeighting: effectivePoolWeighting,
+          effectivePoolStakes: effectivePoolStakes[staker.publicKey],
+          stakingBalance: staker.stakingBalance,
+          sumEffectivePoolStakes: sumEffectivePoolStakes,
+          superchargedWeighting: superchargedWeighting,
+          dateTime: block.blockdatetime,
+          coinbase: block.coinbase,
+          totalRewards: totalRewards,
+          payout: blockTotal,
+        };
+      });
+    }
   });
 
-  // ################################################################
-  // # Print some helpful data to the screen
-  // ################################################################
-
   console.log(`We won these blocks: ${blocksIncluded}`);
-
-  console.log(
-    `We are paying out ${allBlocksTotalRewards} nanomina in this window.`
-  );
-
-  console.log(`That is ${allBlocksTotalRewards} mina`);
-
-  console.log(`Our fee is is ${allBlocksTotalFees} mina`);
+  console.log(`We are paying out based on total rewards of ${allBlocksTotalRewards} nanomina in this window.`);
+  console.log(`That is ${allBlocksTotalRewards / 1000000000} mina`);
+  console.log(`The Pool Fee is is ${allBlocksTotalPoolFees / 1000000000} mina`);
+  console.log(`Total Payout should be ${(allBlocksTotalRewards ) - (allBlocksTotalPoolFees )} nanomina`)
 
   let payoutJson: { publicKey: string; total: number }[] = [];
 
-  payouts.forEach((payout) => {
+  stakers.forEach((staker: StakingKey) => {
     payoutJson.push({
-      publicKey: payout.publicKey,
-      total: payout.total,
+      publicKey: staker.publicKey,
+      total: staker.total,
     });
   });
-
-  console.log(payoutJson);
-  return payoutJson;
+return payoutJson;
 }
+
+//TODO: Store data 
+// 1 - write storePayout to payout_details_[ccyymmddhhmmss]_[lastBlockHeight].json
+// 2 - write payoutJson to payout_transactions_[ccyymmddhhmmss]_[lastBlockHeight].json 
+// 3 - write control file to log last block processed. payout_control.json format tbd. append-only {payoutDetails: hash, payoutTransactions: hash, lastBlockProcessed: blockHeight}
+// control file should be based on command line flag 
+// calculate will run the process and generate the files - append DRAFT to filename after [lastBlockHeight]
+// commit will run the process, hash the payoutjson, hash the storePayout file and save those to the control file along with the last block processed 
+

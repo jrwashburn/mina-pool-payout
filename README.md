@@ -22,7 +22,7 @@ This script will calculate the required payouts for accounts delegating to a giv
 ### Setting up your environment
 
 1. Copy `sample.env` to `.env` and make the following changes within the `.env`:
-2. Populate `MINA_KEY` with the public key of the account being tracked for payouts.
+2. Populate `POOL_PUBLIC_KEY` with the public key of the account being tracked for payouts.
 3. Populate `DATABASE_URL` with the connection string for your archive node Postgresql instance. This will typically look something like:
 
 ```
@@ -31,12 +31,12 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
 
 4. Set your `COMMISSION_RATE`. This is initially default to the maximum rate of .05
 5. Set `MIN_HEIGHT` to the last known payout block.
-6. Export staking ledger and place in src/data directory. You can export the current staking ledger with: 
+6. Set `MIN_CONFIRMATIONS` to the minimum number of confirmation before you will consider a block. Currently defaulted to k (290 blocks)
+7. Export staking ledger and place in src/data directory. You can export the current staking ledger with: 
 
 ```
 coda ledger export staking-epoch-ledger > staking-epoch-ledger.json
 ```
-
 ### Running the script
 
 1. Run `npm install` to install the project dependencies.
