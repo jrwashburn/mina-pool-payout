@@ -21,7 +21,7 @@ export function getStakes(key: string, globalSlotStart: number, slotsPerEpoch: n
       publicKey: stake.pk,
       total: 0,
       stakingBalance: balance,
-      untimedAfterSlot: calculateUntimedSlot(stake),
+      untimedAfterSlot: calculateUntimedSlot(stake)
     });
     totalStakingBalance += balance;
   });
@@ -43,10 +43,12 @@ function calculateUntimedSlot(stake: any): number {
     let initialMinimumBalance: number = Number(stake.timing.initial_minimum_balance);
 
     if (vestingIncrement = 0) {
-      // TODO: This may be a dangerous assumption; it's repeated below if vestingPeriod = 0
-      // Instead of cliffTime, it may be that the balance is never really unlocked at all and it should not be supercharged
-      // better approach may be to check if cliffAmount = initialMinimumBalance, then it is okay to assume cliffTime, else infinity?
-      return cliffTime;
+      //if vestingIncrement is zero, account may never unlock
+      if (cliffAmount >= initialMinimumBalance) {
+        return cliffTime;
+      } else {
+        return Number.MAX_VALUE;
+      }
     } else {
       return ((((initialMinimumBalance - cliffAmount) / vestingIncrement) * vestingPeriod) + cliffTime);
     }

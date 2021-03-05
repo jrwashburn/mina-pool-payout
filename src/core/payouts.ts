@@ -1,7 +1,7 @@
 import { Block, getBlocks, getLatestHeight } from "./queries";
-import { StakingKey, getStakes } from "./stakes";
+import { StakingKey } from "./stakes";
 
-export async function getPayouts(stakingPoolKey: string, minHeight: number, globalSlotStart: number, k: number, maximumHeight: number, slotsPerEpoch: number, commissionRate: number) {
+export async function getPayouts(stakingPoolKey: string, minHeight: number, k: number, maximumHeight: number, stakers: StakingKey[], totalStake: number, commissionRate: number) {
 
   // Initialize some stuff
   let allBlocksTotalRewards = 0;
@@ -19,12 +19,11 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
     blockRangeMaximum = finalityHeight;
   }
 
-  // get the stakes - but maybe move these dependencies up to index vs. payouts -> stakes and queries?
-  let [stakers, totalStake] = getStakes(stakingPoolKey, globalSlotStart, slotsPerEpoch);
-
   console.log(`The pool total staking balance is ${totalStake}`);
 
   const blocks = await getBlocks(stakingPoolKey, minHeight, blockRangeMaximum);
+
+  // for each block, calculate the effective stake of each staker based on 1) is the staker unlocked yet
 
   blocks.forEach((block: Block) => {
 
@@ -71,9 +70,9 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
         // if staker is unlocked, double their share (less discount for fees)
         // otherwise regular share
         if (block.globalslotsincegenesis > staker.untimedAfterSlot) {
-          effectiveStake = (staker.stakingBalance * (2 - superchargedWeightingDiscount)) / totalStake;
+          effectiveStake = (staker.stakingBalance * (2 - superchargedWeightingDiscount));
         } else {
-          effectiveStake = staker.stakingBalance / totalStake;
+          effectiveStake = staker.stakingBalance;
         }
 
         effectivePoolStakes[staker.publicKey] = effectiveStake;
@@ -97,6 +96,8 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
         let storePayout = {
           publicKey: staker.publicKey,
           blockHeight: block.blockheight,
+          globalSlot: block.globalslotsincegenesis,
+          publicKeyUntimedAfter: staker.untimedAfterSlot,
           stateHash: block.statehash,
           effectivePoolWeighting: effectivePoolWeighting,
           effectivePoolStakes: effectivePoolStakes[staker.publicKey],
@@ -118,7 +119,6 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
   console.log(`That is ${allBlocksTotalRewards / 1000000000} mina`);
   console.log(`The Pool Fee is is ${allBlocksTotalPoolFees / 1000000000} mina`);
   console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina`)
-
 
   let payoutJson: { publicKey: string; total: number }[] = [];
 
