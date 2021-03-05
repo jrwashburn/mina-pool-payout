@@ -11,7 +11,7 @@ async function main() {
   // TODO: Fail if any required values missing from .env
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const globalSlotStart = Number(process.env.GLOBAL_SLOT_START);
-  const minHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
+  const minimumHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
   const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS);
   // MAX_HEIGHT is optional - if not provided, set to max
   let configuredMaximum = 0;
@@ -25,7 +25,7 @@ async function main() {
 
   let maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations);
 
-  console.log(`This script will payout from block ${minHeight} to maximum height ${maximumHeight}`);
+  console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
   // get the stakes from staking ledger json
   // TODO: move path to staking ledger files to env
@@ -33,9 +33,9 @@ async function main() {
   console.log(`The pool total staking balance is ${totalStake}`);
 
   // get the blocks from archive db
-  const blocks = await getBlocks(stakingPoolPublicKey, minHeight, maximumHeight);
+  const blocks = await getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);
 
-  let [payouts, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(blocks, stakers, totalStake, commissionRate);
+  let [payouts, storePayout, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(blocks, stakers, totalStake, commissionRate);
 
   // Checking total results
   console.log(`We won these blocks: ${blocksIncluded}`);
@@ -45,21 +45,19 @@ async function main() {
   console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina or ${((allBlocksTotalRewards) - (allBlocksTotalPoolFees)) / 1000000000} mina`)
   console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
 
+  let runDateTime = new Date();
+  let payoutTransactionsFileName = `payout_transactions_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
 
-
-  //TODO: Store data
-  // 1 - write storePayout to payout_details_[ccyymmddhhmmss]_[lastBlockHeight].json
-  // 2 - write payoutJson to payout_transactions_[ccyymmddhhmmss]_[lastBlockHeight].json
-  // 3 - write control file to log last block processed. payout_control.json format tbd. append-only {payoutDetails: hash, payoutTransactions: hash, lastBlockProcessed: blockHeight}
-  // control file should be based on command line flag
-  // calculate will run the process and generate the files - append DRAFT to filename after [lastBlockHeight]
-  // commit will run the process, hash the payoutjson, hash the storePayout file and save those to the control file along with the last block processed
-
-  fs.writeFile("payouts.json", JSON.stringify(payouts), function (err: any) {
+  fs.writeFile(payoutTransactionsFileName, JSON.stringify(payouts), function (err: any) {
     if (err) throw err;
-    console.log('wrote payouts to payouts.json');
-  }
-  );
+    console.log(`wrote payouts transactions to ${payoutTransactionsFileName}`);
+  });
+
+  let payoutDetailsFileName = `payout_details_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
+  fs.writeFile(payoutDetailsFileName, JSON.stringify(storePayout), function (err: any) {
+    if (err) throw err;
+    console.log(`wrote payout details to ${payoutDetailsFileName}`);
+  });
 }
 
 async function determineLastBlockHeightToProcess(maximumHeight: number, minimumConfirmations: number): Promise<number> {
@@ -75,4 +73,10 @@ async function determineLastBlockHeightToProcess(maximumHeight: number, minimumC
   }
   return maximum;
 }
+
+function longDateString(d: Date) {
+  return d.getFullYear() + String(d.getMonth()).padStart(2, '0') + String(d.getDay()).padStart(2, '0') + '_' +
+    String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + String(d.getSeconds()).padStart(2, '0');
+};
+
 main();

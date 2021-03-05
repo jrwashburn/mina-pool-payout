@@ -2,13 +2,13 @@ import { Block } from "./queries";
 import { StakingKey } from "./stakes";
 
 export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number):
-  Promise<[payoutJson: any[], blocksIncluded: any[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
+  Promise<[payoutJson: any[], storePayout: any[], blocksIncluded: any[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
 
   // Initialize some stuff
   let allBlocksTotalRewards = 0;
   let allBlocksTotalPoolFees = 0;
   let blocksIncluded: any[] = [];
-
+  let storePayout: PayoutDetails[] = [];
 
   // for each block, calculate the effective stake of each staker based on 1) is the staker unlocked yet
   blocks.forEach((block: Block) => {
@@ -79,7 +79,7 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
         staker.total += blockTotal;
 
         // Store this data in a structured format for later querying and for the payment script, handled seperately
-        let storePayout = {
+        storePayout.push({
           publicKey: staker.publicKey,
           blockHeight: block.blockheight,
           globalSlot: block.globalslotsincegenesis,
@@ -94,7 +94,7 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
           coinbase: block.coinbase,
           totalRewards: totalRewards,
           payout: blockTotal,
-        };
+        });
       });
     }
   });
@@ -108,5 +108,22 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
     });
     totalPayout += staker.total;
   });
-  return [payoutJson, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout];
+  return [payoutJson, storePayout, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout];
 }
+
+export type PayoutDetails = {
+  publicKey: string,
+  blockHeight: number,
+  globalSlot: number,
+  publicKeyUntimedAfter: number,
+  stateHash: string,
+  effectivePoolWeighting: number,
+  effectivePoolStakes: number,
+  stakingBalance: number,
+  sumEffectivePoolStakes: number,
+  superchargedWeightingDiscount: number,
+  dateTime: number,
+  coinbase: number,
+  totalRewards: number,
+  payout: number
+};
