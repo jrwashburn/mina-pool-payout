@@ -2,10 +2,10 @@
 import ledger from "../data/staking-epoch-ledger.json";
 
 export type StakingKey = {
-  publicKey: string;
-  total: number;
-  stakingBalance: number;
-  untimedAfterSlot: number;
+  publicKey: string,
+  total: number,
+  stakingBalance: number,
+  untimedAfterSlot: number
 };
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
@@ -42,12 +42,12 @@ function calculateUntimedSlot(stake: any): number {
     let cliffAmount: number = Number(stake.timing.cliff_amount);
     let initialMinimumBalance: number = Number(stake.timing.initial_minimum_balance);
 
-    if (vestingIncrement = 0) {
+    if (vestingIncrement == 0) {
       //if vestingIncrement is zero, account may never unlock
-      if (cliffAmount >= initialMinimumBalance) {
+      if (cliffAmount == initialMinimumBalance) {
         return cliffTime;
       } else {
-        return Number.MAX_VALUE;
+        throw new Error('Timed Account with no increment - unsure how to handle');
       }
     } else {
       return ((((initialMinimumBalance - cliffAmount) / vestingIncrement) * vestingPeriod) + cliffTime);

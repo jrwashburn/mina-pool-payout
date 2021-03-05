@@ -10,15 +10,14 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
   let blocksIncluded: any[] = [];
   let storePayout: PayoutDetails[] = [];
 
-  // for each block, calculate the effective stake of each staker based on 1) is the staker unlocked yet
+  // for each block, calculate the effective stake of each staker
   blocks.forEach((block: Block) => {
 
     // Keep a log of all blocks we processed
     blocksIncluded.push(block.blockheight);
 
     if (typeof (block.coinbase) === 'undefined' || block.coinbase == 0) {
-      // TODO: confirm this is definitely true
-      // no coinbase, don't need to do anything?
+      // no coinbase, don't need to do anything
     } else {
 
       let sumEffectivePoolStakes = 0;
@@ -28,13 +27,9 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       // TODO: Should this be based on net fees, which is:
       // block.feeTransferToReceiver - block.feeTransferFromCoinbase
       // instead of txfees.
-      //
-      //original py supercharged_weighting = 1 + ( 1 / (1 + int(b["txFees"]) / int(b["transactions"]["coinbase"])))
 
       let txFees = block.usercommandtransactionfees || 0;
       let superchargedWeightingDiscount = txFees / block.coinbase;
-
-      //console.log(`superchargedWeighting: ${superchargedWeighting} = 1 + ( 1 / ( 1 + ${txFees} / ${block.coinbase} ) )`);
 
       // What are the rewards for the block
       let totalRewards = block.blockpayoutamount
@@ -45,12 +40,8 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
 
       // TODO: Add checks & balances
 
-      // Loop through our list of delegates to determine the weighting per block
-      // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
-      // TODO: assert total_staking_balance <= sum_effective_pool_stakes <= 2 * total_staking_balance
-      // TODO: need to handle rounding to elminate franctional nanomina
-
       // Determine the effective pool weighting based on sum of effective stakes
+      // TODO: need to handle rounding to elminate franctional nanomina
       stakers.forEach((staker: StakingKey) => {
         let effectiveStake = 0;
         // if staker is unlocked, double their share (less discount for fees)
@@ -60,12 +51,20 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
         } else {
           effectiveStake = staker.stakingBalance;
         }
-
         effectivePoolStakes[staker.publicKey] = effectiveStake;
         sumEffectivePoolStakes += effectiveStake;
 
-        //console.log(`block: ${block.blockheight} key: ${staker.publicKey} stakingBalance: ${staker.stakingBalance} untimed: ${staker.untimedAfterSlot - block.globalslotsincegenesis} effectiveStake: ${effectiveStake} superchargedweightingDiscount: ${superchargedWeightingDiscount}`);
+        console.log(`block: ${block.blockheight} key: ${staker.publicKey} stakingBalance: ${staker.stakingBalance} untimed: ${staker.untimedAfterSlot - block.globalslotsincegenesis} effectiveStake: ${effectiveStake} superchargedweightingDiscount: ${superchargedWeightingDiscount}`);
       });
+
+      // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
+      // TODO: assert total_staking_balance <= sum_effective_pool_stakes <= 2 * total_staking_balance
+      if (sumEffectivePoolStakes > totalStake * 2) {
+        throw new Error('Staking Calculation is more than 2x total stake')
+      }
+      if (sumEffectivePoolStakes < totalStake) {
+        throw new Error('Staking Calculation is less than total stake')
+      }
 
       stakers.forEach((staker: StakingKey) => {
         let effectivePoolWeighting = effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
