@@ -1,30 +1,16 @@
-import { Block, getBlocks, getLatestHeight } from "./queries";
+import { Block } from "./queries";
 import { StakingKey } from "./stakes";
 
-export async function getPayouts(stakingPoolKey: string, minHeight: number, k: number, maximumHeight: number, stakers: StakingKey[], totalStake: number, commissionRate: number) {
+export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number):
+  Promise<[payoutJson: any[], blocksIncluded: any[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
 
   // Initialize some stuff
   let allBlocksTotalRewards = 0;
   let allBlocksTotalPoolFees = 0;
   let blocksIncluded: any[] = [];
 
-  // Finality is understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork
-  // Alternatively, stop processing at maximum height if lower than finality
-  // TODO: where does this really belong?
-  let blockRangeMaximum = 0
-  const finalityHeight = await getLatestHeight() - k;
-  if (finalityHeight > maximumHeight) {
-    blockRangeMaximum = maximumHeight;
-  } else {
-    blockRangeMaximum = finalityHeight;
-  }
-
-  console.log(`The pool total staking balance is ${totalStake}`);
-
-  const blocks = await getBlocks(stakingPoolKey, minHeight, blockRangeMaximum);
 
   // for each block, calculate the effective stake of each staker based on 1) is the staker unlocked yet
-
   blocks.forEach((block: Block) => {
 
     // Keep a log of all blocks we processed
@@ -109,32 +95,18 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, k: n
           totalRewards: totalRewards,
           payout: blockTotal,
         };
-        //console.log(storePayout);
       });
     }
   });
 
-  console.log(`We won these blocks: ${blocksIncluded}`);
-  console.log(`We are paying out based on total rewards of ${allBlocksTotalRewards} nanomina in this window.`);
-  console.log(`That is ${allBlocksTotalRewards / 1000000000} mina`);
-  console.log(`The Pool Fee is is ${allBlocksTotalPoolFees / 1000000000} mina`);
-  console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina`)
-
   let payoutJson: { publicKey: string; total: number }[] = [];
-
+  let totalPayout = 0;
   stakers.forEach((staker: StakingKey) => {
     payoutJson.push({
       publicKey: staker.publicKey,
       total: staker.total,
     });
+    totalPayout += staker.total;
   });
-  return payoutJson;
+  return [payoutJson, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout];
 }
-
-//TODO: Store data
-// 1 - write storePayout to payout_details_[ccyymmddhhmmss]_[lastBlockHeight].json
-// 2 - write payoutJson to payout_transactions_[ccyymmddhhmmss]_[lastBlockHeight].json
-// 3 - write control file to log last block processed. payout_control.json format tbd. append-only {payoutDetails: hash, payoutTransactions: hash, lastBlockProcessed: blockHeight}
-// control file should be based on command line flag
-// calculate will run the process and generate the files - append DRAFT to filename after [lastBlockHeight]
-// commit will run the process, hash the payoutjson, hash the storePayout file and save those to the control file along with the last block processed
