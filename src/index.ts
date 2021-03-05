@@ -9,13 +9,17 @@ async function main() {
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const globalSlotStart = Number(process.env.GLOBAL_SLOT_START);
   const minHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
-  // TODO: Get K programatically? Required dependency on a running node
   const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS);
+  // MAX_HEIGHT is optional - if not provided, set to max
+  let maximumHeight = Number(process.env.MAX_HEIGHT)
+  if (typeof (maximumHeight) === 'undefined' || maximumHeight == 0) {
+    maximumHeight = Number.MAX_VALUE;
+  }
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
   const commissionRate = Number(process.env.COMMISSION_RATE);
 
   console.log(`This script will payout from block ${minHeight} to the current max height minus required confirmations of: ${minimumConfirmations}`);
-  const payouts = await getPayouts(stakingPoolPublicKey, minHeight, globalSlotStart, minimumConfirmations, slotsPerEpoch, commissionRate);
+  const payouts = await getPayouts(stakingPoolPublicKey, minHeight, globalSlotStart, minimumConfirmations, maximumHeight, slotsPerEpoch, commissionRate);
   console.log(payouts);
 }
 
