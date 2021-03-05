@@ -79,7 +79,7 @@ export async function getPayouts(stakingPoolKey: string, minHeight: number, glob
         effectivePoolStakes[staker.publicKey] = effectiveStake;
         sumEffectivePoolStakes += effectiveStake;
 
-        console.log(`block: ${block.blockheight} key: ${staker.publicKey} stakingBalance: ${staker.stakingBalance} untimed: ${staker.untimedAfterSlot - block.globalslotsincegenesis} effectiveStake: ${effectiveStake} superchargedweightingDiscount: ${superchargedWeightingDiscount}`);
+        //console.log(`block: ${block.blockheight} key: ${staker.publicKey} stakingBalance: ${staker.stakingBalance} untimed: ${staker.untimedAfterSlot - block.globalslotsincegenesis} effectiveStake: ${effectiveStake} superchargedweightingDiscount: ${superchargedWeightingDiscount}`);
       });
 
       stakers.forEach((staker: StakingKey) => {
