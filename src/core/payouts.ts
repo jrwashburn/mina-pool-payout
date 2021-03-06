@@ -53,8 +53,6 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
         }
         effectivePoolStakes[staker.publicKey] = effectiveStake;
         sumEffectivePoolStakes += effectiveStake;
-
-        console.log(`block: ${block.blockheight} key: ${staker.publicKey} stakingBalance: ${staker.stakingBalance} untimed: ${staker.untimedAfterSlot - block.globalslotsincegenesis} effectiveStake: ${effectiveStake} superchargedweightingDiscount: ${superchargedWeightingDiscount}`);
       });
 
       // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
