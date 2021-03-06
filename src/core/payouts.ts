@@ -1,8 +1,8 @@
 import { Block } from "./queries";
 import { StakingKey } from "./stakes";
 
-export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number):
-  Promise<[payoutJson: any[], storePayout: any[], blocksIncluded: any[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
+export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number, transactionFee: number):
+  Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], payoutFileString: string, blocksIncluded: any[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
 
   // Initialize some stuff
   let allBlocksTotalRewards = 0;
@@ -96,16 +96,25 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
     }
   });
 
-  let payoutJson: { publicKey: string; total: number }[] = [];
+  let payoutJson: PayoutTransaction[] = [];
   let totalPayout = 0;
+  let payoutFileString: string = "(";
   stakers.forEach((staker: StakingKey) => {
     payoutJson.push({
       publicKey: staker.publicKey,
-      total: staker.total,
+      amount: staker.total,
+      fee: transactionFee
     });
+    payoutFileString += "(";
+    payoutFileString += `(receiver ${staker.publicKey})`;
+    payoutFileString += `(amount ${staker.total})`;
+    payoutFileString += `(fee ${transactionFee})`;
+    payoutFileString += ")";
     totalPayout += staker.total;
   });
-  return [payoutJson, storePayout, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout];
+  payoutFileString += ")";
+
+  return [payoutJson, storePayout, payoutFileString, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout];
 }
 
 export type PayoutDetails = {
@@ -123,4 +132,10 @@ export type PayoutDetails = {
   coinbase: number,
   totalRewards: number,
   payout: number
+};
+
+export type PayoutTransaction = {
+  publicKey: string,
+  amount: number,
+  fee: number
 };
