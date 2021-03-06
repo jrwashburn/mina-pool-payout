@@ -1,19 +1,26 @@
-var fs = require('fs');
 import { getPayouts } from "./core/payouts";
 import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
+// TODO: move path to staking ledger files to env
+// where should we get ledger from - currently expects export from 'coda ledger export staking-epoch-ledger'
+import ledger from "./data/staking-epoch-ledger.json";
+import { SignTransactionsToSend } from "./sendPayout";
 
-// TODO: Error handling
-// TODO: Add parameter to run read-only vs. write which would persist max height processed so it is not re-processed in future
-// TODO: Fail if any required values missing from .env
-const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
-const globalSlotStart = Number(process.env.GLOBAL_SLOT_START) || 0;
-const minimumHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
-const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 0;
-const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
-const commissionRate = Number(process.env.COMMISSION_RATE);
+// TODO: create mina currency types
 
 async function main() {
+  // TODO: Error handling
+  // TODO: Add parameter to run read-only vs. write which would persist max height processed so it is not re-processed in future
+  // TODO: Fail if any required values missing from .env
+  const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
+  const globalSlotStart = Number(process.env.GLOBAL_SLOT_START) || 0;
+  const minimumHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
+  const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 0;
+  const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
+  const commissionRate = Number(process.env.COMMISSION_RATE);
+  const transactionFee = Number(process.env.SEND_TRANSACTION_FEE) || 0;
+
+  var fs = require('fs');
   // MAX_HEIGHT is optional - if not provided, set to max
   let configuredMaximum = 0;
   if (typeof (process.env.MAX_HEIGHT) === 'undefined') {
@@ -28,15 +35,14 @@ async function main() {
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
   // get the stakes from staking ledger json
-  // TODO: move path to staking ledger files to env
-  let [stakers, totalStake] = getStakes(stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
+  let [stakers, totalStake] = getStakes(ledger, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
   console.log(`The pool total staking balance is ${totalStake}`);
 
   // get the blocks from archive db
   const blocks = await getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);
 
   // run the payout calculation for those blocks
-  let [payouts, storePayout, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(blocks, stakers, totalStake, commissionRate);
+  let [payouts, storePayout, payoutFileString, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(blocks, stakers, totalStake, commissionRate, transactionFee);
 
   // Output total results and transaction files for input to next process, details file for audit log
   console.log(`We won these blocks: ${blocksIncluded}`);
@@ -58,6 +64,12 @@ async function main() {
   fs.writeFile(payoutDetailsFileName, JSON.stringify(storePayout), function (err: any) {
     if (err) throw err;
     console.log(`wrote payout details to ${payoutDetailsFileName}`);
+  });
+
+  let payoutBatchFileName = `payout_batch_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.txt`
+  fs.writeFile(payoutBatchFileName, payoutFileString, function (err: any) {
+    if (err) throw err;
+    console.log(`wrote payout details to ${payoutBatchFileName}`);
   });
 }
 
