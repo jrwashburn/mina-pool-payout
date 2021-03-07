@@ -60,20 +60,20 @@ async function main() {
   console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
 
   let runDateTime = new Date();
-  let payoutTransactionsFileName = `payout_transactions_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
+  let payoutTransactionsFileName = `./src/data/payout_transactions_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
 
   fs.writeFile(payoutTransactionsFileName, JSON.stringify(payouts), function (err: any) {
     if (err) throw err;
     console.log(`wrote payouts transactions to ${payoutTransactionsFileName}`);
   });
 
-  let payoutDetailsFileName = `payout_details_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
+  let payoutDetailsFileName = `./src/data/payout_details_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
   fs.writeFile(payoutDetailsFileName, JSON.stringify(storePayout), function (err: any) {
     if (err) throw err;
     console.log(`wrote payout details to ${payoutDetailsFileName}`);
   });
 
-  let payoutBatchFileName = `payout_batch_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.txt`
+  let payoutBatchFileName = `./src/data/payout_batch_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.txt`
   fs.writeFile(payoutBatchFileName, payoutFileString, function (err: any) {
     if (err) throw err;
     console.log(`wrote payout details to ${payoutBatchFileName}`);
