@@ -7,6 +7,7 @@ import ledger from "./data/staking-epoch-ledger.json";
 import CodaSDK, { keypair } from "@o1labs/client-sdk";
 import { signTransactionsToSend } from "./core/sign";
 import { stringify } from "node:querystring";
+import fs from "fs";
 
 // TODO: create mina currency types
 
@@ -26,8 +27,6 @@ async function main() {
     publicKey: process.env.PUBLIC_KEY || ""
   };
 
-
-  var fs = require('fs');
   // MAX_HEIGHT is optional - if not provided, set to max
   let configuredMaximum = 0;
   if (typeof (process.env.MAX_HEIGHT) === 'undefined') {
