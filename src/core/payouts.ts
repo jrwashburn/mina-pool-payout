@@ -2,12 +2,12 @@ import { Block } from "./queries";
 import { StakingKey } from "./stakes";
 
 export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number, transactionFee: number):
-  Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], payoutFileString: string, blocksIncluded: any[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
+  Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], payoutFileString: string, blocksIncluded: number[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
 
   // Initialize some stuff
   let allBlocksTotalRewards = 0;
   let allBlocksTotalPoolFees = 0;
-  let blocksIncluded: any[] = [];
+  let blocksIncluded: number[] = [];
   let storePayout: PayoutDetails[] = [];
 
   // for each block, calculate the effective stake of each staker
@@ -28,12 +28,12 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       // block.feeTransferToReceiver - block.feeTransferFromCoinbase
       // instead of txfees.
 
-      let txFees = block.usercommandtransactionfees || 0;
-      let superchargedWeightingDiscount = txFees / block.coinbase;
+      const txFees = block.usercommandtransactionfees || 0;
+      const superchargedWeightingDiscount = txFees / block.coinbase;
 
       // What are the rewards for the block
-      let totalRewards = block.blockpayoutamount
-      let totalPoolFees = commissionRate * totalRewards;
+      const totalRewards = block.blockpayoutamount
+      const totalPoolFees = commissionRate * totalRewards;
 
       allBlocksTotalRewards += totalRewards;
       allBlocksTotalPoolFees += totalPoolFees;
@@ -65,12 +65,12 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       }
 
       stakers.forEach((staker: StakingKey) => {
-        let effectivePoolWeighting = effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
+        const effectivePoolWeighting = effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
 
         // This must be less than 1 or we have a major issue
         // TODO: assert effective_pool_weighting <= 1
         // TODO: use 9 digits precision
-        let blockTotal = Math.round(
+        const blockTotal = Math.round(
           (totalRewards - totalPoolFees) * effectivePoolWeighting
         );
         staker.total += blockTotal;

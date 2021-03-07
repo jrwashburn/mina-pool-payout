@@ -36,19 +36,19 @@ async function main() {
   }
 
   // get current maximum block height from database and determine what max block height for this run will be
-  let maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations);
+  const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations);
 
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
   // get the stakes from staking ledger json
-  let [stakers, totalStake] = getStakes(ledger, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
+  const [stakers, totalStake] = getStakes(ledger, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
   console.log(`The pool total staking balance is ${totalStake}`);
 
   // get the blocks from archive db
   const blocks = await getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);
 
   // run the payout calculation for those blocks
-  let [payouts, storePayout, payoutFileString, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(blocks, stakers, totalStake, commissionRate, transactionFee);
+  const [payouts, storePayout, payoutFileString, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(blocks, stakers, totalStake, commissionRate, transactionFee);
 
   // Output total results and transaction files for input to next process, details file for audit log
   console.log(`We won these blocks: ${blocksIncluded}`);
@@ -58,21 +58,21 @@ async function main() {
   console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina or ${((allBlocksTotalRewards) - (allBlocksTotalPoolFees)) / 1000000000} mina`)
   console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
 
-  let runDateTime = new Date();
-  let payoutTransactionsFileName = `./src/data/payout_transactions_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
+  const runDateTime = new Date();
+  const payoutTransactionsFileName = generateOutputFileName("payout_transactions", runDateTime, minimumHeight, maximumHeight);
 
   fs.writeFile(payoutTransactionsFileName, JSON.stringify(payouts), function (err: any) {
     if (err) throw err;
     console.log(`wrote payouts transactions to ${payoutTransactionsFileName}`);
   });
 
-  let payoutDetailsFileName = `./src/data/payout_details_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
+  const payoutDetailsFileName = generateOutputFileName("payout_details", runDateTime, minimumHeight, maximumHeight);
   fs.writeFile(payoutDetailsFileName, JSON.stringify(storePayout), function (err: any) {
     if (err) throw err;
     console.log(`wrote payout details to ${payoutDetailsFileName}`);
   });
 
-  let payoutBatchFileName = `./src/data/payout_batch_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.txt`
+  const payoutBatchFileName = generateOutputFileName("payout_batch", runDateTime, minimumHeight, maximumHeight);
   fs.writeFile(payoutBatchFileName, payoutFileString, function (err: any) {
     if (err) throw err;
     console.log(`wrote payout details to ${payoutBatchFileName}`);
@@ -95,9 +95,12 @@ async function determineLastBlockHeightToProcess(maximumHeight: number, minimumC
   return maximum;
 }
 
+function generateOutputFileName(identifier: string, runDateTime: Date, minimumHeight: number, maximumHeight: number) {
+  return `./src/data/${identifier}_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`;
+}
+
 function longDateString(d: Date) {
-  return d.getFullYear() + String(d.getMonth()).padStart(2, '0') + String(d.getDay()).padStart(2, '0') + '_' +
-    String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + String(d.getSeconds()).padStart(2, '0');
+  return d.toISOString().replace(/\D/g,'')
 };
 
 main();

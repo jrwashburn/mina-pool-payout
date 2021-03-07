@@ -8,12 +8,12 @@ export type StakingKey = {
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // calculate timed weighting
 export function getStakes(ledger: any[], key: string, globalSlotStart: number, slotsPerEpoch: number): [StakingKey[], number] {
-  let stakes = ledger.filter((x) => x.delegate == key);
+  const stakes = ledger.filter((x) => x.delegate == key);
   let stakers: StakingKey[] = [];
   let totalStakingBalance: number = 0;
 
   stakes.forEach((stake: any) => {
-    let balance = Number(stake.balance);
+    const balance = Number(stake.balance);
     stakers.push({
       publicKey: stake.pk,
       total: 0,
@@ -33,11 +33,11 @@ function calculateUntimedSlot(stake: any): number {
     // Untimed for full epoch so we have the maximum weighting of 1
     return 0;
   } else {
-    let vestingPeriod: number = Number(stake.timing.vesting_period);
-    let vestingIncrement: number = Number(stake.timing.vesting_increment);
-    let cliffTime: number = Number(stake.timing.cliff_time);
-    let cliffAmount: number = Number(stake.timing.cliff_amount);
-    let initialMinimumBalance: number = Number(stake.timing.initial_minimum_balance);
+    const vestingPeriod: number = Number(stake.timing.vesting_period);
+    const vestingIncrement: number = Number(stake.timing.vesting_increment);
+    const cliffTime: number = Number(stake.timing.cliff_time);
+    const cliffAmount: number = Number(stake.timing.cliff_amount);
+    const initialMinimumBalance: number = Number(stake.timing.initial_minimum_balance);
 
     if (vestingIncrement == 0) {
       //if vestingIncrement is zero, account may never unlock

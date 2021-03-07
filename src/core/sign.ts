@@ -7,10 +7,10 @@ export async function signTransactionsToSend(payoutsToSign: PayoutTransaction[],
     let nonce = Number(process.env.STARTING_NONCE) || 0;
 
     payoutsToSign.forEach((payout: PayoutTransaction) => {
-        let paymentTransaction: payment = { to: payout.publicKey, from: payorPublicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
+        const paymentTransaction: payment = { to: payout.publicKey, from: payorPublicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
         try {
-            let signedPayment = signPayment(paymentTransaction, keys);
-            let data = JSON.stringify(signedPayment);
+            const signedPayment = signPayment(paymentTransaction, keys);
+            const data = JSON.stringify(signedPayment);
             // Writes them to a file by nonce for broadcasting
             fs.writeFileSync("./src/data/" + nonce + ".json", data);
             nonce++;
