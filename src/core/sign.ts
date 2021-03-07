@@ -2,9 +2,9 @@ import CodaSDK, { signPayment, keypair, payment } from "@o1labs/client-sdk";
 import { PayoutTransaction } from "./payouts";
 import fs from "fs";
 
-export async function signTransactionsToSend(payoutsToSign: PayoutTransaction[], keys: keypair, payorPublicKey: string, nonce: number) {
+export async function signTransactionsToSend(payoutsToSign: PayoutTransaction[], keys: keypair, nonce: number) {
     payoutsToSign.forEach((payout: PayoutTransaction) => {
-        const paymentTransaction: payment = { to: payout.publicKey, from: payorPublicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
+        const paymentTransaction: payment = { to: payout.publicKey, from: keys.publicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
         try {
             const signedPayment = signPayment(paymentTransaction, keys);
             const data = JSON.stringify(signedPayment);

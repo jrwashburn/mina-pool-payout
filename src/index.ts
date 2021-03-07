@@ -22,7 +22,6 @@ async function main() {
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
   const commissionRate = Number(process.env.COMMISSION_RATE);
   const transactionFee = Number(process.env.SEND_TRANSACTION_FEE) || 0;
-  const payorPublicKey: string = process.env.PAYOR_PUBLIC_KEY || "";
   const nonce = Number(process.env.STARTING_NONCE) || 0;
   const senderKeys: keypair = {
     privateKey: process.env.PRIVATE_KEY || "",
@@ -80,7 +79,7 @@ async function main() {
     console.log(`wrote payout details to ${payoutBatchFileName}`);
   });
 
-  signTransactionsToSend(payouts, senderKeys, payorPublicKey, nonce);
+  signTransactionsToSend(payouts, senderKeys, nonce);
 }
 
 async function determineLastBlockHeightToProcess(maximumHeight: number, minimumConfirmations: number): Promise<number> {
