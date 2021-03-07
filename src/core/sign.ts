@@ -2,10 +2,7 @@ import CodaSDK, { signPayment, keypair, payment } from "@o1labs/client-sdk";
 import { PayoutTransaction } from "./payouts";
 import fs from "fs";
 
-export async function signTransactionsToSend(payoutsToSign: PayoutTransaction[], keys: keypair) {
-    const payorPublicKey: string = process.env.PAYOR_PUBLIC_KEY || "";
-    let nonce = Number(process.env.STARTING_NONCE) || 0;
-
+export async function signTransactionsToSend(payoutsToSign: PayoutTransaction[], keys: keypair, payorPublicKey: string, nonce: number) {
     payoutsToSign.forEach((payout: PayoutTransaction) => {
         const paymentTransaction: payment = { to: payout.publicKey, from: payorPublicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
         try {
