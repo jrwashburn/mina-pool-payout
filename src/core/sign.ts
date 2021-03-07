@@ -12,7 +12,7 @@ export async function signTransactionsToSend(payoutsToSign: PayoutTransaction[],
             let signedPayment = signPayment(paymentTransaction, keys);
             let data = JSON.stringify(signedPayment);
             // Writes them to a file by nonce for broadcasting
-            fs.writeFileSync("./data/toSend/" + nonce + ".json", data);
+            fs.writeFileSync("./src/data/" + nonce + ".json", data);
             nonce++;
         }
         catch (Error) { console.log(Error); }
