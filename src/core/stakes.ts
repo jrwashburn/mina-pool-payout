@@ -8,23 +8,23 @@ export type StakingKey = {
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // calculate timed weighting
 export function getStakes(ledger: any[], key: string, globalSlotStart: number, slotsPerEpoch: number): [StakingKey[], number] {
-  const stakes = ledger.filter((x) => x.delegate == key);
-  let stakers: StakingKey[] = [];
   let totalStakingBalance: number = 0;
 
-  stakes.forEach((stake: any) => {
-    const balance = Number(stake.balance);
-    stakers.push({
-      publicKey: stake.pk,
-      total: 0,
-      stakingBalance: balance,
-      untimedAfterSlot: calculateUntimedSlot(stake)
+  const stakers: StakingKey[] = ledger
+    .filter((x) => x.delegate == key)
+    .map((stake) => {
+      const balance = Number(stake.balance);
+      totalStakingBalance += balance;
+      return {
+        publicKey: stake.pk,
+        total: 0,
+        stakingBalance: balance,
+        untimedAfterSlot: calculateUntimedSlot(stake)
+      };
     });
-    totalStakingBalance += balance;
-  });
   return [stakers, totalStakingBalance];
 }
-
+  
 // Changed from original implementation to simply return the slot number at which account beomes untimed
 function calculateUntimedSlot(stake: any): number {
 
