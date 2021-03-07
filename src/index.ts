@@ -4,7 +4,10 @@ import { getBlocks, getLatestHeight } from "./core/queries";
 // TODO: move path to staking ledger files to env
 // where should we get ledger from - currently expects export from 'coda ledger export staking-epoch-ledger'
 import ledger from "./data/staking-epoch-ledger.json";
-import { SignTransactionsToSend } from "./sendPayout";
+import CodaSDK, { keypair } from "@o1labs/client-sdk";
+import { signTransactionsToSend } from "./core/sign";
+import { stringify } from "node:querystring";
+import fs from "fs";
 
 // TODO: create mina currency types
 
@@ -19,8 +22,11 @@ async function main() {
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
   const commissionRate = Number(process.env.COMMISSION_RATE);
   const transactionFee = Number(process.env.SEND_TRANSACTION_FEE) || 0;
+  const senderKeys: keypair = {
+    privateKey: process.env.PRIVATE_KEY || "",
+    publicKey: process.env.PUBLIC_KEY || ""
+  };
 
-  var fs = require('fs');
   // MAX_HEIGHT is optional - if not provided, set to max
   let configuredMaximum = 0;
   if (typeof (process.env.MAX_HEIGHT) === 'undefined') {
@@ -53,24 +59,26 @@ async function main() {
   console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
 
   let runDateTime = new Date();
-  let payoutTransactionsFileName = `payout_transactions_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
+  let payoutTransactionsFileName = `./src/data/payout_transactions_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
 
   fs.writeFile(payoutTransactionsFileName, JSON.stringify(payouts), function (err: any) {
     if (err) throw err;
     console.log(`wrote payouts transactions to ${payoutTransactionsFileName}`);
   });
 
-  let payoutDetailsFileName = `payout_details_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
+  let payoutDetailsFileName = `./src/data/payout_details_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`
   fs.writeFile(payoutDetailsFileName, JSON.stringify(storePayout), function (err: any) {
     if (err) throw err;
     console.log(`wrote payout details to ${payoutDetailsFileName}`);
   });
 
-  let payoutBatchFileName = `payout_batch_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.txt`
+  let payoutBatchFileName = `./src/data/payout_batch_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.txt`
   fs.writeFile(payoutBatchFileName, payoutFileString, function (err: any) {
     if (err) throw err;
     console.log(`wrote payout details to ${payoutBatchFileName}`);
   });
+
+  signTransactionsToSend(payouts, senderKeys);
 }
 
 async function determineLastBlockHeightToProcess(maximumHeight: number, minimumConfirmations: number): Promise<number> {
