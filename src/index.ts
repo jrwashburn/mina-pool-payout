@@ -4,7 +4,7 @@ import { getBlocks, getLatestHeight } from "./core/queries";
 // TODO: move path to staking ledger files to env
 // where should we get ledger from - currently expects export from 'coda ledger export staking-epoch-ledger'
 import ledger from "./data/staking-epoch-ledger.json";
-import { SignTransactionsToSend } from "./sendPayout";
+import { signTransactionsToSend } from "./core/sign";
 
 // TODO: create mina currency types
 
@@ -71,6 +71,8 @@ async function main() {
     if (err) throw err;
     console.log(`wrote payout details to ${payoutBatchFileName}`);
   });
+
+  signTransactionsToSend(payouts);
 }
 
 async function determineLastBlockHeightToProcess(maximumHeight: number, minimumConfirmations: number): Promise<number> {
