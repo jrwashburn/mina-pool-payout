@@ -4,7 +4,9 @@ import { getBlocks, getLatestHeight } from "./core/queries";
 // TODO: move path to staking ledger files to env
 // where should we get ledger from - currently expects export from 'coda ledger export staking-epoch-ledger'
 import ledger from "./data/staking-epoch-ledger.json";
+import CodaSDK, { keypair } from "@o1labs/client-sdk";
 import { signTransactionsToSend } from "./core/sign";
+import { stringify } from "node:querystring";
 
 // TODO: create mina currency types
 
@@ -19,6 +21,11 @@ async function main() {
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
   const commissionRate = Number(process.env.COMMISSION_RATE);
   const transactionFee = Number(process.env.SEND_TRANSACTION_FEE) || 0;
+  const senderKeys: keypair = {
+    privateKey: process.env.PRIVATE_KEY || "",
+    publicKey: process.env.PUBLIC_KEY || ""
+  };
+
 
   var fs = require('fs');
   // MAX_HEIGHT is optional - if not provided, set to max
@@ -72,7 +79,7 @@ async function main() {
     console.log(`wrote payout details to ${payoutBatchFileName}`);
   });
 
-  signTransactionsToSend(payouts);
+  signTransactionsToSend(payouts, senderKeys);
 }
 
 async function determineLastBlockHeightToProcess(maximumHeight: number, minimumConfirmations: number): Promise<number> {
