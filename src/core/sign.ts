@@ -1,4 +1,4 @@
-import { signPayment, keypair, payment, privateKey } from "@o1labs/client-sdk";
+import { signPayment, keypair, payment } from "@o1labs/client-sdk";
 import { PayoutTransaction } from "./payouts";
 import fs from "fs";
 

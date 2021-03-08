@@ -76,12 +76,6 @@ async function main() {
     console.log(`wrote payout details to ${payoutDetailsFileName}`);
   });
 
-  //batch support from coda client is being removed - we won't be able to use this.
-  /*const payoutBatchFileName = generateOutputFileName("payout_batch", runDateTime, minimumHeight, maximumHeight);
-  fs.writeFile(payoutBatchFileName, payoutFileString, function (err: any) {
-    if (err) throw err;
-    console.log(`wrote payout details to ${payoutBatchFileName}`);
-  });*/
   if( generateEphemeralSenderKey) {
     const CodaSDK = require("@o1labs/client-sdk");
     senderKeys = CodaSDK.genKeys();
