@@ -16,13 +16,16 @@ async function main() {
   // TODO: Fail if any required values missing from .env
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const globalSlotStart = Number(process.env.GLOBAL_SLOT_START) || 0;
-  const minimumHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
-  const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 0;
-  const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
+  const minimumHeight = Number(process.env.MIN_HEIGHT) || 0; // This can be the last known payout or this could be a starting date
+  const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 290;
+  const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH) || 7140;
   const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
   const transactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
   const nonce = Number(process.env.STARTING_NONCE) || 0;
-  const generateEphemeralSenderKey = Boolean(process.env.SEND_EPHEMERAL_KEY) || false;
+  let generateEphemeralSenderKey = false;
+  if( typeof(process.env.SEND_EPHEMERAL_KEY) === 'string' && process.env.SEND_EPHEMERAL_KEY.toLowerCase() == 'true'){
+    generateEphemeralSenderKey = true;
+  };
   let senderKeys: keypair = {
     privateKey: process.env.SEND_PRIVATE_KEY || "",
     publicKey: process.env.SEND_PUBLIC_KEY || ""
