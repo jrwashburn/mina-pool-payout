@@ -6,7 +6,6 @@ import { getBlocks, getLatestHeight } from "./core/queries";
 import ledger from "./data/staking-epoch-ledger.json";
 import CodaSDK, { keypair } from "@o1labs/client-sdk";
 import { signTransactionsToSend } from "./core/sign";
-import { stringify } from "node:querystring";
 import fs from "fs";
 
 // TODO: create mina currency types
@@ -20,12 +19,13 @@ async function main() {
   const minimumHeight = Number(process.env.MIN_HEIGHT); // This can be the last known payout or this could be a starting date
   const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 0;
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH);
-  const commissionRate = Number(process.env.COMMISSION_RATE);
-  const transactionFee = Number(process.env.SEND_TRANSACTION_FEE) || 0;
+  const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
+  const transactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
   const nonce = Number(process.env.STARTING_NONCE) || 0;
-  const senderKeys: keypair = {
-    privateKey: process.env.PRIVATE_KEY || "",
-    publicKey: process.env.PUBLIC_KEY || ""
+  const generateEphemeralSenderKey = Boolean(process.env.SEND_EPHEMERAL_KEY) || false;
+  let senderKeys: keypair = {
+    privateKey: process.env.SEND_PRIVATE_KEY || "",
+    publicKey: process.env.SEND_PUBLIC_KEY || ""
   };
 
   // MAX_HEIGHT is optional - if not provided, set to max
@@ -73,12 +73,16 @@ async function main() {
     console.log(`wrote payout details to ${payoutDetailsFileName}`);
   });
 
-  const payoutBatchFileName = generateOutputFileName("payout_batch", runDateTime, minimumHeight, maximumHeight);
+  //batch support from coda client is being removed - we won't be able to use this.
+  /*const payoutBatchFileName = generateOutputFileName("payout_batch", runDateTime, minimumHeight, maximumHeight);
   fs.writeFile(payoutBatchFileName, payoutFileString, function (err: any) {
     if (err) throw err;
     console.log(`wrote payout details to ${payoutBatchFileName}`);
-  });
-
+  });*/
+  if( generateEphemeralSenderKey) {
+    const CodaSDK = require("@o1labs/client-sdk");
+    senderKeys = CodaSDK.genKeys();
+  }
   signTransactionsToSend(payouts, senderKeys, nonce);
 }
 
