@@ -105,7 +105,6 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       amount: staker.total,
       fee: transactionFee
     });
-    payoutFileString += `((receiver ${staker.publicKey})(amount ${staker.total})(fee ${transactionFee}))`;
     totalPayout += staker.total;
   });
   payoutFileString += ")";
