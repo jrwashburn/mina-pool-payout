@@ -91,7 +91,9 @@ type LatestHeight = {
 export type Block = {
     blockheight: number;
     statehash: string;
+    stakingledgerhash: string;
     blockdatetime: number;
+    slot: number;
     globalslotsincegenesis: number;
     creatorpublickey: string;
     winnerpublickey: string;

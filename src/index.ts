@@ -1,9 +1,7 @@
 import { getPayouts } from "./core/payouts";
 import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
-// TODO: move path to staking ledger files to env
-// where should we get ledger from - currently expects export from 'coda ledger export staking-epoch-ledger'
-import ledger from "./data/staking-epoch-ledger.json";
+
 import CodaSDK, { keypair } from "@o1labs/client-sdk";
 import { signTransactionsToSend } from "./core/sign";
 import fs from "fs";
@@ -22,6 +20,7 @@ async function main() {
   const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
   const transactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
   const nonce = Number(process.env.STARTING_NONCE) || 0;
+  const ledgerDirectory: string = process.env.LEDGER_DIRECTORY || "./data/ledger";
   let generateEphemeralSenderKey = false;
   if( typeof(process.env.SEND_EPHEMERAL_KEY) === 'string' && process.env.SEND_EPHEMERAL_KEY.toLowerCase() == 'true'){
     generateEphemeralSenderKey = true;
@@ -45,6 +44,8 @@ async function main() {
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
   // get the stakes from staking ledger json
+  // TODO: this might need to be reworked for multiple and/or large files
+  const ledger = require(`${ledgerDirectory}/staking-epoch-ledger.json`);
   const [stakers, totalStake] = getStakes(ledger, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
   console.log(`The pool total staking balance is ${totalStake}`);
 
