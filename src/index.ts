@@ -1,4 +1,4 @@
-import { getPayouts } from "./core/payouts";
+import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payouts";
 import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
 
@@ -43,45 +43,56 @@ async function main() {
 
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
-  // get the stakes from staking ledger json
-  // TODO: this might need to be reworked for multiple and/or large files
-  const ledger = require(`${ledgerDirectory}/staking-epoch-ledger.json`);
-  const [stakers, totalStake] = getStakes(ledger, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
-  console.log(`The pool total staking balance is ${totalStake}`);
-
   // get the blocks from archive db
   const blocks = await getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);
 
-  // run the payout calculation for those blocks
-  const [payouts, storePayout, payoutFileString, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(blocks, stakers, totalStake, commissionRate, transactionFee);
+  let payouts: PayoutTransaction[] = [];
+  let storePayout: PayoutDetails[] = [];
+  const ledgerHashes = [...new Set(blocks.map(block=>block.stakingledgerhash))];
+  Promise.all(ledgerHashes.map(async ledgerHash => {
+    console.log(`### Calculating payouts for ledger ${ledgerHash}`)
+    // get the stakes from staking ledger json
+    // TODO: this might need to be reworked for multiple and/or large files
+    const ledgerFile = `${ledgerDirectory}/${ledgerHash}.json`;
+//    if (!fs.existsSync(ledgerFile)){ throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`)}
+    const ledger = require(ledgerFile);
+    const [stakers, totalStake] = getStakes(ledger, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
+    console.log(`The pool total staking balance is ${totalStake}`);
+    
+    // run the payout calculation for those blocks
+    const ledgerBlocks = blocks.filter(x => x.stakingledgerhash == ledgerHash);
+    const [ledgerPayouts, ledgerStorePayout, payoutFileString, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(ledgerBlocks, stakers, totalStake, commissionRate, transactionFee);
+    payouts.push(...ledgerPayouts);
+    storePayout.push(...ledgerStorePayout);
 
-  // Output total results and transaction files for input to next process, details file for audit log
-  console.log(`We won these blocks: ${blocksIncluded}`);
-  console.log(`We are paying out based on total rewards of ${allBlocksTotalRewards} nanomina in this window.`);
-  console.log(`That is ${allBlocksTotalRewards / 1000000000} mina`);
-  console.log(`The Pool Fee is is ${allBlocksTotalPoolFees / 1000000000} mina`);
-  console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina or ${((allBlocksTotalRewards) - (allBlocksTotalPoolFees)) / 1000000000} mina`)
-  console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
+    // Output total results and transaction files for input to next process, details file for audit log
+    console.log(`We won these blocks: ${blocksIncluded}`);
+    console.log(`We are paying out based on total rewards of ${allBlocksTotalRewards} nanomina in this window.`);
+    console.log(`That is ${allBlocksTotalRewards / 1000000000} mina`);
+    console.log(`The Pool Fee is is ${allBlocksTotalPoolFees / 1000000000} mina`);
+    console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina or ${((allBlocksTotalRewards) - (allBlocksTotalPoolFees)) / 1000000000} mina`)
+    console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
+  })).then(()=>{
+    const runDateTime = new Date();
+    const payoutTransactionsFileName = generateOutputFileName("payout_transactions", runDateTime, minimumHeight, maximumHeight);
 
-  const runDateTime = new Date();
-  const payoutTransactionsFileName = generateOutputFileName("payout_transactions", runDateTime, minimumHeight, maximumHeight);
+    fs.writeFile(payoutTransactionsFileName, JSON.stringify(payouts), function (err: any) {
+      if (err) throw err;
+      console.log(`wrote payouts transactions to ${payoutTransactionsFileName}`);
+    });
 
-  fs.writeFile(payoutTransactionsFileName, JSON.stringify(payouts), function (err: any) {
-    if (err) throw err;
-    console.log(`wrote payouts transactions to ${payoutTransactionsFileName}`);
+    const payoutDetailsFileName = generateOutputFileName("payout_details", runDateTime, minimumHeight, maximumHeight);
+    fs.writeFile(payoutDetailsFileName, JSON.stringify(storePayout), function (err: any) {
+      if (err) throw err;
+      console.log(`wrote payout details to ${payoutDetailsFileName}`);
+    });
+
+    if( generateEphemeralSenderKey) {
+      const CodaSDK = require("@o1labs/client-sdk");
+      senderKeys = CodaSDK.genKeys();
+    }
+    signTransactionsToSend(payouts, senderKeys, nonce);
   });
-
-  const payoutDetailsFileName = generateOutputFileName("payout_details", runDateTime, minimumHeight, maximumHeight);
-  fs.writeFile(payoutDetailsFileName, JSON.stringify(storePayout), function (err: any) {
-    if (err) throw err;
-    console.log(`wrote payout details to ${payoutDetailsFileName}`);
-  });
-
-  if( generateEphemeralSenderKey) {
-    const CodaSDK = require("@o1labs/client-sdk");
-    senderKeys = CodaSDK.genKeys();
-  }
-  signTransactionsToSend(payouts, senderKeys, nonce);
 }
 
 async function determineLastBlockHeightToProcess(maximumHeight: number, minimumConfirmations: number): Promise<number> {
