@@ -61,7 +61,7 @@ async function main() {
     
     // run the payout calculation for those blocks
     const ledgerBlocks = blocks.filter(x => x.stakingledgerhash == ledgerHash);
-    const [ledgerPayouts, ledgerStorePayout, payoutFileString, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(ledgerBlocks, stakers, totalStake, commissionRate, transactionFee);
+    const [ledgerPayouts, ledgerStorePayout, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(ledgerBlocks, stakers, totalStake, commissionRate, transactionFee);
     payouts.push(...ledgerPayouts);
     storePayout.push(...ledgerStorePayout);
 
@@ -69,7 +69,7 @@ async function main() {
     console.log(`We won these blocks: ${blocksIncluded}`);
     console.log(`We are paying out based on total rewards of ${allBlocksTotalRewards} nanomina in this window.`);
     console.log(`That is ${allBlocksTotalRewards / 1000000000} mina`);
-    console.log(`The Pool Fee is is ${allBlocksTotalPoolFees / 1000000000} mina`);
+    console.log(`The Pool Fee is ${allBlocksTotalPoolFees / 1000000000} mina`);
     console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina or ${((allBlocksTotalRewards) - (allBlocksTotalPoolFees)) / 1000000000} mina`)
     console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
   })).then(()=>{
