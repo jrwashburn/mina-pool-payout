@@ -1,6 +1,6 @@
-Typescript port from https://github.com/garethtdavies/mina-payout-script
-
 # mina-pool-payout
+
+_Inspired by [minaexplorer](https://github.com/garethtdavies/mina-payout-script)_
 
 This script will calculate the required payouts for accounts delegating to a given account. The script will output JSON containing a list of public keys and their payout amounts, e.g.:
 
