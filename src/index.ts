@@ -67,10 +67,21 @@ async function main() {
     console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina or ${((allBlocksTotalRewards) - (allBlocksTotalPoolFees)) / 1000000000} mina`)
     console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
   })).then(()=>{
+    // Aggregate to a single transaction per key
+    const transactions = [...payouts.reduce((r, o) => {
+      const item = r.get(o.publicKey) || Object.assign({}, o, {
+        amount: 0,
+        fee: 0
+      });
+      item.amount += o.amount;
+      item.fee += o.fee;
+      return r.set(o.publicKey, item);
+    }, new Map).values()];
+
     const runDateTime = new Date();
     const payoutTransactionsFileName = generateOutputFileName("payout_transactions", runDateTime, minimumHeight, maximumHeight);
 
-    fs.writeFile(payoutTransactionsFileName, JSON.stringify(payouts), function (err: any) {
+    fs.writeFile(payoutTransactionsFileName, JSON.stringify(transactions), function (err: any) {
       if (err) throw err;
       console.log(`wrote payouts transactions to ${payoutTransactionsFileName}`);
     });
