@@ -1,7 +1,7 @@
 import { Block } from "./queries";
 import { StakingKey } from "./stakes";
 
-export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number, transactionFee: number):
+export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number):
   Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
 
   // Initialize some stuff
@@ -104,7 +104,7 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       payoutJson.push({
         publicKey: staker.publicKey,
         amount: amount,
-        fee: transactionFee
+        fee: 0
       });
       totalPayout += amount;
     }
