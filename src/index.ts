@@ -48,6 +48,8 @@ async function main() {
   let payouts: PayoutTransaction[] = [];
   let storePayout: PayoutDetails[] = [];
   const ledgerHashes = [...new Set(blocks.map(block=>block.stakingledgerhash))];
+
+  console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey} `)
   Promise.all(ledgerHashes.map(async ledgerHash => {
     console.log(`### Calculating payouts for ledger ${ledgerHash}`)
     const [stakers, totalStake] = getStakes(ledgerHash, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
