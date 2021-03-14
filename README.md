@@ -51,7 +51,7 @@ The consensus parameters will be used to determine finality and the max height i
 DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
 ```
 
-15. Export the relevant staking ledger and place in src/data directory. You can export the current staking ledger with: 
+15. Export the relevant staking ledger and place in src/data/ledger directory. You can export the current staking ledger with: 
 
 ```
 coda ledger export staking-epoch-ledger > staking-epoch-ledger.json
