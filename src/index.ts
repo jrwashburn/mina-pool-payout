@@ -20,7 +20,6 @@ async function main() {
   const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
   const transactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
   const nonce = Number(process.env.STARTING_NONCE) || 0;
-  const ledgerDirectory: string = process.env.LEDGER_DIRECTORY || "./data/ledger";
   let generateEphemeralSenderKey = false;
   if( typeof(process.env.SEND_EPHEMERAL_KEY) === 'string' && process.env.SEND_EPHEMERAL_KEY.toLowerCase() == 'true'){
     generateEphemeralSenderKey = true;
@@ -51,12 +50,7 @@ async function main() {
   const ledgerHashes = [...new Set(blocks.map(block=>block.stakingledgerhash))];
   Promise.all(ledgerHashes.map(async ledgerHash => {
     console.log(`### Calculating payouts for ledger ${ledgerHash}`)
-    // get the stakes from staking ledger json
-    // TODO: this might need to be reworked for multiple and/or large files
-    const ledgerFile = `${ledgerDirectory}/${ledgerHash}.json`;
-//    if (!fs.existsSync(ledgerFile)){ throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`)}
-    const ledger = require(ledgerFile);
-    const [stakers, totalStake] = getStakes(ledger, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
+    const [stakers, totalStake] = getStakes(ledgerHash, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
     console.log(`The pool total staking balance is ${totalStake}`);
     
     // run the payout calculation for those blocks
