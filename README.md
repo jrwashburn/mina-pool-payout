@@ -46,7 +46,7 @@ The other settings can be configured once (or when your environment or pool chan
 
 Keys can either be generated with each run and used as a one-time payout key, or can be provided in the .env config file.
 
- If generating a key for each run, remember that the account will need to be created and there will be an account creation fee - currently the network default is 1 mina. 
+If generating a key for each run, remember that the account will need to be created and there will be an account creation fee - currently the network default is 1 mina.
 
 If providing keys, the 58-char private key should be specified. This can be retrieved from a pk file by running the mina advanced dump-keypair command, e.g.
 
@@ -78,7 +78,7 @@ mina advanced dump-keypair --privkey-path keys/my-payout-wallet
     DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
     ```
 
-14. Export the relevant staking ledger and place in src/data directory. You can export the current staking ledger with: 
+14. Export the relevant staking ledger and place in src/data/ledger directory. You can export the current staking ledger with: 
 
     ```
     coda ledger export staking-epoch-ledger > staking-epoch-ledger.json

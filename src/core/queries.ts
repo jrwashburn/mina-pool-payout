@@ -4,6 +4,7 @@ const blockQuery = `
     SELECT
     b.height AS blockHeight,
     b.state_hash AS stateHash,
+    slh.value as stakingLedgerHash,
     b.timestamp AS blockDateTime,
     b.global_slot AS slot,
     b.global_slot_since_genesis AS globalSlotSinceGenesis,
@@ -18,6 +19,8 @@ const blockQuery = `
     FROM blocks b
     INNER JOIN public_keys pkc ON b.creator_id = pkc.id
     INNER JOIN public_keys pkw ON b.block_winner_id = pkw.id
+    INNER JOIN epoch_data ed ON b.staking_epoch_data_id = ed.id
+    INNER JOIN snarked_ledger_hashes slh ON ed.ledger_hash_id = slh.id
     LEFT JOIN
         (
         SELECT
@@ -88,7 +91,9 @@ type LatestHeight = {
 export type Block = {
     blockheight: number;
     statehash: string;
+    stakingledgerhash: string;
     blockdatetime: number;
+    slot: number;
     globalslotsincegenesis: number;
     creatorpublickey: string;
     winnerpublickey: string;

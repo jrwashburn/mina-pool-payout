@@ -5,14 +5,27 @@ export type StakingKey = {
   untimedAfterSlot: number
 };
 
+//TODO: Add remaining field definitions as needed
+export type LedgerEntry =   {
+  pk: string,
+  balance: number,
+  delegate: string
+};
+
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // calculate timed weighting
-export function getStakes(ledger: any[], key: string, globalSlotStart: number, slotsPerEpoch: number): [StakingKey[], number] {
+export function getStakes(ledgerHash: string, key: string, globalSlotStart: number, slotsPerEpoch: number): [StakingKey[], number] {
   let totalStakingBalance: number = 0;
+  // get the stakes from staking ledger json
+  // TODO: this might need to be reworked for large files
+  const ledgerDirectory = "../data/ledger"; // TODO: Move this back to .env
+  const ledgerFile = `${ledgerDirectory}/${ledgerHash}.json`;
+  // if (!fs.existsSync(ledgerFile)){ throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`)}
+  const ledger = require(ledgerFile);
 
   const stakers: StakingKey[] = ledger
-    .filter((x) => x.delegate == key)
-    .map((stake) => {
+    .filter((entry: LedgerEntry) => entry.delegate == key)
+    .map((stake: LedgerEntry) => {
       const balance = Number(stake.balance);
       totalStakingBalance += balance;
       return {
