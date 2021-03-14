@@ -2,7 +2,7 @@ import { Block } from "./queries";
 import { StakingKey } from "./stakes";
 
 export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number, transactionFee: number):
-  Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], payoutFileString: string, blocksIncluded: number[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
+  Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
 
   // Initialize some stuff
   let allBlocksTotalRewards = 0;
@@ -98,18 +98,19 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
 
   let payoutJson: PayoutTransaction[] = [];
   let totalPayout = 0;
-  let payoutFileString: string = "(";
   stakers.forEach((staker: StakingKey) => {
-    payoutJson.push({
-      publicKey: staker.publicKey,
-      amount: staker.total,
-      fee: transactionFee
-    });
-    totalPayout += staker.total;
+    const amount = staker.total;
+    if (amount > 0) {
+      payoutJson.push({
+        publicKey: staker.publicKey,
+        amount: amount,
+        fee: transactionFee
+      });
+      totalPayout += amount;
+    }
   });
-  payoutFileString += ")";
 
-  return [payoutJson, storePayout, payoutFileString, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout];
+  return [payoutJson, storePayout, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout];
 }
 
 export type PayoutDetails = {
