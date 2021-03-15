@@ -96,7 +96,7 @@ async function main() {
       const CodaSDK = require("@o1labs/client-sdk");
       senderKeys = CodaSDK.genKeys();
     }
-    signTransactionsToSend(payouts, senderKeys, nonce);
+    signTransactionsToSend(transactions, senderKeys, nonce);
   });
 }
 
