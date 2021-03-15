@@ -100,7 +100,7 @@ async function main() {
       const CodaSDK = require("@o1labs/client-sdk");
       senderKeys = CodaSDK.genKeys();
     }
-    signTransactionsToSend(payouts, senderKeys, nonce);
+    signTransactionsToSend(transactions, senderKeys, nonce);
 
     console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
     console.log('Potential Ledger Command:');
