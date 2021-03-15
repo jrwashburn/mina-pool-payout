@@ -1,6 +1,7 @@
 import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payouts";
 import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
+import hash from "object-hash";
 
 import CodaSDK, { keypair } from "@o1labs/client-sdk";
 import { sendSignedTransactions } from "./core/sign";
@@ -106,6 +107,8 @@ async function main() {
     console.log('Potential Ledger Command:');
     console.log(`mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000 }`);
 
+    const payoutHash = hash(storePayout, { algorithm: "sha256" });
+    console.log(`PAYOUT HASH: ${payoutHash}`);
   });
 }
 
