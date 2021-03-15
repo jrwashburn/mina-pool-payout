@@ -22,27 +22,6 @@ async function fetchGraphQL(
   return await result.json();
 }
 
-/*
-function executeSendSignedPayment() {
-  const operationsDoc = `
-    mutation SendSignedPayment {
-      __typename
-      sendPayment(input: {fee: "", amount: "", to: "", from: "", nonce: "", validUntil: "", memo: ""}, signature: {field: "", scalar: ""})
-    }
-  `;
-  return fetchGraphQL(operationsDoc, "SendSignedPayment", {});
-}
-
-export async function sendSignedPayment() {
-  const { errors, data } = await executeSendSignedPayment();
-  if (errors) {
-    // handle those errors like a pro
-    console.error(errors);
-  }
-  return data;
-}
-*/
-
 export async function sendSignedPayment(payment: signed<payment>) {
   const operationsDoc = `
     mutation SendSignedPayment {

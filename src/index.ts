@@ -2,12 +2,16 @@ import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payouts";
 import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
 import hash from "object-hash";
-
+import yargs from "yargs";
 import CodaSDK, { keypair } from "@o1labs/client-sdk";
 import { sendSignedTransactions } from "./core/sign";
 import fs from "fs";
 
 // TODO: create mina currency types
+
+const args = yargs.options({
+  "payout-hash": { type: "string", alias: "h"}
+}).argv;
 
 async function main() {
   // TODO: Error handling
@@ -97,18 +101,25 @@ async function main() {
       console.log(`wrote payout details to ${payoutDetailsFileName}`);
     });
 
-    if( generateEphemeralSenderKey) {
-      const CodaSDK = require("@o1labs/client-sdk");
-      senderKeys = CodaSDK.genKeys();
-    }
-    sendSignedTransactions(transactions, senderKeys, nonce);
-
     console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
     console.log('Potential Ledger Command:');
     console.log(`mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000 }`);
 
     const payoutHash = hash(storePayout, { algorithm: "sha256" });
-    console.log(`PAYOUT HASH: ${payoutHash}`);
+    if (args["payout-hash"]) {
+      console.log(`### Processing signed payout for hash ${args["payout-hash"]}...`)
+      if (args["payout-hash"] == payoutHash) {
+        if( generateEphemeralSenderKey) {
+          const CodaSDK = require("@o1labs/client-sdk");
+          senderKeys = CodaSDK.genKeys();
+        }
+        sendSignedTransactions(transactions, senderKeys, nonce);
+      } else {
+        console.error("HASHES DON'T MATCH");
+      }
+    } else {
+      console.log(`PAYOUT HASH: ${payoutHash}`);
+    }
   });
 }
 

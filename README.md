@@ -87,9 +87,8 @@ mina advanced dump-keypair --privkey-path keys/my-payout-wallet
 ### Running the script
 
 1. Run `npm install` to install the project dependencies.
-2. Run `npm start` to start the local development server.
-
-Note that `npm start` current defaults to run `nodemon` in order to speed development. The process will continue running and automatically restart when changes to the source files are detected.
+2. Run `npm run payout` to run the script as a dry run. This will not transmit any actual payments and will output a hash of the payment details.
+3. Run `npm run payout -- -h {PAYOUT_HASH}` where `{PAYOUT_HASH}` is the hash produced during the dry run in the prior step. If this run produces the same hash (i.e. nothing has changed since the dry run), then the signed payment(s) will be transmitted.
 
 ### Seeing Results ###
 
