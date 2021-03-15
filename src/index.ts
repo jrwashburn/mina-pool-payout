@@ -48,6 +48,8 @@ async function main() {
   let payouts: PayoutTransaction[] = [];
   let storePayout: PayoutDetails[] = [];
   const ledgerHashes = [...new Set(blocks.map(block=>block.stakingledgerhash))];
+
+  console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey} `)
   Promise.all(ledgerHashes.map(async ledgerHash => {
     console.log(`### Calculating payouts for ledger ${ledgerHash}`)
     const [stakers, totalStake] = getStakes(ledgerHash, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
@@ -67,7 +69,8 @@ async function main() {
     console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina or ${((allBlocksTotalRewards) - (allBlocksTotalPoolFees)) / 1000000000} mina`)
     console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
   })).then(()=>{
-    // Aggregate to a single transaction per key
+    // Aggregate to a single transaction per key and track the total for funding transaction
+    let totalPayoutFundsNeeded = 0
     const transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
@@ -75,6 +78,7 @@ async function main() {
       });
       item.amount += o.amount;
       item.fee = payorSendTransactionFee;
+      totalPayoutFundsNeeded += item.amount + item.fee;
       return r.set(o.publicKey, item);
     }, new Map).values()];
 
@@ -97,6 +101,11 @@ async function main() {
       senderKeys = CodaSDK.genKeys();
     }
     signTransactionsToSend(transactions, senderKeys, nonce);
+
+    console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
+    console.log('Potential Ledger Command:');
+    console.log(`mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000 }`);
+
   });
 }
 
