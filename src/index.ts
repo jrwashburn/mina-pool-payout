@@ -3,7 +3,7 @@ import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
 
 import CodaSDK, { keypair } from "@o1labs/client-sdk";
-import { signTransactionsToSend } from "./core/sign";
+import { sendSignedTransactions } from "./core/sign";
 import fs from "fs";
 
 // TODO: create mina currency types
@@ -100,7 +100,7 @@ async function main() {
       const CodaSDK = require("@o1labs/client-sdk");
       senderKeys = CodaSDK.genKeys();
     }
-    signTransactionsToSend(transactions, senderKeys, nonce);
+    sendSignedTransactions(transactions, senderKeys, nonce);
 
     console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
     console.log('Potential Ledger Command:');
