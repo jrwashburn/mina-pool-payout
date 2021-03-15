@@ -1,21 +1,13 @@
 # mina-pool-payout
 
-_Inspired by [minaexplorer](https://github.com/garethtdavies/mina-payout-script)_
+_Inspired by [minaexplorer - mina-payout-script](https://github.com/garethtdavies/mina-payout-script)_
+This started out as a port from the original, but has morphed into a slightly different payout algorithm, so we don't want you thinking this will generate exactly the same results. 
 
-This script will calculate the required payouts for accounts delegating to a given account. The script will output JSON containing a list of public keys and their payout amounts, e.g.:
+This script will calculate or transmit the required payouts for accounts delegating to a given account. 
 
-```json
-[
-  {
-    "publicKey": "B62qkbdgRRJJfqcyVd23s9tgCkNYuGMCmZHKijnJGqYgs9N3UdjcRtR",
-    "total": 4644003513
-  },
-  {
-    "publicKey": "B62qqMo7X8i2NnMxrtKf3PAWfbEADk4V1ojWhGeH6Gvye9hrMjBiZjM",
-    "total": 22577193721
-  }
-]
-```
+Currently, the operational assumptions are in flux so the output and control mechanisms are changing rapidly. As soon  as things settle, we'll updat this! 
+// TODO: explain calculate vs. transmit modes, key config vales to maintain, etc.
+
 
 ## Getting started
 
