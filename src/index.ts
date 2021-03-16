@@ -25,7 +25,6 @@ async function main() {
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH) || 7140;
   const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
   const payorSendTransactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
-  const nonce = Number(process.env.STARTING_NONCE) || 0;
   let generateEphemeralSenderKey = false;
   if( typeof(process.env.SEND_EPHEMERAL_KEY) === 'string' && process.env.SEND_EPHEMERAL_KEY.toLowerCase() == 'true'){
     generateEphemeralSenderKey = true;
@@ -109,7 +108,7 @@ async function main() {
           const CodaSDK = require("@o1labs/client-sdk");
           senderKeys = CodaSDK.genKeys();
         }
-        sendSignedTransactions(transactions, senderKeys, nonce);
+        sendSignedTransactions(stakingPoolPublicKey, transactions, senderKeys);
       } else {
         console.error("HASHES DON'T MATCH");
       }

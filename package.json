@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run payout",
+    "start": "npm run payout -- -m=0",
     "build": "tsc -p .",
     "payout": "ts-node -r dotenv/config src/index.ts"
   },

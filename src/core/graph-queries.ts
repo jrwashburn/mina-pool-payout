@@ -69,3 +69,23 @@ export async function sendSignedPayment(payment: signed<payment>) {
   // }
   // return data;
 }
+
+export async function getNonce(publicKey: string) {
+  const operationsDoc = `
+    query GetNonce($publicKey: String) {
+      account(publicKey: $publicKey) {
+        nonce
+      }
+    }
+  `;
+  const { errors, data } = await fetchGraphQL(
+    operationsDoc,
+    "GetNonce",
+    {publicKey: publicKey}
+  );
+  if (errors) {
+    // handle those errors like a pro
+    console.error(errors);
+  }
+  return data.account.nonce;
+}

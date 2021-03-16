@@ -1,9 +1,10 @@
 import { signPayment, keypair, payment } from "@o1labs/client-sdk";
 import { PayoutTransaction } from "./payouts";
 import fs from "fs";
-import { sendSignedPayment } from "./graph-queries";
+import { getNonce, sendSignedPayment } from "./graph-queries";
 
-export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair, nonce: number) {
+export async function sendSignedTransactions(key: string, payoutsToSign: PayoutTransaction[], keys: keypair) {
+    let nonce = await getNonce(key);
     payoutsToSign.forEach((payout: PayoutTransaction) => {
         const paymentTransaction: payment = { to: payout.publicKey, from: keys.publicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
         try {
