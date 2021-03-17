@@ -81,11 +81,11 @@ export async function getNonce(publicKey: string) {
   const { errors, data } = await fetchGraphQL(
     operationsDoc,
     "GetNonce",
-    {publicKey: publicKey}
+    {"publicKey": publicKey}
   );
   if (errors) {
-    // handle those errors like a pro
-    console.error(errors);
+    console.log(`not able to get the nonce`)
+    console.log(errors);
   }
-  return data.account.nonce;
+  return data.account.nonce ?? 0;
 }
