@@ -24,29 +24,43 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       let effectivePoolStakes: { [key: string]: number } = {};
 
       // Determine the supercharged discount for the block
-      // TODO: Should this be based on net fees, which is:
-      // block.feeTransferToReceiver - block.feeTransferFromCoinbase
-      // instead of txfees.
-
       const txFees = block.usercommandtransactionfees || 0;
       const superchargedWeightingDiscount = txFees / block.coinbase;
-
-      // What are the rewards for the block
       const totalRewards = block.blockpayoutamount
-      const totalPoolFees = commissionRate * totalRewards;
 
+      // NPS have to unwrap the net here now
+      // have totalRewardsNPSPool and totalRewardsCommonPool
+      /*
+          if **./stakes.publicKeyIsLocked** ( block.winnerpublickey, block.globalslotsincegenesis)
+            totalRewardsNPSPool = coinbase
+          else
+            totalRewardsNPSPool = coinbase / 2 (round down to nearest nanomina)
+          totalRewardsCommonPool = totalRewards - totalRewardsNPSPool
+      */
+
+      //NPS remove these sums total Pool Fees and just add them up at the end.
+      const totalPoolFees = commissionRate * totalRewards;
       allBlocksTotalRewards += totalRewards;
       allBlocksTotalPoolFees += totalPoolFees;
 
-      // TODO: Add checks & balances
-
+      // NPS add new field NPSStake and rename effectiveStake to commonStake?
+      // only calculate the supercharged on Common keys, NPS cannot supercharge 
+      // and need a new sum for each
+      // All stakers will get their NPSStake share, and then common stakers will also get their superchargedStake
+      // NPS Stakers are not included in the common stakers total
+      // given 1000 NPS shares in 2 keys, and 500 common shares in 10 keys, 4 are unlocked
+      // each NPS has a 0.25 share of the NPS pool, and each common has 0.025; pool is 2000
+      // each NPS has 0 of the common. locked have ~.0714 and unlocked have ~.1428 (minus superchargedweighting discount) 
+      //  of a common pool total of ~700
+    
       // Determine the effective pool weighting based on sum of effective stakes
-      // TODO: need to handle rounding to elminate franctional nanomina
       stakers.forEach((staker: StakingKey) => {
         let effectiveStake = 0;
         // if staker is unlocked, double their share (less discount for fees)
         // otherwise regular share
         if (block.globalslotsincegenesis > staker.untimedAfterSlot) {
+          // NPS need to do this now
+          // TODO: need to handle rounding to elminate franctional nanomina
           effectiveStake = (staker.stakingBalance * (2 - superchargedWeightingDiscount));
         } else {
           effectiveStake = staker.stakingBalance;
@@ -55,8 +69,8 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
         sumEffectivePoolStakes += effectiveStake;
       });
 
+      // NPS below only makes sense against commonStake now, add assert NPSSTake must be == total
       // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
-      // TODO: assert total_staking_balance <= sum_effective_pool_stakes <= 2 * total_staking_balance
       if (sumEffectivePoolStakes > totalStake * 2) {
         throw new Error('Staking Calculation is more than 2x total stake')
       }
@@ -65,15 +79,24 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       }
 
       stakers.forEach((staker: StakingKey) => {
+
         const effectivePoolWeighting = effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
 
         // This must be less than 1 or we have a major issue
         // TODO: assert effective_pool_weighting <= 1
         // TODO: use 9 digits precision
+        // NPS handle totals at the end, and handle rounding
+        /* NPS everyone gets their share of the NPS, then common get their common
+          key block reward = 
+          blockTotal = (totalRewardsNPSPool * NPSStake) + (totalRewardsCommonPool * CommonStake) (which is 0 for NPS keys)
+        */
         const blockTotal = Math.round(
           (totalRewards - totalPoolFees) * effectivePoolWeighting
         );
         staker.total += blockTotal;
+
+        //NPS 
+        // add NPS/CommonStake and Totals
 
         // Store this data in a structured format for later querying and for the payment script, handled seperately
         storePayout.push({

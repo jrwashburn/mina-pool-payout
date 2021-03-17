@@ -1,8 +1,11 @@
+//NPS conside renaming to staking-ledger since this handles the staking ledger files?
 export type StakingKey = {
   publicKey: string,
   total: number,
   stakingBalance: number,
-  untimedAfterSlot: number
+  untimedAfterSlot: number,
+  //NPS add a shareClass, populate from file
+  // shareClass = NPS | Common
 };
 
 //TODO: Add remaining field definitions as needed
@@ -13,7 +16,7 @@ export type LedgerEntry =   {
 };
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
-// calculate timed weighting
+// determine when key will be unlocked and eligible for supercharged coinbase awards
 export function getStakes(ledgerHash: string, key: string, globalSlotStart: number, slotsPerEpoch: number): [StakingKey[], number] {
   let totalStakingBalance: number = 0;
   // get the stakes from staking ledger json
@@ -33,11 +36,24 @@ export function getStakes(ledgerHash: string, key: string, globalSlotStart: numb
         total: 0,
         stakingBalance: balance,
         untimedAfterSlot: calculateUntimedSlot(stake)
+        // shareClass -> GetPublicKeyShareClass
       };
     });
   return [stakers, totalStakingBalance];
 }
-  
+
+//NPS
+// export function publicKeyIsLocked(key, slot){}; (called from payouts when processing blocks)
+// for a key (need to calculate for winning key, not staking key)
+// get the ledger entry for the pk
+//  call calculateUntimedSlot, (should consider renaming stake since we will use for key in general?)
+//  determine if calculateUntimedSlot <= slot, return false (unlocked), if > slot, true (locked)
+
+//NPS GetPublicKeyShareClass (stake)
+// lookup key in file 
+// (see src/data/nps-addresses with lists of o1 and mina foundation keys, which are only current the NPS keys)
+// If the key is not in the list, returns common, if found, NPS
+ 
 // Changed from original implementation to simply return the slot number at which account beomes untimed
 function calculateUntimedSlot(stake: any): number {
 
