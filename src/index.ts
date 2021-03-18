@@ -2,7 +2,7 @@ import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payouts";
 import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
 
-import CodaSDK, { keypair } from "@o1labs/client-sdk";
+import { keypair } from "mainnet-client-sdk";
 import { signTransactionsToSend } from "./core/sign";
 import fs from "fs";
 

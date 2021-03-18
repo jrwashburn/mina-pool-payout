@@ -1,6 +1,13 @@
-import { signPayment, keypair, payment } from "@o1labs/client-sdk";
+import { keypair, payment, signPayment as mSignPayment } from "mainnet-client-sdk";
+import { signPayment as tSignPayment } from "testnet-client-sdk";
 import { PayoutTransaction } from "./payouts";
 import fs from "fs";
+
+const signPayment = 
+    typeof(process.env.TESTNET) === 'string' && 
+    process.env.TESTNET.toLowerCase() == 'true' ?
+    tSignPayment :
+    mSignPayment;
 
 export async function signTransactionsToSend(payoutsToSign: PayoutTransaction[], keys: keypair, nonce: number) {
     payoutsToSign.forEach((payout: PayoutTransaction) => {
