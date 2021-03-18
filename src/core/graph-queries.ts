@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { signed, payment } from "@o1labs/client-sdk";
+import fs from "fs";
 
 const graphqlEndpoint = process.env.GRAPHQL_ENDPOINT || "https://localhost:3085";
 
@@ -58,16 +59,20 @@ export async function sendSignedPayment(payment: signed<payment>) {
       }
     }
   `;
-  // const { errors, data } = await fetchGraphQL(
-  //   operationsDoc,
-  //   "SendSignedPayment",
-  //   {}
-  // );
-  // if (errors) {
-  //   // handle those errors like a pro
-  //   console.error(errors);
-  // }
-  // return data;
+
+  fs.writeFileSync("./src/data/" + payment.payload.nonce + ".gql", operationsDoc);
+
+  console.log(operationsDoc);
+  const { errors, data } = await fetchGraphQL(
+    operationsDoc,
+    "SendSignedPayment",
+    {}
+  );
+  if (errors) {
+    // handle those errors like a pro
+    console.error(errors);
+  }
+  return data;
 }
 
 export async function getNonce(publicKey: string) {

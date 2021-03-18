@@ -8,12 +8,12 @@ export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[],
     payoutsToSign.reduce( async (previousPromise, payout) => {
         await previousPromise;
         return new Promise<void>((resolve, reject) => {
-            setTimeout(() => {
+            setTimeout(async () => {
                 console.log(`#### Processing nonce ${nonce}...`);
                 const paymentTransaction: payment = { to: payout.publicKey, from: keys.publicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
                 try {
                     const signedPayment = signPayment(paymentTransaction, keys);
-                    const data = sendSignedPayment(signedPayment);
+                    const data = await sendSignedPayment(signedPayment);
                     // Writes them to a file by nonce for broadcasting
                     fs.writeFileSync("./src/data/" + nonce + ".json", JSON.stringify(data));
                     nonce++;
