@@ -108,7 +108,7 @@ async function main() {
           const CodaSDK = require("@o1labs/client-sdk");
           senderKeys = CodaSDK.genKeys();
         }
-        sendSignedTransactions(stakingPoolPublicKey, transactions, senderKeys);
+        sendSignedTransactions(transactions, senderKeys);
       } else {
         console.error("HASHES DON'T MATCH");
       }

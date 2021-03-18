@@ -3,8 +3,8 @@ import { PayoutTransaction } from "./payouts";
 import fs from "fs";
 import { getNonce, sendSignedPayment } from "./graph-queries";
 
-export async function sendSignedTransactions(key: string, payoutsToSign: PayoutTransaction[], keys: keypair) {
-    let nonce = await getNonce(key);
+export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair) {
+    let nonce = await getNonce(keys.publicKey);
     payoutsToSign.forEach((payout: PayoutTransaction) => {
         const paymentTransaction: payment = { to: payout.publicKey, from: keys.publicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
         try {
@@ -18,5 +18,3 @@ export async function sendSignedTransactions(key: string, payoutsToSign: PayoutT
         finally { };
     });
 };
-
-
