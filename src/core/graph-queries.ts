@@ -74,7 +74,7 @@ export async function getNonce(publicKey: string) {
   const operationsDoc = `
     query GetNonce($publicKey: String) {
       account(publicKey: $publicKey) {
-        nonce
+        inferredNonce
       }
     }
   `;
@@ -87,5 +87,5 @@ export async function getNonce(publicKey: string) {
     console.log(`not able to get the nonce`)
     console.log(errors);
   }
-  return data.account.nonce ?? 0;
+  return data.account.inferredNonce ?? 0;
 }
