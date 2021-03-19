@@ -1,12 +1,13 @@
 # mina-pool-payout
 
-_Inspired by [minaexplorer](https://github.com/garethtdavies/mina-payout-script)_
+_Inspired by [minaexplorer - mina-payout-script](https://github.com/garethtdavies/mina-payout-script)_
+This started out as a port from the original, but has morphed into a slightly different payout algorithm, so we don't want you thinking this will generate exactly the same results. 
 
-payout will calculate the required payouts for accounts delegating to a given account. The script will calculate the payouts, log the calculation details, provide a summary of funds required to make the payout, and a hash of the payout plan.
+This script will calculate or transmit the required payouts for accounts delegating to a given account. 
 
-The payout script can be re-run after verification, providing the hash from the first run as an authoization to actually make the payments. Payout will recalculate the payment plan, verify the hash to confirm the plan is the same as the authorized plan, and then sign and transmit payments to the network.
+Currently, the operational assumptions are in flux so the output and control mechanisms are changing rapidly. As soon  as things settle, we'll updat this! 
+// TODO: explain calculate vs. transmit modes, key config vales to maintain, etc.
 
-If necessary, it is assumed the pool operator will take offline steps to fund the payor account between runs.
 
 ## Getting started
 
