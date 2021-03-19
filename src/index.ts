@@ -1,12 +1,19 @@
 import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payouts";
 import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
-
+import hash from "object-hash";
+import yargs from "yargs";
 import CodaSDK, { keypair } from "@o1labs/client-sdk";
-import { signTransactionsToSend } from "./core/sign";
+import { sendSignedTransactions } from "./core/sign";
 import fs from "fs";
 
 // TODO: create mina currency types
+
+const args = yargs.options({
+  "payouthash": { type: "string", alias: ["h","hash"]},
+  "minheight": { type: "number", alias: ["m","min"], demandOption: true},
+  "maxheight": { type: "number", alias: ["x","max"], default: Number.MAX_VALUE}
+}).argv;
 
 async function main() {
   // TODO: Error handling
@@ -14,12 +21,10 @@ async function main() {
   // TODO: Fail if any required values missing from .env
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const globalSlotStart = Number(process.env.GLOBAL_SLOT_START) || 0;
-  const minimumHeight = Number(process.env.MIN_HEIGHT) || 0; // This can be the last known payout or this could be a starting date
   const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 290;
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH) || 7140;
   const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
   const payorSendTransactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
-  const nonce = Number(process.env.STARTING_NONCE) || 0;
   let generateEphemeralSenderKey = false;
   if( typeof(process.env.SEND_EPHEMERAL_KEY) === 'string' && process.env.SEND_EPHEMERAL_KEY.toLowerCase() == 'true'){
     generateEphemeralSenderKey = true;
@@ -29,13 +34,8 @@ async function main() {
     publicKey: process.env.SEND_PUBLIC_KEY || ""
   };
 
-  // MAX_HEIGHT is optional - if not provided, set to max
-  let configuredMaximum = 0;
-  if (typeof (process.env.MAX_HEIGHT) === 'undefined') {
-    configuredMaximum = Number.MAX_VALUE;
-  } else {
-    configuredMaximum = Number(process.env.MAX_HEIGHT);
-  }
+  const minimumHeight = args.minheight;
+  const configuredMaximum = args.maxheight;
 
   // get current maximum block height from database and determine what max block height for this run will be
   const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations);
@@ -96,16 +96,32 @@ async function main() {
       console.log(`wrote payout details to ${payoutDetailsFileName}`);
     });
 
-    if( generateEphemeralSenderKey) {
-      const CodaSDK = require("@o1labs/client-sdk");
-      senderKeys = CodaSDK.genKeys();
-    }
-    signTransactionsToSend(transactions, senderKeys, nonce);
-
     console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
     console.log('Potential Ledger Command:');
     console.log(`mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000 }`);
 
+    const payoutHash = hash(storePayout, { algorithm: "sha256" });
+    if (args.payouthash) {
+      console.log(`### Processing signed payout for hash ${args.payouthash}...`)
+      if (args.payouthash == payoutHash) {
+        if( generateEphemeralSenderKey) {
+          const CodaSDK = require("@o1labs/client-sdk");
+          senderKeys = CodaSDK.genKeys();
+        }
+        sendSignedTransactions(transactions, senderKeys);
+
+        const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, {flags:'a'});
+        blocks.forEach((block)=>{
+          paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
+        });
+        paidblockStream.end();
+
+      } else {
+        console.error("HASHES DON'T MATCH");
+      }
+    } else {
+      console.log(`PAYOUT HASH: ${payoutHash}`);
+    }
   });
 }
 
