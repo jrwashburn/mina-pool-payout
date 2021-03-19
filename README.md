@@ -2,20 +2,11 @@
 
 _Inspired by [minaexplorer](https://github.com/garethtdavies/mina-payout-script)_
 
-This script will calculate the required payouts for accounts delegating to a given account. The script will output JSON containing a list of public keys and their payout amounts, e.g.:
+payout will calculate the required payouts for accounts delegating to a given account. The script will calculate the payouts, log the calculation details, provide a summary of funds required to make the payout, and a hash of the payout plan.
 
-```json
-[
-  {
-    "publicKey": "B62qkbdgRRJJfqcyVd23s9tgCkNYuGMCmZHKijnJGqYgs9N3UdjcRtR",
-    "total": 4644003513
-  },
-  {
-    "publicKey": "B62qqMo7X8i2NnMxrtKf3PAWfbEADk4V1ojWhGeH6Gvye9hrMjBiZjM",
-    "total": 22577193721
-  }
-]
-```
+The payout script can be re-run after verification, providing the hash from the first run as an authoization to actually make the payments. Payout will recalculate the payment plan, verify the hash to confirm the plan is the same as the authorized plan, and then sign and transmit payments to the network.
+
+If necessary, it is assumed the pool operator will take offline steps to fund the payor account between runs.
 
 ## Getting started
 
@@ -72,8 +63,8 @@ mina advanced dump-keypair --privkey-path keys/my-payout-wallet
 ### Running the script
 
 1. Run `npm install` to install the project dependencies.
-2. Run `npm run payout -- -m={MIN_BLOCK}` to run the script as a dry run, where `{MIN_BLOCK}` is the lowest blockheight to process. This will not transmit any actual payments and will output a hash of the payment details.
-3. Run `npm run payout -- -m={MIN_BLOCK} -h={PAYOUT_HASH}` where `{PAYOUT_HASH}` is the hash produced during the dry run in the prior step. If this run produces the same hash (i.e. nothing has changed since the dry run), then the signed payment(s) will be transmitted.
+2. Run `npm run payout -- -m={MIN_BLOCK} [-x={MAX_BLOCK}]` to run the script as a dry run, where `{MIN_BLOCK}` is the lowest blockheight to process, and `{MAX_BLOCK}` is the highest blockheight to process. This will not transmit any actual payments and will output a hash of the payment details.
+3. Run `npm run payout -- -m={MIN_BLOCK} [-x={MAX_BLOCK} -h={PAYOUT_HASH}` where `{PAYOUT_HASH}` is the hash produced during the dry run in the prior step. If this run produces the same hash (i.e. nothing has changed since the dry run), then the signed payment(s) will be transmitted.
 
 ### Seeing Results ###
 
