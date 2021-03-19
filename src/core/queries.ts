@@ -98,7 +98,9 @@ export async function getBlocks(key: string, minHeight: number, maxHeight: numbe
         .on("error", reject);
     });
   };
-  await filterBlocks();
+  if (fs.existsSync(blockFile)) {
+    await filterBlocks();
+  }
   return blocks;
 }
 
