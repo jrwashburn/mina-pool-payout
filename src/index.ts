@@ -109,6 +109,13 @@ async function main() {
           senderKeys = CodaSDK.genKeys();
         }
         sendSignedTransactions(transactions, senderKeys);
+
+        const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, {flags:'a'});
+        blocks.forEach((block)=>{
+          paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
+        });
+        paidblockStream.end();
+
       } else {
         console.error("HASHES DON'T MATCH");
       }
