@@ -99,8 +99,8 @@ export type Block = {
     winnerpublickey: string;
     receiverpublickey: string;
     coinbase: number;
-    feeTransferToReceiver: number;
-    feeTransferFromCoinbase: number;
+    feetransfertoreceiver: number;
+    feetransferfromcoinbase: number;
     blockpayoutamount: number;
     usercommandtransactionfees: number;
 };
