@@ -1,5 +1,6 @@
 import { Block } from "./queries";
 import { stakeIsLocked, Stake } from "./stakes";
+const npsCommissionRate = 0.05
 
 export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number):
   Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]> {
@@ -27,9 +28,9 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
       // Determine the supercharged discount for the block
       const txFees = block.usercommandtransactionfees || 0;
       const superchargedWeightingDiscount = txFees / block.coinbase;
-      const totalRewards = block.blockpayoutamount;
+      const totalRewards = block.coinbase + block.feetransfertoreceiver - block.feetransferfromcoinbase;
       const totalNPSPoolRewards = stakeIsLocked(winner, block) ? block.coinbase : block.coinbase / 2;
-      const totalNPSPoolFees = .05 * totalNPSPoolRewards;
+      const totalNPSPoolFees = npsCommissionRate * totalNPSPoolRewards;
       const totalCommonPoolRewards = totalRewards - totalNPSPoolRewards;
       const totalCommonPoolFees = commissionRate * totalCommonPoolRewards;
 
