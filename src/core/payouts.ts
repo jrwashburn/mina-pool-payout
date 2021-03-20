@@ -1,7 +1,7 @@
 import { Block } from "./queries";
-import { StakingKey } from "./stakes";
+import { stakeIsLocked, Stake } from "./stakes";
 
-export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number):
+export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number):
   Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
 
   // Initialize some stuff
@@ -20,6 +20,12 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       // no coinbase, don't need to do anything
     } else {
 
+      const winners = stakers.filter(x => x.publicKey == block.winnerpublickey);
+      if (winners.length != 1) {
+        throw new Error("Should have exactly 1 winner.");
+      }
+      const winner = winners[0];
+
       let sumEffectivePoolStakes = 0;
       let effectivePoolStakes: { [key: string]: number } = {};
 
@@ -28,6 +34,10 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       const superchargedWeightingDiscount = txFees / block.coinbase;
       const totalRewards = block.blockpayoutamount
 
+
+      if (stakeIsLocked(winner, block.globalslotsincegenesis)) {
+        
+      }
       // NPS have to unwrap the net here now
       // have totalRewardsNPSPool and totalRewardsCommonPool
       /*
@@ -54,7 +64,7 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       //  of a common pool total of ~700
     
       // Determine the effective pool weighting based on sum of effective stakes
-      stakers.forEach((staker: StakingKey) => {
+      stakers.forEach((staker: Stake) => {
         let effectiveStake = 0;
         // if staker is unlocked, double their share (less discount for fees)
         // otherwise regular share
@@ -78,7 +88,7 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
         throw new Error('Staking Calculation is less than total stake')
       }
 
-      stakers.forEach((staker: StakingKey) => {
+      stakers.forEach((staker: Stake) => {
 
         const effectivePoolWeighting = effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
 
@@ -121,7 +131,7 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
 
   let payoutJson: PayoutTransaction[] = [];
   let totalPayout = 0;
-  stakers.forEach((staker: StakingKey) => {
+  stakers.forEach((staker: Stake) => {
     const amount = staker.total;
     if (amount > 0) {
       payoutJson.push({
