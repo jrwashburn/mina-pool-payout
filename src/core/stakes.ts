@@ -1,3 +1,5 @@
+import { Block } from "./queries";
+
 export type Stake = {
   publicKey: string,
   total: number,
@@ -47,8 +49,8 @@ export function getStakes(ledgerHash: string, key: string, globalSlotStart: numb
   return [stakers, totalStakingBalance];
 }
 
-export function stakeIsLocked(stake: Stake, slot: number){
-  return stake.untimedAfterSlot > slot;
+export function stakeIsLocked(stake: Stake, block: Block){
+  return stake.untimedAfterSlot && stake.untimedAfterSlot > block.globalslotsincegenesis;
 }
 
 function GetPublicKeyShareClass(key: string) {
