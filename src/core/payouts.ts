@@ -96,7 +96,6 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
           payout: blockTotal,
         });
       });
-
     }
   });
 
@@ -108,12 +107,13 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
       payoutJson.push({
         publicKey: staker.publicKey,
         amount: amount,
-        fee: 0
+        fee: 0,
+        amountMina: 0,
+        feeMina: 0 
       });
       totalPayout += amount;
     }
   });
-
   return [payoutJson, storePayout, blocksIncluded, totalPayout];
 }
 
@@ -151,5 +151,7 @@ export type PayoutDetails = {
 export type PayoutTransaction = {
   publicKey: string,
   amount: number,
-  fee: number
+  fee: number,
+  amountMina: number,
+  feeMina: number
 };

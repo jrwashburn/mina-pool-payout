@@ -75,13 +75,19 @@ async function main() {
     const transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
-        fee: 0
+        fee: 0,
+        amountMina: 0,
+        feeMina: 0
       });
       item.amount += o.amount;
       item.fee = payorSendTransactionFee;
+      item.amountMina = item.amount / 1000000000;
+      item.feeMina = item.fee / 1000000000;
       totalPayoutFundsNeeded += item.amount + item.fee;
       return r.set(o.publicKey, item);
     }, new Map).values()];
+
+    console.table(transactions);
 
     const runDateTime = new Date();
     const payoutTransactionsFileName = generateOutputFileName("payout_transactions", runDateTime, minimumHeight, maximumHeight);
