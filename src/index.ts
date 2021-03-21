@@ -3,7 +3,7 @@ import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
 import hash from "object-hash";
 import yargs from "yargs";
-import { keypair } from "mainnet-client-sdk";
+import CodaSDK, { keypair } from "@o1labs/client-sdk";
 import { sendSignedTransactions } from "./core/sign";
 import fs from "fs";
 

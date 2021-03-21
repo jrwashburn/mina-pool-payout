@@ -1,14 +1,7 @@
-import { keypair, payment, signPayment as mSignPayment } from "mainnet-client-sdk";
-import { signPayment as tSignPayment } from "testnet-client-sdk";
+import { signPayment, keypair, payment } from "@o1labs/client-sdk";
 import { PayoutTransaction } from "./payouts";
 import fs from "fs";
 import { getNonce, sendSignedPayment } from "./graph-queries";
-
-const signPayment = 
-    typeof(process.env.TESTNET) === 'string' && 
-    process.env.TESTNET.toLowerCase() == 'true' ?
-    tSignPayment :
-    mSignPayment;
 
 export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair) {
     let nonce = await getNonce(keys.publicKey);
