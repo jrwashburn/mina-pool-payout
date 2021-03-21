@@ -32,9 +32,10 @@ async function main() {
     generateEphemeralSenderKey = true;
   };
   let signOnly = false;
+  let signOnlyNonce = "0"
   if (typeof (process.env.SIGN_ONLY) === 'string' && process.env.SIGN_ONLY.toLowerCase() == 'true') {
     signOnly = true;
-    let signOnlyNonce = process.env.NONCE || 0;
+    signOnlyNonce = process.env.NONCE || "";
   };
   let senderKeys: keypair = {
     privateKey: process.env.SEND_PRIVATE_KEY || "",

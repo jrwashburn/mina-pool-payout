@@ -11,7 +11,7 @@ const signPayment =
         tSignPayment :
         mSignPayment;
 
-export async function signTransactionsWithOptionalSend(payoutsToSign: PayoutTransaction[], keys: keypair, memo: string, signOnly: boolean, signOnlyNonce: number) {
+export async function signTransactionsWithOptionalSend(payoutsToSign: PayoutTransaction[], keys: keypair, memo: string, signOnly: boolean, signOnlyNonce: string) {
     let nonce = signOnly ? signOnlyNonce : await getNonce(keys.publicKey);
     payoutsToSign.reduce(async (previousPromise, payout) => {
         await previousPromise;
