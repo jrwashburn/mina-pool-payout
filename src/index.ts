@@ -76,8 +76,6 @@ async function main() {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
         fee: 0,
-        amountMina: 0,
-        feeMina: 0
       });
       item.amount += o.amount;
       item.fee = payorSendTransactionFee;

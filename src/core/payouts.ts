@@ -67,8 +67,8 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
         const effectiveCommonPoolWeighting = effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes;
 
         const blockTotal = 
-          Math.round((totalNPSPoolRewards - totalNPSPoolFees) * effectiveNPSPoolWeighting ) +
-          Math.round((totalCommonPoolRewards - totalCommonPoolFees) * effectiveCommonPoolWeighting);  
+          Math.floor((totalNPSPoolRewards - totalNPSPoolFees) * effectiveNPSPoolWeighting ) +
+          Math.floor((totalCommonPoolRewards - totalCommonPoolFees) * effectiveCommonPoolWeighting);  
 
           staker.total += blockTotal;
 
