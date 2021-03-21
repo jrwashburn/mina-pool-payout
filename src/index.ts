@@ -57,30 +57,29 @@ async function main() {
     
     // run the payout calculation for those blocks
     const ledgerBlocks = blocks.filter(x => x.stakingledgerhash == ledgerHash);
-    const [ledgerPayouts, ledgerStorePayout, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout] = await getPayouts(ledgerBlocks, stakers, totalStake, commissionRate);
+    const [ledgerPayouts, ledgerStorePayout, blocksIncluded, totalPayout] = await getPayouts(ledgerBlocks, stakers, totalStake, commissionRate);
     payouts.push(...ledgerPayouts);
     storePayout.push(...ledgerStorePayout);
 
     // Output total results and transaction files for input to next process, details file for audit log
     console.log(`We won these blocks: ${blocksIncluded}`);
-    console.log(`We are paying out based on total rewards of ${allBlocksTotalRewards} nanomina in this window.`);
-    console.log(`That is ${allBlocksTotalRewards / 1000000000} mina`);
-    console.log(`The Pool Fee is ${allBlocksTotalPoolFees / 1000000000} mina`);
-    console.log(`Total Payout should be ${(allBlocksTotalRewards) - (allBlocksTotalPoolFees)} nanomina or ${((allBlocksTotalRewards) - (allBlocksTotalPoolFees)) / 1000000000} mina`)
-    console.log(`The Total Payout is actually: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
+    console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
   })).then(()=>{
     // Aggregate to a single transaction per key and track the total for funding transaction
     let totalPayoutFundsNeeded = 0
     const transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
-        fee: 0
+        fee: 0,
       });
       item.amount += o.amount;
       item.fee = payorSendTransactionFee;
       totalPayoutFundsNeeded += item.amount + item.fee;
       return r.set(o.publicKey, item);
     }, new Map).values()];
+
+    console.table(storePayout, ["publicKey", "blockHeight", "shareClass","stakingBalance", "effectiveNPSPoolWeighting","effectiveCommonPoolWeighting", "coinbase", "totalRewards", "totalRewardsNPSPool","totalRewardsCommonPool","payout"]);
+    console.table(transactions);
 
     const runDateTime = new Date();
     const payoutTransactionsFileName = generateOutputFileName("payout_transactions", runDateTime, minimumHeight, maximumHeight);

@@ -1,12 +1,13 @@
 import { Block } from "./queries";
-import { StakingKey } from "./stakes";
+import { stakeIsLocked, Stake } from "./stakes";
+// per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
+// see https://minaprotocol.com/docs/advanced/foundation-delegation-program
+const npsCommissionRate = 0.05
 
-export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalStake: number, commissionRate: number):
-  Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], allBlocksTotalRewards: number, allBlocksTotalPoolFees: number, totalPayout: number]> {
+export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number):
+  Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]> {
 
   // Initialize some stuff
-  let allBlocksTotalRewards = 0;
-  let allBlocksTotalPoolFees = 0;
   let blocksIncluded: number[] = [];
   let storePayout: PayoutDetails[] = [];
 
@@ -20,60 +21,56 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
       // no coinbase, don't need to do anything
     } else {
 
-      let sumEffectivePoolStakes = 0;
-      let effectivePoolStakes: { [key: string]: number } = {};
+      const winner = getWinner(stakers, block);
+
+      let sumEffectiveCommonPoolStakes = 0;
+      let sumEffectiveNPSPoolStakes = 0;
+      let effectivePoolStakes: { [key: string]: { npsStake: number , commonStake: number} } = {};
+
+      const transactionFees = block.usercommandtransactionfees || 0;
+      const totalRewards = block.coinbase + block.feetransfertoreceiver - block.feetransferfromcoinbase;
+      const totalNPSPoolRewards = stakeIsLocked(winner, block) ? block.coinbase : block.coinbase / 2;
+      const totalNPSPoolFees = npsCommissionRate * totalNPSPoolRewards;
+      const totalCommonPoolRewards = totalRewards - totalNPSPoolRewards;
+      const totalCommonPoolFees = commissionRate * totalCommonPoolRewards;
 
       // Determine the supercharged discount for the block
-      // TODO: Should this be based on net fees, which is:
-      // block.feeTransferToReceiver - block.feeTransferFromCoinbase
-      // instead of txfees.
+      //  unlocked accounts will get a double share less this discount based on the ratio of fees : coinbase
+      //  unlocaked accounts generate extra coinbase, but if fees are significant, that coinbase would have a lower relative weight
+      const superchargedWeightingDiscount = transactionFees / block.coinbase;
 
-      const txFees = block.usercommandtransactionfees || 0;
-      const superchargedWeightingDiscount = txFees / block.coinbase;
-
-      // What are the rewards for the block
-      const totalRewards = block.blockpayoutamount
-      const totalPoolFees = commissionRate * totalRewards;
-
-      allBlocksTotalRewards += totalRewards;
-      allBlocksTotalPoolFees += totalPoolFees;
-
-      // TODO: Add checks & balances
-
-      // Determine the effective pool weighting based on sum of effective stakes
-      // TODO: need to handle rounding to elminate franctional nanomina
-      stakers.forEach((staker: StakingKey) => {
-        let effectiveStake = 0;
-        // if staker is unlocked, double their share (less discount for fees)
-        // otherwise regular share
-        if (block.globalslotsincegenesis > staker.untimedAfterSlot) {
-          effectiveStake = (staker.stakingBalance * (2 - superchargedWeightingDiscount));
-        } else {
-          effectiveStake = staker.stakingBalance;
+      let totalUnweightedCommonStake = 0;
+      // Determine the non-participating and common pool weighting for each staker
+      stakers.forEach((staker: Stake) => {
+        let effectiveNPSStake = staker.stakingBalance;
+        let effectiveCommonStake = 0;
+        // common stake stays at 0 for NPS shares - they do not participate with the common in fees or supercharged block coinbase
+        if (staker.shareClass == "Common") {
+          effectiveCommonStake = !stakeIsLocked(staker, block) ? staker.stakingBalance * (2 - superchargedWeightingDiscount) : staker.stakingBalance;
+          totalUnweightedCommonStake += staker.stakingBalance
         }
-        effectivePoolStakes[staker.publicKey] = effectiveStake;
-        sumEffectivePoolStakes += effectiveStake;
+        sumEffectiveNPSPoolStakes += effectiveNPSStake;
+        sumEffectiveCommonPoolStakes += effectiveCommonStake;
+        effectivePoolStakes[staker.publicKey] = {npsStake: effectiveNPSStake, commonStake: effectiveCommonStake};
       });
 
       // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
-      // TODO: assert total_staking_balance <= sum_effective_pool_stakes <= 2 * total_staking_balance
-      if (sumEffectivePoolStakes > totalStake * 2) {
-        throw new Error('Staking Calculation is more than 2x total stake')
+      if (sumEffectiveNPSPoolStakes != totalStake) {
+        throw new Error('NPS Share must be equal to total staked amount');
       }
-      if (sumEffectivePoolStakes < totalStake) {
-        throw new Error('Staking Calculation is less than total stake')
+      if (sumEffectiveCommonPoolStakes > totalUnweightedCommonStake * 2) {
+        throw new Error('Common weighted share must not be greater than 2x total common stake');
       }
 
-      stakers.forEach((staker: StakingKey) => {
-        const effectivePoolWeighting = effectivePoolStakes[staker.publicKey] / sumEffectivePoolStakes;
+      stakers.forEach((staker: Stake) => {
+        const effectiveNPSPoolWeighting = effectivePoolStakes[staker.publicKey].npsStake / sumEffectiveNPSPoolStakes ;
+        const effectiveCommonPoolWeighting = effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes;
 
-        // This must be less than 1 or we have a major issue
-        // TODO: assert effective_pool_weighting <= 1
-        // TODO: use 9 digits precision
-        const blockTotal = Math.round(
-          (totalRewards - totalPoolFees) * effectivePoolWeighting
-        );
-        staker.total += blockTotal;
+        const blockTotal = 
+          Math.floor((totalNPSPoolRewards - totalNPSPoolFees) * effectiveNPSPoolWeighting ) +
+          Math.floor((totalCommonPoolRewards - totalCommonPoolFees) * effectiveCommonPoolWeighting);  
+
+          staker.total += blockTotal;
 
         // Store this data in a structured format for later querying and for the payment script, handled seperately
         storePayout.push({
@@ -81,15 +78,21 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
           blockHeight: block.blockheight,
           globalSlot: block.globalslotsincegenesis,
           publicKeyUntimedAfter: staker.untimedAfterSlot,
+          shareClass: staker.shareClass,
           stateHash: block.statehash,
-          effectivePoolWeighting: effectivePoolWeighting,
-          effectivePoolStakes: effectivePoolStakes[staker.publicKey],
           stakingBalance: staker.stakingBalance,
-          sumEffectivePoolStakes: sumEffectivePoolStakes,
+          effectiveNPSPoolWeighting: effectiveNPSPoolWeighting, 
+          effectiveNPSPoolStakes: effectivePoolStakes[staker.publicKey].npsStake,
+          effectiveCommonPoolWeighting: effectiveCommonPoolWeighting,
+          effectiveCommonPoolStakes: effectivePoolStakes[staker.publicKey].commonStake,
+          sumEffectiveNPSPoolStakes: sumEffectiveNPSPoolStakes,
+          sumEffectiveCommonPoolStakes: sumEffectiveCommonPoolStakes,
           superchargedWeightingDiscount: superchargedWeightingDiscount,
           dateTime: block.blockdatetime,
           coinbase: block.coinbase,
           totalRewards: totalRewards,
+          totalRewardsNPSPool: totalNPSPoolRewards, 
+          totalRewardsCommonPool: totalCommonPoolRewards,
           payout: blockTotal,
         });
       });
@@ -98,19 +101,26 @@ export async function getPayouts(blocks: Block[], stakers: StakingKey[], totalSt
 
   let payoutJson: PayoutTransaction[] = [];
   let totalPayout = 0;
-  stakers.forEach((staker: StakingKey) => {
+  stakers.forEach((staker: Stake) => {
     const amount = staker.total;
     if (amount > 0) {
       payoutJson.push({
         publicKey: staker.publicKey,
         amount: amount,
-        fee: 0
+        fee: 0,
       });
       totalPayout += amount;
     }
   });
+  return [payoutJson, storePayout, blocksIncluded, totalPayout];
+}
 
-  return [payoutJson, storePayout, blocksIncluded, allBlocksTotalRewards, allBlocksTotalPoolFees, totalPayout];
+function getWinner(stakers: Stake[], block: Block): Stake {
+  const winners = stakers.filter(x => x.publicKey == block.winnerpublickey);
+  if (winners.length != 1) {
+    throw new Error("Should have exactly 1 winner.");
+  }
+  return winners[0];
 }
 
 export type PayoutDetails = {
@@ -118,20 +128,26 @@ export type PayoutDetails = {
   blockHeight: number,
   globalSlot: number,
   publicKeyUntimedAfter: number,
+  shareClass: "NPS"|"Common",
   stateHash: string,
-  effectivePoolWeighting: number,
-  effectivePoolStakes: number,
+  effectiveNPSPoolWeighting: number, 
+  effectiveNPSPoolStakes: number,
+  effectiveCommonPoolWeighting: number,
+  effectiveCommonPoolStakes: number,
   stakingBalance: number,
-  sumEffectivePoolStakes: number,
+  sumEffectiveNPSPoolStakes: number,
+  sumEffectiveCommonPoolStakes: number,
   superchargedWeightingDiscount: number,
   dateTime: number,
   coinbase: number,
   totalRewards: number,
+  totalRewardsNPSPool: number,
+  totalRewardsCommonPool: number,
   payout: number
 };
 
 export type PayoutTransaction = {
   publicKey: string,
   amount: number,
-  fee: number
+  fee: number,
 };

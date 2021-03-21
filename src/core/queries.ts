@@ -16,7 +16,6 @@ const blockQuery = `
     coalesce( bif.coinbase, 0) AS coinbase,
     coalesce( bif2.feeTransferToReceiver, 0) AS feeTransferToReceiver,
     coalesce( bif.feeTransferFromCoinbase, 0) AS feeTransferFromCoinbase,
-    coalesce( bif.coinbase + bif2.feeTransferToReceiver - bif.feeTransferFromCoinbase, 0) AS blockPayoutAmount,
     coalesce( btf.userCommandTransactionFees, 0) AS userCommandTransactionFees
     FROM blocks b
     INNER JOIN public_keys pkc ON b.creator_id = pkc.id
@@ -119,9 +118,8 @@ export type Block = {
   winnerpublickey: string;
   receiverpublickey: string;
   coinbase: number;
-  feeTransferToReceiver: number;
-  feeTransferFromCoinbase: number;
-  blockpayoutamount: number;
+  feetransfertoreceiver: number;
+  feetransferfromcoinbase: number;
   usercommandtransactionfees: number;
 };
 

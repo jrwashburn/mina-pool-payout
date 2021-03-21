@@ -1,8 +1,12 @@
-export type StakingKey = {
+import { Block } from "./queries";
+import fs from "fs";
+
+export type Stake = {
   publicKey: string,
   total: number,
   stakingBalance: number,
-  untimedAfterSlot: number
+  untimedAfterSlot: number,
+  shareClass: "NPS" | "Common",
 };
 
 //TODO: Add remaining field definitions as needed
@@ -10,11 +14,18 @@ export type LedgerEntry =   {
   pk: string,
   balance: number,
   delegate: string
+  timing: {
+    initial_minimum_balance: number,
+    cliff_time: number,
+    cliff_amount: number,
+    vesting_period: number,
+    vesting_increment: number
+  }
 };
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
-// calculate timed weighting
-export function getStakes(ledgerHash: string, key: string, globalSlotStart: number, slotsPerEpoch: number): [StakingKey[], number] {
+// determine when key will be unlocked and eligible for supercharged coinbase awards
+export function getStakes(ledgerHash: string, key: string, globalSlotStart: number, slotsPerEpoch: number): [Stake[], number] {
   let totalStakingBalance: number = 0;
   // get the stakes from staking ledger json
   // TODO: this might need to be reworked for large files
@@ -23,7 +34,7 @@ export function getStakes(ledgerHash: string, key: string, globalSlotStart: numb
   // if (!fs.existsSync(ledgerFile)){ throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`)}
   const ledger = require(ledgerFile);
 
-  const stakers: StakingKey[] = ledger
+  const stakers: Stake[] = ledger
     .filter((entry: LedgerEntry) => entry.delegate == key)
     .map((stake: LedgerEntry) => {
       const balance = Number(stake.balance);
@@ -32,25 +43,41 @@ export function getStakes(ledgerHash: string, key: string, globalSlotStart: numb
         publicKey: stake.pk,
         total: 0,
         stakingBalance: balance,
-        untimedAfterSlot: calculateUntimedSlot(stake)
+        untimedAfterSlot: calculateUntimedSlot(stake),
+        shareClass: GetPublicKeyShareClass(stake.pk)
       };
     });
   return [stakers, totalStakingBalance];
 }
-  
+
+export function stakeIsLocked(stake: Stake, block: Block){
+  return stake.untimedAfterSlot && stake.untimedAfterSlot > block.globalslotsincegenesis;
+}
+
+const foundationAddresses = fs.readFileSync(`${__dirname}/../data/nps-addresses/Mina_Foundation_Addresses.csv`).toString().split(/[\n\r]+/);
+const o1labsAddresses = fs.readFileSync(`${__dirname}/../data/nps-addresses/O1_Labs_addresses.csv`).toString().split(/[\n\r]+/);
+
+function GetPublicKeyShareClass(key: string) {
+  if (foundationAddresses.includes(key) || o1labsAddresses.includes(key)){
+    return "NPS";
+  } else {
+    return "Common";
+  }
+}
+ 
 // Changed from original implementation to simply return the slot number at which account beomes untimed
-function calculateUntimedSlot(stake: any): number {
+function calculateUntimedSlot(ledgerEntry: LedgerEntry): number {
 
   // account is not locked if there is no timing section at all
-  if (typeof (stake.timing) === 'undefined') {
+  if (typeof (ledgerEntry.timing) === 'undefined') {
     // Untimed for full epoch so we have the maximum weighting of 1
     return 0;
   } else {
-    const vestingPeriod: number = Number(stake.timing.vesting_period);
-    const vestingIncrement: number = Number(stake.timing.vesting_increment);
-    const cliffTime: number = Number(stake.timing.cliff_time);
-    const cliffAmount: number = Number(stake.timing.cliff_amount);
-    const initialMinimumBalance: number = Number(stake.timing.initial_minimum_balance);
+    const vestingPeriod: number = Number(ledgerEntry.timing.vesting_period);
+    const vestingIncrement: number = Number(ledgerEntry.timing.vesting_increment);
+    const cliffTime: number = Number(ledgerEntry.timing.cliff_time);
+    const cliffAmount: number = Number(ledgerEntry.timing.cliff_amount);
+    const initialMinimumBalance: number = Number(ledgerEntry.timing.initial_minimum_balance);
 
     if (vestingIncrement == 0) {
       //if vestingIncrement is zero, account may never unlock
