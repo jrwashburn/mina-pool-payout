@@ -1,5 +1,7 @@
 import { Block } from "./queries";
 import { stakeIsLocked, Stake } from "./stakes";
+// per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
+// see https://minaprotocol.com/docs/advanced/foundation-delegation-program
 const npsCommissionRate = 0.05
 
 export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number):
@@ -25,21 +27,27 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
       let sumEffectiveNPSPoolStakes = 0;
       let effectivePoolStakes: { [key: string]: { npsStake: number , commonStake: number} } = {};
 
-      // Determine the supercharged discount for the block
-      const txFees = block.usercommandtransactionfees || 0;
-      const superchargedWeightingDiscount = txFees / block.coinbase;
+      const transactionFees = block.usercommandtransactionfees || 0;
       const totalRewards = block.coinbase + block.feetransfertoreceiver - block.feetransferfromcoinbase;
       const totalNPSPoolRewards = stakeIsLocked(winner, block) ? block.coinbase : block.coinbase / 2;
       const totalNPSPoolFees = npsCommissionRate * totalNPSPoolRewards;
       const totalCommonPoolRewards = totalRewards - totalNPSPoolRewards;
       const totalCommonPoolFees = commissionRate * totalCommonPoolRewards;
 
-      // Determine the effective pool weighting based on sum of effective stakes
+      // Determine the supercharged discount for the block
+      //  unlocked accounts will get a double share less this discount based on the ratio of fees : coinbase
+      //  unlocaked accounts generate extra coinbase, but if fees are significant, that coinbase would have a lower relative weight
+      const superchargedWeightingDiscount = transactionFees / block.coinbase;
+
+      let totalUnweightedCommonStake = 0;
+      // Determine the non-participating and common pool weighting for each staker
       stakers.forEach((staker: Stake) => {
         let effectiveNPSStake = staker.stakingBalance;
         let effectiveCommonStake = 0;
+        // common stake stays at 0 for NPS shares - they do not participate with the common in fees or supercharged block coinbase
         if (staker.shareClass == "Common") {
           effectiveCommonStake = !stakeIsLocked(staker, block) ? staker.stakingBalance * (2 - superchargedWeightingDiscount) : staker.stakingBalance;
+          totalUnweightedCommonStake += staker.stakingBalance
         }
         sumEffectiveNPSPoolStakes += effectiveNPSStake;
         sumEffectiveCommonPoolStakes += effectiveCommonStake;
@@ -47,11 +55,11 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
       });
 
       // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
-      if ((sumEffectiveNPSPoolStakes + sumEffectiveNPSPoolStakes) > totalStake * 2) {
-        throw new Error('Staking Calculation is more than 2x total stake')
+      if (sumEffectiveNPSPoolStakes != totalStake) {
+        throw new Error('NPS Share must be equal to total staked amount');
       }
-      if ((sumEffectiveNPSPoolStakes + sumEffectiveNPSPoolStakes) < totalStake) {
-        throw new Error('Staking Calculation is less than total stake')
+      if (sumEffectiveCommonPoolStakes > totalUnweightedCommonStake * 2) {
+        throw new Error('Common weighted share must not be greater than 2x total common stake');
       }
 
       stakers.forEach((staker: Stake) => {
