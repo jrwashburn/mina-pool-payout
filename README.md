@@ -41,12 +41,6 @@ mina advanced dump-keypair --privkey-path keys/my-payout-wallet
 
    The consensus parameters will be used to determine finality and the max height if `MAX_HEIGHT` is not provided.
 
-- Set `SIGN_ONLY` to `TRUE` to run offline only, default FALSE to broadcast transactions. This also requires a NONCE to be provided.
-
-- Set `NONCE` to current nonce for offline signing. Required if SIGN_ONLY=TRUE, don't forget to increment!
-
-- Populate `TESTNET` with `TRUE` or `FALSE`. If TRUE, transactions will be signed using O(1) CodaSDK 0.2.5; if FALSE, the mainnet signer (v1.0.0) will be used.
-
 - Set `GLOBAL_SLOT_START=0` - expect to deprecate
 
 - Set `SLOTS_PER_EPOCH=7140` - expeect to deprecate

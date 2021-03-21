@@ -3,8 +3,8 @@ import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
 import hash from "object-hash";
 import yargs from "yargs";
-import { keypair } from "mainnet-client-sdk";
-import { signTransactionsWithOptionalSend } from "./core/sign";
+import { keypair } from "@o1labs/client-sdk";
+import { sendSignedTransactions } from "./core/sign";
 import fs from "fs";
 
 // TODO: create mina currency types
@@ -21,7 +21,6 @@ async function main() {
   // TODO: Fail if any required values missing from .env
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const payoutMemo: string = process.env.POOL_MEMO || "";
-
   const globalSlotStart = Number(process.env.GLOBAL_SLOT_START) || 0;
   const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 290;
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH) || 7140;
@@ -30,12 +29,6 @@ async function main() {
   let generateEphemeralSenderKey = false;
   if (typeof (process.env.SEND_EPHEMERAL_KEY) === 'string' && process.env.SEND_EPHEMERAL_KEY.toLowerCase() == 'true') {
     generateEphemeralSenderKey = true;
-  };
-  let signOnly = false;
-  let signOnlyNonce = "0"
-  if (typeof (process.env.SIGN_ONLY) === 'string' && process.env.SIGN_ONLY.toLowerCase() == 'true') {
-    signOnly = true;
-    signOnlyNonce = process.env.NONCE || "";
   };
   let senderKeys: keypair = {
     privateKey: process.env.SEND_PRIVATE_KEY || "",
@@ -111,15 +104,13 @@ async function main() {
     if (args.payouthash) {
       console.log(`### Processing signed payout for hash ${args.payouthash}...`)
       if (args.payouthash == payoutHash) {
-        signTransactionsWithOptionalSend(transactions, senderKeys, payoutMemo, signOnly, signOnlyNonce);
+        sendSignedTransactions(transactions, senderKeys, payoutMemo, signOnly, signOnlyNonce);
+        const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, {flags:'a'});
+        blocks.forEach((block)=>{
+          paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
+        });
+        paidblockStream.end();
       }
-
-      const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, { flags: 'a' });
-      blocks.forEach((block) => {
-        paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
-      });
-      paidblockStream.end();
-
     } else {
       console.error("HASHES DON'T MATCH");
     }
