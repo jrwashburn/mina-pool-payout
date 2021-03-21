@@ -1,4 +1,5 @@
 import { Block } from "./queries";
+import fs from "fs";
 
 export type Stake = {
   publicKey: string,
@@ -53,9 +54,10 @@ export function stakeIsLocked(stake: Stake, block: Block){
   return stake.untimedAfterSlot && stake.untimedAfterSlot > block.globalslotsincegenesis;
 }
 
+const foundationAddresses = fs.readFileSync(`${__dirname}/../data/nps-addresses/Mina_Foundation_Addresses.csv`).toString().split(/[\n\r]+/);
+const o1labsAddresses = fs.readFileSync(`${__dirname}/../data/nps-addresses/O1_Labs_addresses.csv`).toString().split(/[\n\r]+/);
+
 function GetPublicKeyShareClass(key: string) {
-  const foundationAddresses: string[] = require(`${__dirname}/../data/nps-addresses/Mina_Foundation_Addresses.json`);
-  const o1labsAddresses: string[] = require(`${__dirname}/../data/nps-addresses/O1_Labs_addresses.json`);
   if (foundationAddresses.includes(key) || o1labsAddresses.includes(key)){
     return "NPS";
   } else {
