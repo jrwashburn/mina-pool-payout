@@ -118,7 +118,7 @@ async function main() {
         console.error("HASHES DON'T MATCH");
       }
     } else {
-    console.log(`PAYOUT HASH: ${payoutHash}`);
+      console.log(`PAYOUT HASH: ${payoutHash}`);
     }
   });
 }

@@ -10,7 +10,7 @@ export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[],
         return new Promise<void>((resolve, reject) => {
             setTimeout(async () => {
                 console.log(`#### Processing nonce ${nonce}...`);
-                const paymentTransaction: payment = { to: payout.publicKey, from: keys.publicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
+                const paymentTransaction: payment = { to: payout.publicKey, from: keys.publicKey, fee: payout.fee, amount: payout.amount, nonce: nonce, memo: memo };
                 try {
                     const signedPayment = signPayment(paymentTransaction, keys);
                     const data = await sendSignedPayment(signedPayment);
