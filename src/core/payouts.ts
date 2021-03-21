@@ -108,8 +108,6 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
         publicKey: staker.publicKey,
         amount: amount,
         fee: 0,
-        amountMina: 0,
-        feeMina: 0 
       });
       totalPayout += amount;
     }
@@ -152,6 +150,4 @@ export type PayoutTransaction = {
   publicKey: string,
   amount: number,
   fee: number,
-  amountMina: number,
-  feeMina: number
 };

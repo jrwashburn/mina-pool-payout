@@ -81,12 +81,11 @@ async function main() {
       });
       item.amount += o.amount;
       item.fee = payorSendTransactionFee;
-      item.amountMina = item.amount / 1000000000;
-      item.feeMina = item.fee / 1000000000;
       totalPayoutFundsNeeded += item.amount + item.fee;
       return r.set(o.publicKey, item);
     }, new Map).values()];
 
+    console.table(storePayout, ["publicKey", "blockHeight", "shareClass","stakingBalance", "effectiveNPSPoolWeighting","effectiveCommonPoolWeighting", "coinbase", "totalRewards", "totalRewardsNPSPool","totalRewardsCommonPool","payout"]);
     console.table(transactions);
 
     const runDateTime = new Date();
