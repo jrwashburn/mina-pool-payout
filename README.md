@@ -1,11 +1,11 @@
 # mina-pool-payout
 
 _Inspired by [minaexplorer - mina-payout-script](https://github.com/garethtdavies/mina-payout-script)_
-This started out as a port from the original, but has morphed into a slightly different payout algorithm, so we don't want you thinking this will generate exactly the same results. 
+This started out as a port from the original, but has morphed into a slightly different payout algorithm, so we don't want you thinking this will generate exactly the same results.
 
-This script will calculate or transmit the required payouts for accounts delegating to a given account. 
+This script will calculate or transmit the required payouts for accounts delegating to a given account.
 
-Currently, the operational assumptions are in flux so the output and control mechanisms are changing rapidly. As soon  as things settle, we'll updat this! 
+Currently, the operational assumptions are in flux so the output and control mechanisms are changing rapidly. As soon  as things settle, we'll updat this!
 // TODO: explain calculate vs. transmit modes, key config vales to maintain, etc.
 
 
@@ -43,9 +43,9 @@ mina advanced dump-keypair --privkey-path keys/my-payout-wallet
 
 8. Set `SLOTS_PER_EPOCH=7140` - expeect to deprecate
 
-9. Set `MIN_CONFIRMATIONS` to whatever number of confirmed blocks you require before paying out. Default to 290 or "k" to use the assumed network finality. 
+9. Set `MIN_CONFIRMATIONS` to whatever number of confirmed blocks you require before paying out. Default to 290 or "k" to use the assumed network finality.
 
-    The process will include blocks at a height up to the **lower of** `MAX_HEIGHT` and the current tip minus `MIN_CONFIRMATIONS`. 
+    The process will include blocks at a height up to the **lower of** `MAX_HEIGHT` and the current tip minus `MIN_CONFIRMATIONS`.
 
     To clarify - `MAX_HEIGHT` only applies _below_ the minimum confirmation window. (i.e. Given a  current block height of 1,500; `MAX_HEIGHT` of 5,000; and `MIN_CONFIRMATIONS` of 290, the process will consider blocks up to height 1210 (1500-290). If `MAX_HEIGHT` were set to 1,000, then the process would consider blocks up to height 1000.)
 
@@ -55,7 +55,9 @@ mina advanced dump-keypair --privkey-path keys/my-payout-wallet
     DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
     ```
 
-11. Export the relevant staking ledger and place in src/data/ledger directory. You can export the current staking ledger with: 
+11. Populate `TESTNET` with `TRUE` or `FALSE`. If TRUE, transactions will be signed using O(1) CodaSDK 0.2.5; if FALSE, the mainnet signer (v1.0.0) will be used.
+
+12. Export the relevant staking ledger and place in src/data/ledger directory. You can export the current staking ledger with:
 
     ```
     coda ledger export staking-epoch-ledger > staking-epoch-ledger.json
