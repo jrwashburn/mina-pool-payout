@@ -3,7 +3,7 @@ import { PayoutTransaction } from "./payouts";
 import fs from "fs";
 import { getNonce, sendSignedPayment } from "./graph-queries";
 
-export async function signTransactionsWithOptionalSend(payoutsToSign: PayoutTransaction[], keys: keypair, memo: string, signOnly: boolean, signOnlyNonce: string) {
+export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair, memo: string) {
     let nonce = await getNonce(keys.publicKey);
     payoutsToSign.reduce( async (previousPromise, payout) => {
         await previousPromise;

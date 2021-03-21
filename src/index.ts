@@ -104,7 +104,7 @@ async function main() {
     if (args.payouthash) {
       console.log(`### Processing signed payout for hash ${args.payouthash}...`)
       if (args.payouthash == payoutHash) {
-        sendSignedTransactions(transactions, senderKeys, payoutMemo, signOnly, signOnlyNonce);
+        sendSignedTransactions(transactions, senderKeys, payoutMemo);
         const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, {flags:'a'});
         blocks.forEach((block)=>{
           paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
