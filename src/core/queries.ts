@@ -1,4 +1,6 @@
 import { db } from "../infrastructure/database";
+import fs from "fs";
+import parse from "csv-parse";
 
 const blockQuery = `
     SELECT
@@ -73,34 +75,52 @@ const blockQuery = `
 `;
 
 export async function getLatestHeight() {
-    const result = await db.one<LatestHeight>(`
+  const result = await db.one<LatestHeight>(`
         SELECT MAX(height) AS height FROM public.blocks
     `);
-    return result.height;
+  return result.height;
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number) {
-    return (await db.any(blockQuery, [key, minHeight, maxHeight])) as Blocks;
+  let blocks: Blocks = await db.any(blockQuery, [key, minHeight, maxHeight]);
+
+  const blockFile = `${__dirname}/../data/.paidblocks`;
+  
+  const filterBlocks = () => {
+    return new Promise((resolve, reject) => {
+      fs.createReadStream(blockFile)
+        .pipe(parse({delimiter: "|"}))
+        .on("data", (record) => {
+          blocks = blocks.filter(block => !(block.blockheight == record[0] && block.statehash == record[1]));
+        })
+        .on("end", resolve)
+        .on("error", reject);
+    });
+  };
+  if (fs.existsSync(blockFile)) {
+    await filterBlocks();
+  }
+  return blocks;
 }
 
 type LatestHeight = {
-    height: number;
+  height: number;
 };
 
 export type Block = {
-    blockheight: number;
-    statehash: string;
-    stakingledgerhash: string;
-    blockdatetime: number;
-    slot: number;
-    globalslotsincegenesis: number;
-    creatorpublickey: string;
-    winnerpublickey: string;
-    receiverpublickey: string;
-    coinbase: number;
-    feetransfertoreceiver: number;
-    feetransferfromcoinbase: number;
-    usercommandtransactionfees: number;
+  blockheight: number;
+  statehash: string;
+  stakingledgerhash: string;
+  blockdatetime: number;
+  slot: number;
+  globalslotsincegenesis: number;
+  creatorpublickey: string;
+  winnerpublickey: string;
+  receiverpublickey: string;
+  coinbase: number;
+  feetransfertoreceiver: number;
+  feetransferfromcoinbase: number;
+  usercommandtransactionfees: number;
 };
 
 export type Blocks = Array<Block>;
