@@ -21,9 +21,7 @@ async function main() {
   // TODO: Fail if any required values missing from .env
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const payoutMemo: string = process.env.POOL_MEMO || "";
-  const globalSlotStart = Number(process.env.GLOBAL_SLOT_START) || 0;
   const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 290;
-  const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH) || 7140;
   const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
   const payorSendTransactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
   let senderKeys: keypair = {
@@ -49,7 +47,7 @@ async function main() {
   console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey} `)
   Promise.all(ledgerHashes.map(async ledgerHash => {
     console.log(`### Calculating payouts for ledger ${ledgerHash}`)
-    const [stakers, totalStake] = getStakes(ledgerHash, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
+    const [stakers, totalStake] = getStakes(ledgerHash, stakingPoolPublicKey);
     console.log(`The pool total staking balance is ${totalStake}`);
 
     // run the payout calculation for those blocks

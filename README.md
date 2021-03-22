@@ -39,10 +39,6 @@ mina advanced dump-keypair --privkey-path keys/my-payout-wallet
 
 - Set `GRAPHQL_ENDPOINT` to the url of a graphql server that can send transactions (e.g. http://127.0.0.1:3085/graphql ) This is required to transmit payout transactions.
 
-- Set `GLOBAL_SLOT_START=0` - expect to deprecate
-
-- Set `SLOTS_PER_EPOCH=7140` - expeect to deprecate
-
 - Set `MIN_CONFIRMATIONS` to whatever number of confirmed blocks you require before paying out. Default to 290 or "k" to use the assumed network finality.
 
     The process will include blocks at a height up to the **lower of** `MAX_HEIGHT` and the current tip minus `MIN_CONFIRMATIONS`.

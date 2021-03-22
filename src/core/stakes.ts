@@ -10,7 +10,7 @@ export type Stake = {
 };
 
 //TODO: Add remaining field definitions as needed
-export type LedgerEntry =   {
+export type LedgerEntry = {
   pk: string,
   balance: number,
   delegate: string
@@ -25,7 +25,7 @@ export type LedgerEntry =   {
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards
-export function getStakes(ledgerHash: string, key: string, globalSlotStart: number, slotsPerEpoch: number): [Stake[], number] {
+export function getStakes(ledgerHash: string, key: string): [Stake[], number] {
   let totalStakingBalance: number = 0;
   // get the stakes from staking ledger json
   // TODO: this might need to be reworked for large files
@@ -50,7 +50,7 @@ export function getStakes(ledgerHash: string, key: string, globalSlotStart: numb
   return [stakers, totalStakingBalance];
 }
 
-export function stakeIsLocked(stake: Stake, block: Block){
+export function stakeIsLocked(stake: Stake, block: Block) {
   return stake.untimedAfterSlot && stake.untimedAfterSlot > block.globalslotsincegenesis;
 }
 
@@ -58,13 +58,13 @@ const foundationAddresses = fs.readFileSync(`${__dirname}/../data/nps-addresses/
 const o1labsAddresses = fs.readFileSync(`${__dirname}/../data/nps-addresses/O1_Labs_addresses.csv`).toString().split(/[\n\r]+/);
 
 function GetPublicKeyShareClass(key: string) {
-  if (foundationAddresses.includes(key) || o1labsAddresses.includes(key)){
+  if (foundationAddresses.includes(key) || o1labsAddresses.includes(key)) {
     return "NPS";
   } else {
     return "Common";
   }
 }
- 
+
 // Changed from original implementation to simply return the slot number at which account beomes untimed
 function calculateUntimedSlot(ledgerEntry: LedgerEntry): number {
 
