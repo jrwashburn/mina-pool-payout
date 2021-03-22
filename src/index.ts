@@ -19,16 +19,15 @@ async function main() {
   // TODO: Error handling
   // TODO: Add parameter to run read-only vs. write which would persist max height processed so it is not re-processed in future
   // TODO: Fail if any required values missing from .env
+  const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const payoutMemo: string = process.env.POOL_MEMO || "";
-  const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 290;
-  const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
   const payorSendTransactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
   let senderKeys: keypair = {
     privateKey: process.env.SEND_PRIVATE_KEY || "",
     publicKey: process.env.SEND_PUBLIC_KEY || ""
   };
-
+  const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 290;
   const minimumHeight = args.minheight;
   const configuredMaximum = args.maxheight;
 
