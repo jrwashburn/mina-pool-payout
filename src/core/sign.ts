@@ -5,7 +5,7 @@ import { getNonce, sendSignedPayment } from "./graph-queries";
 
 export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair, memo: string) {
     let nonce = await getNonce(keys.publicKey);
-    payoutsToSign.reduce( async (previousPromise, payout) => {
+    payoutsToSign.reduce(async (previousPromise, payout) => {
         await previousPromise;
         return new Promise<void>((resolve, reject) => {
             setTimeout(async () => {
@@ -22,6 +22,6 @@ export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[],
                 finally { };
                 resolve();
             }, 5000); //TODO: Move timeout to .env
-          });
+        });
     }, Promise.resolve());
 };

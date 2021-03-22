@@ -37,10 +37,6 @@ mina advanced dump-keypair --privkey-path keys/my-payout-wallet
 
 - Set `SEND_PUBLIC_KEY` to the sender public key. It can also be blank if generating ephemeral keys.
 
-- Set `SEND_EPHEMERAL_KEY` to true or false. If true, the SEND_PRIVATE_KEY will be ignored and a new keypair will be generated for the payout transactions.
-
-   The consensus parameters will be used to determine finality and the max height if `MAX_HEIGHT` is not provided.
-
 - Set `GLOBAL_SLOT_START=0` - expect to deprecate
 
 - Set `SLOTS_PER_EPOCH=7140` - expeect to deprecate
