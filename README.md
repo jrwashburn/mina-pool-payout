@@ -37,6 +37,8 @@ mina advanced dump-keypair --privkey-path keys/my-payout-wallet
 
 - Set `SEND_PUBLIC_KEY` to the sender public key. It can also be blank if generating ephemeral keys.
 
+- Set `GRAPHQL_ENDPOINT` to the url of a graphql server that can send transactions (e.g. http://127.0.0.1:3085/graphql ) This is required to transmit payout transactions.
+
 - Set `GLOBAL_SLOT_START=0` - expect to deprecate
 
 - Set `SLOTS_PER_EPOCH=7140` - expeect to deprecate
