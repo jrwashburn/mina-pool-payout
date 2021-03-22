@@ -25,9 +25,10 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
 
 - Set `SEND_PRIVATE_KEY` to the sender private key
 The private key value can be retrieved from a pk file by running the mina advanced dump-keypair command, e.g.
-```bash
-mina advanced dump-keypair --privkey-path keys/my-payout-wallet
-```
+
+    ```bash
+    mina advanced dump-keypair --privkey-path keys/my-payout-wallet
+    ```
 
 - Set `SEND_PUBLIC_KEY` to the sender public key. It can also be blank if generating ephemeral keys.
 
