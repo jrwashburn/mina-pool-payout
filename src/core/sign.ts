@@ -3,14 +3,14 @@ import { PayoutTransaction } from "./payouts";
 import fs from "fs";
 import { getNonce, sendSignedPayment } from "./graph-queries";
 
-export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair) {
+export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair, memo: string) {
     let nonce = await getNonce(keys.publicKey);
-    payoutsToSign.reduce( async (previousPromise, payout) => {
+    payoutsToSign.reduce(async (previousPromise, payout) => {
         await previousPromise;
         return new Promise<void>((resolve, reject) => {
             setTimeout(async () => {
                 console.log(`#### Processing nonce ${nonce}...`);
-                const paymentTransaction: payment = { to: payout.publicKey, from: keys.publicKey, fee: payout.fee, amount: payout.amount, nonce: nonce };
+                const paymentTransaction: payment = { to: payout.publicKey, from: keys.publicKey, fee: payout.fee, amount: payout.amount, nonce: nonce, memo: memo };
                 try {
                     const signedPayment = signPayment(paymentTransaction, keys);
                     const data = await sendSignedPayment(signedPayment);
@@ -22,6 +22,6 @@ export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[],
                 finally { };
                 resolve();
             }, 5000); //TODO: Move timeout to .env
-          });
+        });
     }, Promise.resolve());
 };

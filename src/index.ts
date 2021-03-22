@@ -3,16 +3,16 @@ import { getStakes } from "./core/stakes";
 import { getBlocks, getLatestHeight } from "./core/queries";
 import hash from "object-hash";
 import yargs from "yargs";
-import CodaSDK, { keypair } from "@o1labs/client-sdk";
+import { keypair } from "@o1labs/client-sdk";
 import { sendSignedTransactions } from "./core/sign";
 import fs from "fs";
 
 // TODO: create mina currency types
 
 const args = yargs.options({
-  "payouthash": { type: "string", alias: ["h","hash"]},
-  "minheight": { type: "number", alias: ["m","min"], demandOption: true},
-  "maxheight": { type: "number", alias: ["x","max"], default: Number.MAX_VALUE}
+  "payouthash": { type: "string", alias: ["h", "hash"] },
+  "minheight": { type: "number", alias: ["m", "min"], demandOption: true },
+  "maxheight": { type: "number", alias: ["x", "max"], default: Number.MAX_VALUE }
 }).argv;
 
 async function main() {
@@ -20,15 +20,12 @@ async function main() {
   // TODO: Add parameter to run read-only vs. write which would persist max height processed so it is not re-processed in future
   // TODO: Fail if any required values missing from .env
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
+  const payoutMemo: string = process.env.POOL_MEMO || "";
   const globalSlotStart = Number(process.env.GLOBAL_SLOT_START) || 0;
   const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 290;
   const slotsPerEpoch = Number(process.env.SLOTS_PER_EPOCH) || 7140;
   const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
   const payorSendTransactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
-  let generateEphemeralSenderKey = false;
-  if( typeof(process.env.SEND_EPHEMERAL_KEY) === 'string' && process.env.SEND_EPHEMERAL_KEY.toLowerCase() == 'true'){
-    generateEphemeralSenderKey = true;
-  };
   let senderKeys: keypair = {
     privateKey: process.env.SEND_PRIVATE_KEY || "",
     publicKey: process.env.SEND_PUBLIC_KEY || ""
@@ -47,14 +44,14 @@ async function main() {
 
   let payouts: PayoutTransaction[] = [];
   let storePayout: PayoutDetails[] = [];
-  const ledgerHashes = [...new Set(blocks.map(block=>block.stakingledgerhash))];
+  const ledgerHashes = [...new Set(blocks.map(block => block.stakingledgerhash))];
 
   console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey} `)
   Promise.all(ledgerHashes.map(async ledgerHash => {
     console.log(`### Calculating payouts for ledger ${ledgerHash}`)
     const [stakers, totalStake] = getStakes(ledgerHash, stakingPoolPublicKey, globalSlotStart, slotsPerEpoch);
     console.log(`The pool total staking balance is ${totalStake}`);
-    
+
     // run the payout calculation for those blocks
     const ledgerBlocks = blocks.filter(x => x.stakingledgerhash == ledgerHash);
     const [ledgerPayouts, ledgerStorePayout, blocksIncluded, totalPayout] = await getPayouts(ledgerBlocks, stakers, totalStake, commissionRate);
@@ -64,7 +61,7 @@ async function main() {
     // Output total results and transaction files for input to next process, details file for audit log
     console.log(`We won these blocks: ${blocksIncluded}`);
     console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
-  })).then(()=>{
+  })).then(() => {
     // Aggregate to a single transaction per key and track the total for funding transaction
     let totalPayoutFundsNeeded = 0
     const transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
@@ -78,7 +75,7 @@ async function main() {
       return r.set(o.publicKey, item);
     }, new Map).values()];
 
-    console.table(storePayout, ["publicKey", "blockHeight", "shareClass","stakingBalance", "effectiveNPSPoolWeighting","effectiveCommonPoolWeighting", "coinbase", "totalRewards", "totalRewardsNPSPool","totalRewardsCommonPool","payout"]);
+    console.table(storePayout, ["publicKey", "blockHeight", "shareClass", "stakingBalance", "effectiveNPSPoolWeighting", "effectiveCommonPoolWeighting", "coinbase", "totalRewards", "totalRewardsNPSPool", "totalRewardsCommonPool", "payout"]);
     console.table(transactions);
 
     const runDateTime = new Date();
@@ -97,24 +94,18 @@ async function main() {
 
     console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
     console.log('Potential Ledger Command:');
-    console.log(`mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000 }`);
+    console.log(`mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000}`);
 
     const payoutHash = hash(storePayout, { algorithm: "sha256" });
     if (args.payouthash) {
       console.log(`### Processing signed payout for hash ${args.payouthash}...`)
       if (args.payouthash == payoutHash) {
-        if( generateEphemeralSenderKey) {
-          const CodaSDK = require("@o1labs/client-sdk");
-          senderKeys = CodaSDK.genKeys();
-        }
-        sendSignedTransactions(transactions, senderKeys);
-
-        const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, {flags:'a'});
-        blocks.forEach((block)=>{
+        sendSignedTransactions(transactions, senderKeys, payoutMemo);
+        const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, { flags: 'a' });
+        blocks.forEach((block) => {
           paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
         });
         paidblockStream.end();
-
       } else {
         console.error("HASHES DON'T MATCH");
       }
@@ -143,7 +134,7 @@ function generateOutputFileName(identifier: string, runDateTime: Date, minimumHe
 }
 
 function longDateString(d: Date) {
-  return d.toISOString().replace(/\D/g,'')
+  return d.toISOString().replace(/\D/g, '')
 };
 
 main();
