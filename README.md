@@ -1,17 +1,28 @@
 # mina-pool-payout
 
 _Inspired by [minaexplorer - mina-payout-script](https://github.com/garethtdavies/mina-payout-script)_
-This started out as a port from the original, but has morphed into a slightly different payout algorithm, so we don't want you thinking this will generate exactly the same results.
+This started out as a port from the original, but has morphed a fair amount. With major updates we will try to compare the output with MinaExplorer's approach, but we are not necessarily committed to maintaining parity.
+The main difference is that Mina Explorer spreads an unlocked key's supercharged award across the entire epoch when it will unlock during the epoch. mina-pool-payout will simply attribute supercharged rewards when a key unlocks.
+Other than that known difference, the payout rules are the same. In our last parity test (on 3/21/2021), both approaches generated exactly the same payout calculations.
 
-This script will calculate or transmit the required payouts for accounts delegating to a given account.
+# Operational Overview
+This application will calculate, and may sign and transmit, the required payouts for accounts delegating to a given account.
 
-Currently, the operational assumptions are in flux so the output and control mechanisms are changing rapidly. As soon  as things settle, we'll updat this!
-// TODO: explain calculate vs. transmit modes, key config vales to maintain, etc.
+The recommended run process is:
+- copy any updated ledger files to the machine that will run the payout process
+(See Providing the Staking Ledgers below)
+- run payout process read only for a given block range (you can provie a min height and max height on the command line)
+This will process the blocks in the range (inclusive) and calculate and display the calculations per delegator per block, and the summary payout plan and a hash of the projected payouts.
+- review the payout plan, confirm, and then transmit funds to the wallet that is configured to make the payments.
+This is assumed to be an offline process and is intentionally not automated.
+- when confident of the plan, re-run the payout process with the same height parameters, and including the hash calculated in the prior run
+This step will recalculate, verify the payout plan has not changed (via the hash), and then sign and transmit payments via the payor key.
+The blocks that were paid will be saved and will be excluded from future runs. (If you need to re-run for some reason, the processed blocks are saved in .paidblocks)
+Note that you should wait for the offline funding transaction to be completed if the funds are required to be able to make the payout.
 
+# Getting started
 
-## Getting started
-
-### Setting up your environment
+## Setting up your environment
 
 Copy `sample.env` to `.env` and make the following changes within the `.env`:
 
@@ -26,7 +37,7 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
 - Set `SEND_PRIVATE_KEY` to the sender private key
 The private key value can be retrieved from a pk file by running the mina advanced dump-keypair command, e.g.
 
-    ```bash
+    ```
     mina advanced dump-keypair --privkey-path keys/my-payout-wallet
     ```
 
@@ -45,14 +56,24 @@ The private key value can be retrieved from a pk file by running the mina advanc
     ```
 
 - Set `GRAPHQL_ENDPOINT` to the url of a graphql server that can send transactions. (e.g. http://127.0.0.1:3085/graphql ) This is required to transmit payout transactions; payouts will be broadcast via this endpoint.
-
-- Export the relevant staking ledger and place in src/data/ledger directory. You can export the current staking ledger with:
+## Providing the Staking Ledgers
+Export the staking ledger and place in src/data/ledger directory. You can export the current staking ledger with:
 
     ```
-    coda ledger export staking-epoch-ledger > staking-epoch-ledger.json
+    mina ledger export staking-epoch-ledger > staking-epoch-ledger.json
     ```
+and the next epoch's ledger is available via:
 
-### Running the script
+    ```
+    mina ledger export next-epoch-ledger > next-epoch-ledger.json
+    ```
+The files can then be hashed and renamed with:
+
+    ```
+    mina ledger hash --ledger-file staking-epoch-ledger.json | xargs -I % cp staking-epoch-ledger.json %.json
+    mina ledger hash --ledger-file next-epoch-ledger.json | xargs -I % cp next-epoch-ledger.json %.json
+    ```
+# Running the script
 
 - Run `npm install` to install the project dependencies.
 - Run `npm run payout -- -m={MIN_BLOCK} [-x={MAX_BLOCK}]` to run the script as a dry run, where `{MIN_BLOCK}` is the lowest blockheight to process, and `{MAX_BLOCK}` is the highest blockheight to process. This will not transmit any actual payments and will output a hash of the payment details.
@@ -66,12 +87,11 @@ After verifying the results and confirming you are ready to payout, but adding t
 
 ```npm run payout -- -m=0 x=1000 -h=84cd21b7b566dc1c84cf06039462e013851df483ad61c229d1830285934dcae2```
 
-
-### Seeing Results ###
+## Seeing Results ###
 
 The process will output summary informaiton to the console, and will generate several files under the src/data directory. Files will include:
 
-```bash
+```
 ./src/data/payout_details_[datetime_minblock_maxblock].json - contains the detailed calculations for each delegator key at each block.
 ./src/data/payout_transactions_[datetime_minblock_maxblock].json - contains the list of payout transactions that should be sent.
 ./src/data/[nonce].json - contains a signed transaction for each payment that should be sent. These are also broadcast to the network on the graphql endpoint.
@@ -83,4 +103,4 @@ The process will also maintain a list of blocks for which it generated signed pa
 ./src/data/.paidblocks - contains block height number and statehash for each block that has been processed
 ```
 
-.paidblocks is used to filter future runs - so that you should not duplicate payouts by running repeatedly. This file may need to be manipulated if you sign but do not send transactions and want to reprocess a block. By removing a block (or several) from the paidblocks file, the process will calculate (and can payout) those blocks again.
+.paidblocks is used to filter future runs - so that you will not duplicate payouts by running repeatedly. This file may need to be manipulated if you sign but do not send transactions and want to reprocess a block. By removing a block (or several) from the paidblocks file, the process will calculate (and can payout) those blocks again.
