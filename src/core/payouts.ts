@@ -25,14 +25,12 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
 
       let sumEffectiveCommonPoolStakes = 0;
       let sumEffectiveNPSPoolStakes = 0;
-      let effectivePoolStakes: { [key: string]: { npsStake: number , commonStake: number} } = {};
+      let effectivePoolStakes: { [key: string]: { npsStake: number, commonStake: number } } = {};
 
       const transactionFees = block.usercommandtransactionfees || 0;
       const totalRewards = block.coinbase + block.feetransfertoreceiver - block.feetransferfromcoinbase;
       const totalNPSPoolRewards = stakeIsLocked(winner, block) ? block.coinbase : block.coinbase / 2;
-      const totalNPSPoolFees = npsCommissionRate * totalNPSPoolRewards;
       const totalCommonPoolRewards = totalRewards - totalNPSPoolRewards;
-      const totalCommonPoolFees = commissionRate * totalCommonPoolRewards;
 
       // Determine the supercharged discount for the block
       //  unlocked accounts will get a double share less this discount based on the ratio of fees : coinbase
@@ -51,7 +49,7 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
         }
         sumEffectiveNPSPoolStakes += effectiveNPSStake;
         sumEffectiveCommonPoolStakes += effectiveCommonStake;
-        effectivePoolStakes[staker.publicKey] = {npsStake: effectiveNPSStake, commonStake: effectiveCommonStake};
+        effectivePoolStakes[staker.publicKey] = { npsStake: effectiveNPSStake, commonStake: effectiveCommonStake };
       });
 
       // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
@@ -63,14 +61,20 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
       }
 
       stakers.forEach((staker: Stake) => {
-        const effectiveNPSPoolWeighting = effectivePoolStakes[staker.publicKey].npsStake / sumEffectiveNPSPoolStakes ;
+        const effectiveNPSPoolWeighting = effectivePoolStakes[staker.publicKey].npsStake / sumEffectiveNPSPoolStakes;
         const effectiveCommonPoolWeighting = effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes;
 
-        const blockTotal = 
-          Math.floor((totalNPSPoolRewards - totalNPSPoolFees) * effectiveNPSPoolWeighting ) +
-          Math.floor((totalCommonPoolRewards - totalCommonPoolFees) * effectiveCommonPoolWeighting);  
+        let blockTotal = 0;
+        if (staker.shareClass == "Common") {
+          blockTotal =
+            Math.floor((1 - commissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting) +
+            Math.floor((1 - commissionRate) * totalCommonPoolRewards * effectiveCommonPoolWeighting);
+        } else if (staker.shareClass == "NPS") {
+          blockTotal =
+            Math.floor((1 - npsCommissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting);
+        }
 
-          staker.total += blockTotal;
+        staker.total += blockTotal;
 
         // Store this data in a structured format for later querying and for the payment script, handled seperately
         storePayout.push({
@@ -81,7 +85,7 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
           shareClass: staker.shareClass,
           stateHash: block.statehash,
           stakingBalance: staker.stakingBalance,
-          effectiveNPSPoolWeighting: effectiveNPSPoolWeighting, 
+          effectiveNPSPoolWeighting: effectiveNPSPoolWeighting,
           effectiveNPSPoolStakes: effectivePoolStakes[staker.publicKey].npsStake,
           effectiveCommonPoolWeighting: effectiveCommonPoolWeighting,
           effectiveCommonPoolStakes: effectivePoolStakes[staker.publicKey].commonStake,
@@ -91,7 +95,7 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
           dateTime: block.blockdatetime,
           coinbase: block.coinbase,
           totalRewards: totalRewards,
-          totalRewardsNPSPool: totalNPSPoolRewards, 
+          totalRewardsNPSPool: totalNPSPoolRewards,
           totalRewardsCommonPool: totalCommonPoolRewards,
           payout: blockTotal,
         });
@@ -128,9 +132,9 @@ export type PayoutDetails = {
   blockHeight: number,
   globalSlot: number,
   publicKeyUntimedAfter: number,
-  shareClass: "NPS"|"Common",
+  shareClass: "NPS" | "Common",
   stateHash: string,
-  effectiveNPSPoolWeighting: number, 
+  effectiveNPSPoolWeighting: number,
   effectiveNPSPoolStakes: number,
   effectiveCommonPoolWeighting: number,
   effectiveCommonPoolStakes: number,
