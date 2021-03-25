@@ -5,6 +5,11 @@ This started out as a port from the original, but has morphed a fair amount. Wit
 The main difference is that Mina Explorer spreads an unlocked key's supercharged award across the entire epoch when it will unlock during the epoch. mina-pool-payout will simply attribute supercharged rewards when a key unlocks.
 Other than that known difference, the payout rules are the same. In our last parity test (on 3/21/2021), both approaches generated exactly the same payout calculations.
 
+# Dependencies
+This code uses language features of Typescript v3.7 and Node 14.
+The host this runs from will require access to a Mina Archive database.
+If payments are to be sent, access to a graphql endpoint that can send signed transactions is required.
+
 # Operational Overview
 This application will calculate, and may sign and transmit, the required payouts for accounts delegating to a given account.
 
@@ -57,22 +62,25 @@ The private key value can be retrieved from a pk file by running the mina advanc
 
 - Set `GRAPHQL_ENDPOINT` to the url of a graphql server that can send transactions. (e.g. http://127.0.0.1:3085/graphql ) This is required to transmit payout transactions; payouts will be broadcast via this endpoint.
 ## Providing the Staking Ledgers
-Export the staking ledger and place in src/data/ledger directory. You can export the current staking ledger with:
+- Export the staking ledger and place in src/data/ledger directory. You can export the current staking ledger with:
 
     ```
     mina ledger export staking-epoch-ledger > staking-epoch-ledger.json
     ```
-and the next epoch's ledger is available via:
+
+- and the next epoch's ledger is available via:
 
     ```
     mina ledger export next-epoch-ledger > next-epoch-ledger.json
     ```
-The files can then be hashed and renamed with:
+
+- The files can then be hashed and renamed with:
 
     ```
     mina ledger hash --ledger-file staking-epoch-ledger.json | xargs -I % cp staking-epoch-ledger.json %.json
     mina ledger hash --ledger-file next-epoch-ledger.json | xargs -I % cp next-epoch-ledger.json %.json
     ```
+
 # Running the script
 
 - Run `npm install` to install the project dependencies.
