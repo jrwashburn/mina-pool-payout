@@ -89,11 +89,11 @@ The private key value can be retrieved from a pk file by running the mina advanc
 
 For example, this will process blocks 0-1000, output a summary table, write detailed data to files, and provide a hash of the payouts it intends to make.
 
-```npm run payout -- -m=0 x=1000```
+```npm run payout -- -m=0 -x=1000```
 
 After verifying the results and confirming you are ready to payout, but adding the -h parameter with the hash provided by the output above, as long as the caluclations are the same, the payments will be signed and sent.
 
-```npm run payout -- -m=0 x=1000 -h=84cd21b7b566dc1c84cf06039462e013851df483ad61c229d1830285934dcae2```
+```npm run payout -- -m=0 -x=1000 -h=84cd21b7b566dc1c84cf06039462e013851df483ad61c229d1830285934dcae2```
 
 ## Seeing Results ###
 
