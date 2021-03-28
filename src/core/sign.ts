@@ -1,7 +1,7 @@
 import { signPayment, keypair, payment } from "@o1labs/client-sdk";
 import { PayoutTransaction } from "./payouts";
 import fs from "fs";
-import { getNonce, sendSignedPayment } from "./graph-queries";
+import { getNonce, sendSignedPayment } from "./send-payments";
 
 export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair, memo: string) {
     let nonce = await getNonce(keys.publicKey);

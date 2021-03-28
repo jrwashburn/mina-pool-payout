@@ -32,8 +32,8 @@ export function stakeIsLocked(stake: Stake, block: Block) {
   return stake.untimedAfterSlot && stake.untimedAfterSlot > block.globalslotsincegenesis;
 }
 
-const foundationAddresses = fs.readFileSync(`${__dirname}/../data/nps-addresses/Mina_Foundation_Addresses.csv`).toString().split(/[\n\r]+/);
-const o1labsAddresses = fs.readFileSync(`${__dirname}/../data/nps-addresses/O1_Labs_addresses.csv`).toString().split(/[\n\r]+/);
+const foundationAddresses = fs.readFileSync(`${__dirname}/../../data/nps-addresses/Mina_Foundation_Addresses.csv`).toString().split(/[\n\r]+/);
+const o1labsAddresses = fs.readFileSync(`${__dirname}/../../data/nps-addresses/O1_Labs_addresses.csv`).toString().split(/[\n\r]+/);
 
 function GetPublicKeyShareClass(key: string) {
   if (foundationAddresses.includes(key) || o1labsAddresses.includes(key)) {
