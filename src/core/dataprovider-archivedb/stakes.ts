@@ -7,7 +7,7 @@ export function getStakes(ledgerHash: string, key: string): [Stake[], number] {
   let totalStakingBalance: number = 0;
   // get the stakes from staking ledger json
   // TODO: this might need to be reworked for large files
-  const ledgerDirectory = "../data/ledger"; // TODO: Move this back to .env
+  const ledgerDirectory = "../../data/ledger"; // TODO: Move this back to .env
   const ledgerFile = `${ledgerDirectory}/${ledgerHash}.json`;
   // if (!fs.existsSync(ledgerFile)){ throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`)}
   const ledger = require(ledgerFile);
