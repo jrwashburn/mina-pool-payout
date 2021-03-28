@@ -85,7 +85,7 @@ export async function getLatestHeight() {
 export async function getBlocks(key: string, minHeight: number, maxHeight: number) {
   let blocks: Blocks = await db.any(blockQuery, [key, minHeight, maxHeight]);
 
-  const blockFile = `${__dirname}/../data/.paidblocks`;
+  const blockFile = `${__dirname}/data/.paidblocks`;
 
   const filterBlocks = () => {
     return new Promise((resolve, reject) => {
