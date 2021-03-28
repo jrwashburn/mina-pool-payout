@@ -1,6 +1,6 @@
 import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payouts";
 import { getStakes } from "./core/stakes";
-import { getBlocks, getLatestHeight } from "./core/queries";
+import { getBlocks, getLatestHeight, getHeightMissing, getNullParents } from "./core/queries";
 import hash from "object-hash";
 import yargs from "yargs";
 import { keypair } from "@o1labs/client-sdk";
@@ -35,6 +35,20 @@ async function main() {
   const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations);
 
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
+
+  const missingHeights = await getHeightMissing(minimumHeight, maximumHeight);
+  if ((minimumHeight == 0 && missingHeights.length > 1 && missingHeights[0] != 0) || (minimumHeight > 0 && missingHeights.length > 0)) {
+    throw new Error(`
+      Archive database is missing blocks in the specified range. Import them and try again. Missing blocks were: ${JSON.stringify(missingHeights)}
+    `);
+  }
+
+  const nullParents = await getNullParents(minimumHeight, maximumHeight);
+  if (((minimumHeight == 0 || minimumHeight == 1) && nullParents.length > 1 && nullParents[0] != 1) || (minimumHeight > 0 && nullParents.length > 0)) {
+    throw new Error(`
+      Archive database has null parents in the specified range. Import them and try again. Blocks with null parents were: ${JSON.stringify(nullParents)}
+    `);
+  }
 
   // get the blocks from archive db
   const blocks = await getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);

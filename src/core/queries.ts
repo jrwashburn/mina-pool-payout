@@ -74,11 +74,32 @@ const blockQuery = `
     ORDER BY blockheight DESC;
 `;
 
+const getHeightsMissingQuery = `
+  SELECT h as height
+  FROM (SELECT h::int FROM generate_series($1 , $2) h
+  LEFT JOIN blocks b 
+  ON h = b.height where b.height is null) as v
+`;
+
+const getNullParentsQuery = `
+  SELECT height FROM blocks WHERE parent_id is null AND height >= $1 AND height <= $2
+`;
+
 export async function getLatestHeight() {
-  const result = await db.one<LatestHeight>(`
-        SELECT MAX(height) AS height FROM public.blocks
-    `);
+  const result = await db.one<Height>(`
+      SELECT MAX(height) AS height FROM public.blocks
+  `);
   return result.height;
+}
+
+export async function getHeightMissing(minHeight: number, maxHeight: number) {
+  const heights: Array<Height> = await db.any(getHeightsMissingQuery, [minHeight, maxHeight]);
+  return heights.map(x=> x.height);
+}
+
+export async function getNullParents(minHeight: number, maxHeight: number) {
+  const heights: Array<Height> = await db.any(getNullParentsQuery, [minHeight, maxHeight]);
+  return heights.map(x=> x.height);
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number) {
@@ -103,7 +124,7 @@ export async function getBlocks(key: string, minHeight: number, maxHeight: numbe
   return blocks;
 }
 
-type LatestHeight = {
+type Height = {
   height: number;
 };
 
