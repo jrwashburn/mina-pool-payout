@@ -1,27 +1,5 @@
-import { Block } from "./queries";
+import { Block, Stake, LedgerEntry } from "../dataprovider-interface";
 import fs from "fs";
-
-export type Stake = {
-  publicKey: string,
-  total: number,
-  stakingBalance: number,
-  untimedAfterSlot: number,
-  shareClass: "NPS" | "Common",
-};
-
-//TODO: Add remaining field definitions as needed
-export type LedgerEntry = {
-  pk: string,
-  balance: number,
-  delegate: string
-  timing: {
-    initial_minimum_balance: number,
-    cliff_time: number,
-    cliff_amount: number,
-    vesting_period: number,
-    vesting_increment: number
-  }
-};
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards
