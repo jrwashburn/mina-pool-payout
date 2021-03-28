@@ -1,27 +1,9 @@
-import fetch from "node-fetch";
 import { signed, payment } from "@o1labs/client-sdk";
 import fs from "fs";
+import { fetchGraphQL } from "../infrastructure/graphql";
 
 const graphqlEndpoint = process.env.GRAPHQL_ENDPOINT || "https://localhost:3085";
 
-async function fetchGraphQL(
-  operationsDoc: string,
-  operationName: string,
-  variables: {}
-) {
-  const result = await fetch(graphqlEndpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query: operationsDoc,
-      variables: variables,
-      operationName: operationName,
-    }),
-  });
-  return await result.json();
-}
 
 export async function sendSignedPayment(payment: signed<payment>) {
   const operationsDoc = `
@@ -37,9 +19,9 @@ export async function sendSignedPayment(payment: signed<payment>) {
           validUntil: "${payment.payload.validUntil}"
           memo: "${payment.payload.memo}"
         }
-        signature: { 
-          field: "${payment.signature.field}", 
-          scalar: "${payment.signature.scalar}" 
+        signature: {
+          field: "${payment.signature.field}",
+          scalar: "${payment.signature.scalar}"
         }
       ) {
         payment {
@@ -66,7 +48,8 @@ export async function sendSignedPayment(payment: signed<payment>) {
   const { errors, data } = await fetchGraphQL(
     operationsDoc,
     "SendSignedPayment",
-    {}
+    {},
+    graphqlEndpoint
   );
   if (errors) {
     // handle those errors like a pro
@@ -86,7 +69,8 @@ export async function getNonce(publicKey: string) {
   const { errors, data } = await fetchGraphQL(
     operationsDoc,
     "GetNonce",
-    {"publicKey": publicKey}
+    { "publicKey": publicKey },
+    graphqlEndpoint
   );
   if (errors) {
     console.log(`not able to get the nonce`)

@@ -1,7 +1,7 @@
 import { db } from "../../infrastructure/database";
 import fs from "fs";
 import parse from "csv-parse";
-import { Blocks } from "../dataprovider-interface";
+import { Blocks } from "../dataprovider-types";
 
 const blockQuery = `
     SELECT

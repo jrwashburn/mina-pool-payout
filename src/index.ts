@@ -1,7 +1,7 @@
 import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payouts";
 import { getStakes } from "./core/dataprovider-archivedb/stakes";
 import { getBlocks, getLatestHeight } from "./core/dataprovider-archivedb/queries";
-import { Block } from "./core/dataprovider-interface";
+import { Block } from "./core/dataprovider-types";
 import hash from "object-hash";
 import yargs from "yargs";
 import { keypair } from "@o1labs/client-sdk";

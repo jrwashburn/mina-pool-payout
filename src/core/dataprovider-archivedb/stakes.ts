@@ -1,4 +1,4 @@
-import { Block, Stake, LedgerEntry } from "../dataprovider-interface";
+import { Block, Stake, LedgerEntry } from "../dataprovider-types";
 import fs from "fs";
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)

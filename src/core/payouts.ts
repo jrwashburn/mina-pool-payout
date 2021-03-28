@@ -1,4 +1,4 @@
-import { Block, Stake } from "./dataprovider-interface";
+import { Block, Stake } from "./dataprovider-types";
 import { stakeIsLocked } from "./dataprovider-archivedb/stakes";
 // per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
 // see https://minaprotocol.com/docs/advanced/foundation-delegation-program
