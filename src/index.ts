@@ -1,11 +1,12 @@
-import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payouts";
-import { getStakes } from "./core/dataprovider-archivedb/stakes";
-import { getBlocks, getLatestHeight } from "./core/dataprovider-archivedb/queries";
-import { Block } from "./core/dataprovider-types";
+import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payout-calculator";
+import { getStakes } from "./core/dataprovider-archivedb/staking-ledger-queries";
+import { getBlocks, getLatestHeight } from "./core/dataprovider-archivedb/block-queries-sql";
+import { getBlocksFromMinaExplorer } from './core/dataprovider-minaexplorer/block-queries-gql'
+import { Block, Blocks } from "./core/dataprovider-types";
 import hash from "object-hash";
 import yargs from "yargs";
 import { keypair } from "@o1labs/client-sdk";
-import { sendSignedTransactions } from "./core/sign";
+import { sendSignedTransactions } from "./core/send-payments";
 import fs from "fs";
 
 // TODO: create mina currency types
@@ -13,10 +14,10 @@ import fs from "fs";
 const args = yargs.options({
   "payouthash": { type: "string", alias: ["h", "hash"] },
   "minheight": { type: "number", alias: ["m", "min"], demandOption: true },
-  "maxheight": { type: "number", alias: ["x", "max"], default: Number.MAX_VALUE }
+  "maxheight": { type: "number", alias: ["x", "max"], default: Number.MAX_VALUE },
 }).argv;
 
-async function main() {
+async function main () {
   // TODO: Error handling
   // TODO: Add parameter to run read-only vs. write which would persist max height processed so it is not re-processed in future
   // TODO: Fail if any required values missing from .env
@@ -31,17 +32,22 @@ async function main() {
   const minimumConfirmations = Number(process.env.MIN_CONFIRMATIONS) || 290;
   const minimumHeight = args.minheight;
   const configuredMaximum = args.maxheight;
+  const blockDataSource = process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB'
 
   // get current maximum block height from database and determine what max block height for this run will be
   const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations);
 
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
+
   // get the blocks from archive db
-  const blocks = await getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);
+  const blocks: Blocks = (blockDataSource == "MINAEXPLORER") ?
+    await getBlocksFromMinaExplorer(stakingPoolPublicKey, minimumHeight, maximumHeight) :
+    await getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight)
 
   let payouts: PayoutTransaction[] = [];
   let storePayout: PayoutDetails[] = [];
+
   const ledgerHashes = [...new Set(blocks.map(block => block.stakingledgerhash))];
 
   console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey} `)
@@ -113,7 +119,7 @@ async function main() {
   });
 }
 
-async function determineLastBlockHeightToProcess(maximumHeight: number, minimumConfirmations: number): Promise<number> {
+async function determineLastBlockHeightToProcess (maximumHeight: number, minimumConfirmations: number): Promise<number> {
   // Finality is understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork
   // Alternatively, stop processing at maximum height if lower than finality
   // TODO: where does this really belong?
@@ -127,11 +133,11 @@ async function determineLastBlockHeightToProcess(maximumHeight: number, minimumC
   return maximum;
 }
 
-function generateOutputFileName(identifier: string, runDateTime: Date, minimumHeight: number, maximumHeight: number) {
+function generateOutputFileName (identifier: string, runDateTime: Date, minimumHeight: number, maximumHeight: number) {
   return `./src/data/${identifier}_${longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`;
 }
 
-function longDateString(d: Date) {
+function longDateString (d: Date) {
   return d.toISOString().replace(/\D/g, '')
 };
 

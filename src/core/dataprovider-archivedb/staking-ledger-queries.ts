@@ -1,5 +1,5 @@
 import { Block, Stake, LedgerEntry } from '../dataprovider-types'
-import { calculateUntimedSlot, getPublicKeyShareClass } from '../stakes-util'
+import { calculateUntimedSlot, getPublicKeyShareClass } from '../staking-ledger-util'
 import fs from "fs";
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)

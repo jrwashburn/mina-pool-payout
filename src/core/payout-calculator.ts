@@ -1,5 +1,5 @@
 import { Block, Stake } from "./dataprovider-types";
-import { stakeIsLocked } from "./stakes-util";
+import { stakeIsLocked } from "./staking-ledger-util";
 // per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
 // see https://minaprotocol.com/docs/advanced/foundation-delegation-program
 const npsCommissionRate = 0.05

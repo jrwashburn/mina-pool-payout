@@ -75,14 +75,14 @@ const blockQuery = `
     ORDER BY blockheight DESC;
 `;
 
-export async function getLatestHeight() {
+export async function getLatestHeight () {
   const result = await db.one<LatestHeight>(`
         SELECT MAX(height) AS height FROM public.blocks
     `);
   return result.height;
 }
 
-export async function getBlocks(key: string, minHeight: number, maxHeight: number) {
+export async function getBlocks (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
   let blocks: Blocks = await db.any(blockQuery, [key, minHeight, maxHeight]);
 
   const blockFile = `${__dirname}/../../data/.paidblocks`;
