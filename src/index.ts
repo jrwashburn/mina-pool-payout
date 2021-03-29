@@ -2,7 +2,7 @@ import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payout-calc
 import { getStakes } from "./core/dataprovider-archivedb/staking-ledger-queries";
 import { getBlocks, getLatestHeight } from "./core/dataprovider-archivedb/block-queries-sql";
 import { getBlocksFromMinaExplorer } from './core/dataprovider-minaexplorer/block-queries-gql'
-import { Block, Blocks } from "./core/dataprovider-types";
+import { Blocks } from "./core/dataprovider-types";
 import hash from "object-hash";
 import yargs from "yargs";
 import { keypair } from "@o1labs/client-sdk";
@@ -33,6 +33,8 @@ async function main () {
   const minimumHeight = args.minheight;
   const configuredMaximum = args.maxheight;
   const blockDataSource = process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB'
+
+  // TODO #13 get "getBlocks" and "getLatestHeight" based on data souce
 
   // get current maximum block height from database and determine what max block height for this run will be
   const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations);

@@ -80,6 +80,22 @@ query blockData( $creator: String, $blockHeight_gte: Int, $blockHeight_lte: Int 
   }
 }`;
 
+const tipQuery = `
+query LatestHeight {
+  blocks(sortBy: BLOCKHEIGHT_DESC, query: { canonical: true }, limit: 1) {
+    blockHeight
+  }
+}`
+
+export async function getLatestHeight () {
+  const { errors, data } = await fetchGraphQL(
+    tipQuery,
+    'LatestHeight',
+    {},
+    graphqlEndpoint)
+  return data.blockHeight;
+}
+
 export async function getBlocksFromMinaExplorer (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
   let flatBlocks: Blocks = []
   const { errors, data } = await fetchGraphQL(
