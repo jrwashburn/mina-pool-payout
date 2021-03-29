@@ -7,8 +7,8 @@ export function stakeIsLocked (stake: Stake, block: Block) {
 
 export function getPublicKeyShareClass (key: string) {
   const path = require('path')
-  const foundationAddressesFile = path.join('data', 'nps-addresses', 'Mina_Foundation_Addresses.csv')
-  const labsAddressesFile = path.join('data', 'nps-addresses', 'O1_Labs_addresses.csv')
+  const foundationAddressesFile = path.join('src', 'data', 'nps-addresses', 'Mina_Foundation_Addresses.csv')
+  const labsAddressesFile = path.join('src', 'data', 'nps-addresses', 'O1_Labs_addresses.csv')
   const foundationAddresses = fs.readFileSync(foundationAddressesFile)
   const o1labsAddresses = fs.readFileSync(labsAddressesFile)
 
