@@ -1,13 +1,45 @@
 import { fetchGraphQL } from '../../infrastructure/graphql';
-import { Block, Blocks } from "../dataprovider-types";
+import { Blocks } from "../dataprovider-types";
+import fs from "fs";
+import parse from "csv-parse";
+
+type minaExplorerBlock =
+  {
+    creatorAccount: { publicKey: string },
+    stateHash: string,
+    protocolState: {
+      consensusState: {
+        blockHeight: number,
+        slot: number,
+        slotSinceGenesis: number,
+        stakingEpochData: {
+          ledger: { hash: string }
+        }
+      },
+      blockchainState: { date: number },
+    },
+    winnerAccount: { publicKey: string },
+    transactions: {
+      coinbase: number,
+      coinbaseReceiverAccount: { publicKey: string },
+      feeTransfer: [{
+        fee: number,
+        recipient: string,
+        type: string
+      }],
+      userCommands: [{ fee: number }]
+    },
+    txFees: number,
+  }
+
 
 const graphqlEndpoint = process.env.MINAEXPLORER_GRAPHQL_ENDPOINT || "https://localhost:3085";
 
 // TODO switch to lodash? https://github.com/APIs-guru/graphql-lodash
 
 const blockQuery = `
-query blockData( $creator: String, $blockHeight_gte: Int, $limit: Int  ) {
-  blocks(sortBy: BLOCKHEIGHT_ASC, query: {canonical: true, creator: $creator, blockHeight_gte: $blockHeight_gte }, limit: $limit ) {
+query blockData( $creator: String, $blockHeight_gte: Int, $blockHeight_lte: Int  ) {
+  blocks(sortBy: BLOCKHEIGHT_ASC, query: {canonical: true, creator: $creator, blockHeight_gte: $blockHeight_gte , blockHeight_lte: $blockHeight_lte } ) {
     stateHash
     protocolState {
       consensusState {
@@ -56,7 +88,7 @@ export async function getBlocksFromMinaExplorer (key: string, minHeight: number,
     {
       creator: key,
       blockHeight_gte: minHeight,
-      limit: (maxHeight - minHeight)
+      blockHeight_lte: (maxHeight - minHeight)
     },
     graphqlEndpoint
   );
@@ -64,9 +96,7 @@ export async function getBlocksFromMinaExplorer (key: string, minHeight: number,
     console.log(errors)
     throw new Error('could not get block from mina explorer');
   } else {
-    //let b: Blocks = data.blocks
-    data.blocks.forEach((meBlock: any) => {
-      console.log(JSON.stringify(meBlock))
+    data.blocks.map((meBlock: minaExplorerBlock) => {
       flatBlocks.push({
         blockheight: meBlock.protocolState.consensusState.blockHeight,
         statehash: meBlock.stateHash,
@@ -78,59 +108,28 @@ export async function getBlocksFromMinaExplorer (key: string, minHeight: number,
         winnerpublickey: meBlock.winnerAccount.publicKey,
         receiverpublickey: meBlock.transactions.coinbaseReceiverAccount.publicKey,
         coinbase: meBlock.transactions.coinbase,
-        feetransfertoreceiver: meBlock.transactions.feeTransfer,
-        feetransferfromcoinbase: 0,
+        feetransfertoreceiver: meBlock.transactions.feeTransfer.filter(x => x.recipient === meBlock.transactions.coinbaseReceiverAccount.publicKey).reduce((sum, y) => sum + y.fee, 0),
+        feetransferfromcoinbase: meBlock.transactions.feeTransfer.filter(x => x.type === 'Fee_transfer_via_coinbase').reduce((sum, y) => sum + y.fee, 0),
         usercommandtransactionfees: meBlock.txFees
       })
     })
   }
+  // TODO move this up a layer to a helper / werapper - identical code in block-queries-sql.ts for archivedb.
+  const blockFile = `${__dirname}/../../data/.paidblocks`;
+
+  const filterBlocks = () => {
+    return new Promise((resolve, reject) => {
+      fs.createReadStream(blockFile)
+        .pipe(parse({ delimiter: "|" }))
+        .on("data", (record) => {
+          flatBlocks = flatBlocks.filter(block => !(block.blockheight == record[0] && block.statehash == record[1]));
+        })
+        .on("end", resolve)
+        .on("error", reject);
+    });
+  };
+  if (fs.existsSync(blockFile)) {
+    await filterBlocks();
+  }
   return flatBlocks
 }
-
-/*
-
-{
-         {
-        "creatorAccount": {
-          "publicKey": "B62qrxNgwAdhGYZv1BXQRt2HgopUceFyrtXZMikwsuaHu5FigRJjhwY"
-        },
-        "protocolState": {
-          "blockchainState": {
-            "date": "1616016420000"
-          },
-          "consensusState": {
-            "blockHeight": 303,
-            "slot": 429,
-            "slotSinceGenesis": 429,
-            "stakingEpochData": {
-              "ledger": {
-                "hash": "jx7buQVWFLsXTtzRgSxbYcT8EYLS8KCZbLrfDcJxMtyy4thw2Ee"
-              }
-            }
-          }
-        },
-        "stateHash": "3NKQvqG1a5MJrtRaJHezuASArkDZWtMV6UfJMUUR5gQ8qTcSmEvy",
-        "transactions": {
-          "coinbase": "720000000000",
-          "coinbaseReceiverAccount": {
-            "publicKey": "B62qqa9g4CFfkSuX2j22S52z6UfcDcS9tMTgQrFKZ21v7GrEP6Zu5Tc"
-          },
-          "feeTransfer": [
-            {
-              "fee": "10000000",
-              "recipient": "B62qqa9g4CFfkSuX2j22S52z6UfcDcS9tMTgQrFKZ21v7GrEP6Zu5Tc",
-              "type": "Fee_transfer"
-            }
-          ],
-          "userCommands": [
-            {
-              "fee": 10000000
-            }
-          ]
-        },
-        "txFees": "10000000",
-        "winnerAccount": {
-          "publicKey": "B62qq8sm8HemutQiT6VuDKNWKLAi1Tvz1jrnttVajpL8zdaXMq6M9gu"
-        }
-      },
-*/
