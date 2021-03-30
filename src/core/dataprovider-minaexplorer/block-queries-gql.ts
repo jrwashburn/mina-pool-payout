@@ -16,20 +16,20 @@ type minaExplorerBlock =
           ledger: { hash: string }
         }
       },
-      blockchainState: { date: number },
+      blockchainState: { date: string },
     },
     winnerAccount: { publicKey: string },
     transactions: {
-      coinbase: number,
+      coinbase: string,
       coinbaseReceiverAccount: { publicKey: string },
       feeTransfer: [{
-        fee: number,
+        fee: string,
         recipient: string,
         type: string
       }],
       userCommands: [{ fee: number }]
     },
-    txFees: number,
+    txFees: string,
   }
 
 
@@ -117,16 +117,16 @@ export async function getBlocksFromMinaExplorer (key: string, minHeight: number,
         blockheight: meBlock.protocolState.consensusState.blockHeight,
         statehash: meBlock.stateHash,
         stakingledgerhash: meBlock.protocolState.consensusState.stakingEpochData.ledger.hash,
-        blockdatetime: meBlock.protocolState.blockchainState.date,
+        blockdatetime: +meBlock.protocolState.blockchainState.date,
         slot: meBlock.protocolState.consensusState.slot,
         globalslotsincegenesis: meBlock.protocolState.consensusState.slotSinceGenesis,
         creatorpublickey: meBlock.creatorAccount.publicKey,
         winnerpublickey: meBlock.winnerAccount.publicKey,
         receiverpublickey: meBlock.transactions.coinbaseReceiverAccount.publicKey,
-        coinbase: meBlock.transactions.coinbase,
-        feetransfertoreceiver: meBlock.transactions.feeTransfer.filter(x => x.recipient === meBlock.transactions.coinbaseReceiverAccount.publicKey).reduce((sum, y) => sum + y.fee, 0),
-        feetransferfromcoinbase: meBlock.transactions.feeTransfer.filter(x => x.type === 'Fee_transfer_via_coinbase').reduce((sum, y) => sum + y.fee, 0),
-        usercommandtransactionfees: meBlock.txFees
+        coinbase: +meBlock.transactions.coinbase,
+        feetransfertoreceiver: meBlock.transactions.feeTransfer.filter(x => x.recipient === meBlock.transactions.coinbaseReceiverAccount.publicKey).reduce((sum, y) => sum + (+y.fee), 0),
+        feetransferfromcoinbase: meBlock.transactions.feeTransfer.filter(x => x.type === 'Fee_transfer_via_coinbase').reduce((sum, y) => sum + (+y.fee), 0),
+        usercommandtransactionfees: +meBlock.txFees
       })
     })
   }
