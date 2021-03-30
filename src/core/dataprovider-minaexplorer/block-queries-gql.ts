@@ -87,7 +87,7 @@ query LatestHeight {
   }
 }`
 
-export async function getLatestHeight () {
+export async function getLatestHeightFromMinaExplorer () {
   const { errors, data } = await fetchGraphQL(
     tipQuery,
     'LatestHeight',

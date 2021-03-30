@@ -1,10 +1,11 @@
 import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payout-calculator";
-import { getStakes } from "./core/dataprovider-archivedb/staking-ledger-queries";
-import { getBlocks, getLatestHeight } from "./core/dataprovider-archivedb/block-queries-sql";
+import { getStakesFromFile } from "./core/dataprovider-archivedb/staking-ledger-json-file";
+import { getBlocksFromArchive, getLatestHeightFromArchive } from "./core/dataprovider-archivedb/block-queries-sql";
 import { getBlocksFromMinaExplorer } from './core/dataprovider-minaexplorer/block-queries-gql'
+import { getStakesFromMinaExplorer } from './core/dataprovider-minaexplorer/staking-ledger-gql'
 import { Blocks } from "./core/dataprovider-types";
 import hash from "object-hash";
-import yargs from "yargs";
+import yargs, { boolean } from "yargs";
 import { keypair } from "@o1labs/client-sdk";
 import { sendSignedTransactions } from "./core/send-payments";
 import fs from "fs";
@@ -15,6 +16,7 @@ const args = yargs.options({
   "payouthash": { type: "string", alias: ["h", "hash"] },
   "minheight": { type: "number", alias: ["m", "min"], demandOption: true },
   "maxheight": { type: "number", alias: ["x", "max"], default: Number.MAX_VALUE },
+  "verbose": {type: "boolean", alias: ["v"], default: true}
 }).argv;
 
 async function main () {
@@ -33,8 +35,7 @@ async function main () {
   const minimumHeight = args.minheight;
   const configuredMaximum = args.maxheight;
   const blockDataSource = process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB'
-
-  // TODO #13 get "getBlocks" and "getLatestHeight" based on data souce
+  const verbose = args.verbose;
 
   // get current maximum block height from database and determine what max block height for this run will be
   const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations);
@@ -45,7 +46,7 @@ async function main () {
   // get the blocks from archive db
   const blocks: Blocks = (blockDataSource == "MINAEXPLORER") ?
     await getBlocksFromMinaExplorer(stakingPoolPublicKey, minimumHeight, maximumHeight) :
-    await getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight)
+    await getBlocksFromArchive(stakingPoolPublicKey, minimumHeight, maximumHeight)
 
   let payouts: PayoutTransaction[] = [];
   let storePayout: PayoutDetails[] = [];
@@ -55,7 +56,11 @@ async function main () {
   console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey} `)
   Promise.all(ledgerHashes.map(async ledgerHash => {
     console.log(`### Calculating payouts for ledger ${ledgerHash}`)
-    const [stakers, totalStake] = getStakes(ledgerHash, stakingPoolPublicKey);
+    
+    const [stakers, totalStake] = (blockDataSource == "MINAEXPLORER") ?
+      await getStakesFromMinaExplorer(ledgerHash, stakingPoolPublicKey) :
+      getStakesFromFile(ledgerHash, stakingPoolPublicKey) 
+    
     console.log(`The pool total staking balance is ${totalStake}`);
 
     // run the payout calculation for those blocks
@@ -126,7 +131,8 @@ async function determineLastBlockHeightToProcess (maximumHeight: number, minimum
   // Alternatively, stop processing at maximum height if lower than finality
   // TODO: where does this really belong?
   let maximum = 0
-  const finalityHeight = await getLatestHeight() - minimumConfirmations;
+  // TODO #13 get "getBlocks" and "getLatestHeight" based on data souce
+  const finalityHeight = await getLatestHeightFromArchive() - minimumConfirmations;
   if (finalityHeight > maximumHeight) {
     maximum = maximumHeight;
   } else {
