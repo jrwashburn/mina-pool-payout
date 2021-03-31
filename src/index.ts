@@ -1,7 +1,7 @@
 import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payout-calculator";
 import { getStakesFromFile } from "./core/dataprovider-archivedb/staking-ledger-json-file";
 import { getBlocksFromArchive, getLatestHeightFromArchive } from "./core/dataprovider-archivedb/block-queries-sql";
-import { getBlocksFromMinaExplorer } from './core/dataprovider-minaexplorer/block-queries-gql'
+import { getBlocksFromMinaExplorer, getLatestHeightFromMinaExplorer } from './core/dataprovider-minaexplorer/block-queries-gql'
 import { getStakesFromMinaExplorer } from './core/dataprovider-minaexplorer/staking-ledger-gql'
 import { Blocks } from "./core/dataprovider-types";
 import hash from "object-hash";
@@ -38,7 +38,7 @@ async function main () {
   const verbose = args.verbose;
 
   // get current maximum block height from database and determine what max block height for this run will be
-  const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations);
+  const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, blockDataSource);
 
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
@@ -126,13 +126,16 @@ async function main () {
   });
 }
 
-async function determineLastBlockHeightToProcess (maximumHeight: number, minimumConfirmations: number): Promise<number> {
+async function determineLastBlockHeightToProcess (maximumHeight: number, minimumConfirmations: number, blockDataSource: string): Promise<number> {
   // Finality is understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork
   // Alternatively, stop processing at maximum height if lower than finality
   // TODO: where does this really belong?
   let maximum = 0
   // TODO #13 get "getBlocks" and "getLatestHeight" based on data souce
-  const finalityHeight = await getLatestHeightFromArchive() - minimumConfirmations;
+  const finalityHeight = (blockDataSource == "MINAEXPLORER") ?
+    await getLatestHeightFromMinaExplorer() - minimumConfirmations : 
+    await getLatestHeightFromArchive() - minimumConfirmations;
+  
   if (finalityHeight > maximumHeight) {
     maximum = maximumHeight;
   } else {
