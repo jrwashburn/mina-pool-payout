@@ -93,7 +93,7 @@ export async function getLatestHeightFromMinaExplorer () {
     'LatestHeight',
     {},
     graphqlEndpoint)
-  return data.blockHeight;
+  return (data.blocks[0].blockHeight);
 }
 
 export async function getBlocksFromMinaExplorer (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
