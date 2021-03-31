@@ -22,7 +22,7 @@ export function getPublicKeyShareClass (key: string) {
 // Changed from original implementation to simply return the slot number at which account beomes untimed
 export function calculateUntimedSlot (ledgerEntry: LedgerEntry): number {
   // account is not locked if there is no timing section at all
-  if (typeof (ledgerEntry.timing) === 'undefined') {
+  if (!ledgerEntry.timing) {
     // Untimed for full epoch so we have the maximum weighting of 1
     return 0
   } else {
