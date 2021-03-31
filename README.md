@@ -6,9 +6,9 @@ The main difference is that Mina Explorer spreads an unlocked key's supercharged
 Other than that known difference, the payout rules are the same. In our last parity test (on 3/21/2021), both approaches generated exactly the same payout calculations.
 
 # Dependencies
-This code uses language features of Typescript v3.7 and Node 14.
-The host this runs from will require access to a Mina Archive database.
-If payments are to be sent, access to a graphql endpoint that can send signed transactions is required.
+- This code uses language features of Typescript v3.7 and Node 14.
+- The host this runs from will either require access to a Mina Archive database, or to the MinaExplorer grapql API.
+- If payments are to be sent, access to a graphql endpoint that can send signed transactions is required.
 
 # Operational Overview
 This application will calculate, and may sign and transmit, the required payouts for accounts delegating to a given account.
@@ -30,6 +30,8 @@ Note that you should wait for the offline funding transaction to be completed if
 ## Setting up your environment
 
 Copy `sample.env` to `.env` and make the following changes within the `.env`:
+
+- Set `BLOCK_DATA_SOURCE` to either ARCHIVEDB or MINAEXPLORER. ARCHIVEDB will use the database connection string to get blocks and the curretn max height, and will expect [hash].json files for the ledgers being processed. MINAEXPLORER will use the 
 
 - Set `COMMISSION_RATE` to the commission your pool charges. Default is assumed to be the Mina Foundation maximum rate of .05 if a value is not provided.
 
@@ -60,7 +62,10 @@ The private key value can be retrieved from a pk file by running the mina advanc
     DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
     ```
 
-- Set `GRAPHQL_ENDPOINT` to the url of a graphql server that can send transactions. (e.g. http://127.0.0.1:3085/graphql ) This is required to transmit payout transactions; payouts will be broadcast via this endpoint.
+- Set `SEND_PAYMENT_GRAPHQL_ENDPOINT` to the url of a graphql server that can send transactions. (e.g. http://127.0.0.1:3085/graphql ) This is required to transmit payout transactions; payouts will be broadcast via this endpoint.
+
+- Set `MINAEXPLORER_GRAPHQL_ENDPOINT` to the url of the mina explorer graphql api if block data source is set to minaexplorer.
+
 ## Providing the Staking Ledgers
 - Export the staking ledger and place in src/data/ledger directory. You can export the current staking ledger with:
 
