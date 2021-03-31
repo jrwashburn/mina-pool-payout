@@ -16,7 +16,7 @@ const args = yargs.options({
   "payouthash": { type: "string", alias: ["h", "hash"] },
   "minheight": { type: "number", alias: ["m", "min"], demandOption: true },
   "maxheight": { type: "number", alias: ["x", "max"], default: Number.MAX_VALUE },
-  "verbose": {type: "boolean", alias: ["v"], default: true}
+  "verbose": {type: "boolean", alias: ["v"], default: false}
 }).argv;
 
 async function main () {
@@ -86,7 +86,9 @@ async function main () {
       return r.set(o.publicKey, item);
     }, new Map).values()];
 
+    if (verbose) {
     console.table(storePayout, ["publicKey", "blockHeight", "shareClass", "stakingBalance", "effectiveNPSPoolWeighting", "effectiveCommonPoolWeighting", "coinbase", "totalRewards", "totalRewardsNPSPool", "totalRewardsCommonPool", "payout"]);
+    }
     console.table(transactions);
 
     const runDateTime = new Date();
