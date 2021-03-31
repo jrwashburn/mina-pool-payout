@@ -100,6 +100,8 @@ After verifying the results and confirming you are ready to payout, but adding t
 
 ```npm run payout -- -m=0 -x=1000 -h=84cd21b7b566dc1c84cf06039462e013851df483ad61c229d1830285934dcae2```
 
+NOTE: Prior versions also output the entire calculation list for every block. That is now suppressed by default, but still visible by using a -verbose (or -v) flag at runtime. For example: `npm run payout -- -m=0 -x=1000 -v=true`
+
 ## Seeing Results ###
 
 The process will output summary informaiton to the console, and will generate several files under the src/data directory. Files will include:
