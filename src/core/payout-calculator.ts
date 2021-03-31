@@ -1,10 +1,10 @@
-import { Block } from "./queries";
-import { stakeIsLocked, Stake } from "./stakes";
+import { Block, Stake } from "./dataprovider-types";
+import { stakeIsLocked } from "./staking-ledger-util";
 // per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
 // see https://minaprotocol.com/docs/advanced/foundation-delegation-program
 const npsCommissionRate = 0.05
 
-export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number):
+export async function getPayouts (blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number):
   Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]> {
 
   // Initialize some stuff
@@ -119,7 +119,7 @@ export async function getPayouts(blocks: Block[], stakers: Stake[], totalStake: 
   return [payoutJson, storePayout, blocksIncluded, totalPayout];
 }
 
-function getWinner(stakers: Stake[], block: Block): Stake {
+function getWinner (stakers: Stake[], block: Block): Stake {
   const winners = stakers.filter(x => x.publicKey == block.winnerpublickey);
   if (winners.length != 1) {
     throw new Error("Should have exactly 1 winner.");

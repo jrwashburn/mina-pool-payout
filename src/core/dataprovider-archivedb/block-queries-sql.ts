@@ -1,6 +1,7 @@
-import { db } from "../infrastructure/database";
+import { db } from "../../infrastructure/database";
 import fs from "fs";
 import parse from "csv-parse";
+import { Blocks } from "../dataprovider-types";
 
 const blockQuery = `
     SELECT
@@ -74,22 +75,22 @@ const blockQuery = `
     ORDER BY blockheight DESC;
 `;
 
-export async function getLatestHeight() {
+export async function getLatestHeightFromArchive () {
   const result = await db.one<LatestHeight>(`
         SELECT MAX(height) AS height FROM public.blocks
     `);
   return result.height;
 }
 
-export async function getBlocks(key: string, minHeight: number, maxHeight: number) {
+export async function getBlocksFromArchive (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
   let blocks: Blocks = await db.any(blockQuery, [key, minHeight, maxHeight]);
 
-  const blockFile = `${__dirname}/../data/.paidblocks`;
-  
+  const blockFile = `${__dirname}/../../data/.paidblocks`;
+
   const filterBlocks = () => {
     return new Promise((resolve, reject) => {
       fs.createReadStream(blockFile)
-        .pipe(parse({delimiter: "|"}))
+        .pipe(parse({ delimiter: "|" }))
         .on("data", (record) => {
           blocks = blocks.filter(block => !(block.blockheight == record[0] && block.statehash == record[1]));
         })
@@ -106,21 +107,3 @@ export async function getBlocks(key: string, minHeight: number, maxHeight: numbe
 type LatestHeight = {
   height: number;
 };
-
-export type Block = {
-  blockheight: number;
-  statehash: string;
-  stakingledgerhash: string;
-  blockdatetime: number;
-  slot: number;
-  globalslotsincegenesis: number;
-  creatorpublickey: string;
-  winnerpublickey: string;
-  receiverpublickey: string;
-  coinbase: number;
-  feetransfertoreceiver: number;
-  feetransferfromcoinbase: number;
-  usercommandtransactionfees: number;
-};
-
-export type Blocks = Array<Block>;
