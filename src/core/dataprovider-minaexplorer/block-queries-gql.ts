@@ -39,7 +39,7 @@ const graphqlEndpoint = process.env.MINAEXPLORER_GRAPHQL_ENDPOINT || "https://lo
 
 const blockQuery = `
 query blockData( $creator: String, $blockHeight_gte: Int, $blockHeight_lte: Int  ) {
-  blocks(sortBy: BLOCKHEIGHT_ASC, query: {canonical: true, creator: $creator, blockHeight_gte: $blockHeight_gte , blockHeight_lte: $blockHeight_lte } ) {
+  blocks(limit: 1000, sortBy: BLOCKHEIGHT_ASC, query: {canonical: true, creator: $creator, blockHeight_gte: $blockHeight_gte , blockHeight_lte: $blockHeight_lte } ) {
     stateHash
     protocolState {
       consensusState {
