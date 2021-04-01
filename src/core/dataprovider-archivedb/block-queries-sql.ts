@@ -75,11 +75,32 @@ const blockQuery = `
     ORDER BY blockheight DESC;
 `;
 
+const getHeightsMissingQuery = `
+  SELECT h as height
+  FROM (SELECT h::int FROM generate_series($1 , $2) h
+  LEFT JOIN blocks b 
+  ON h = b.height where b.height is null) as v
+`;
+
+const getNullParentsQuery = `
+  SELECT height FROM blocks WHERE parent_id is null AND height >= $1 AND height <= $2
+`;
+
 export async function getLatestHeightFromArchive () {
-  const result = await db.one<LatestHeight>(`
+  const result = await db.one<height>(`
         SELECT MAX(height) AS height FROM public.blocks
     `);
   return result.height;
+}
+
+export async function getHeightMissing(minHeight: number, maxHeight: number) {
+  const heights: Array<height> = await db.any(getHeightsMissingQuery, [minHeight, maxHeight]);
+  return heights.map(x=> x.height);
+}
+
+export async function getNullParents(minHeight: number, maxHeight: number) {
+  const heights: Array<height> = await db.any(getNullParentsQuery, [minHeight, maxHeight]);
+  return heights.map(x=> x.height);
 }
 
 export async function getBlocksFromArchive (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
@@ -104,6 +125,6 @@ export async function getBlocksFromArchive (key: string, minHeight: number, maxH
   return blocks;
 }
 
-type LatestHeight = {
+type height = {
   height: number;
 };
