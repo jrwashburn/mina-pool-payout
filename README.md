@@ -31,7 +31,9 @@ Note that you should wait for the offline funding transaction to be completed if
 
 Copy `sample.env` to `.env` and make the following changes within the `.env`:
 
-- Set `BLOCK_DATA_SOURCE` to either ARCHIVEDB or MINAEXPLORER. ARCHIVEDB will use the database connection string to get blocks and the curretn max height, and will expect [hash].json files for the ledgers being processed. MINAEXPLORER will use the 
+- Set `BLOCK_DATA_SOURCE` to either ARCHIVEDB or MINAEXPLORER. 
+    - ARCHIVEDB will use the database connection string to get blocks and the current max height, and will expect [hash].json files for the ledgers being processed. 
+    - MINAEXPLORER will use endpoint specified in MINAEXPLORER_GRAPHQL_ENDPOINT (expect: graphql.minaexplorer.com) to get blocks and the staking ledger
 
 - Set `COMMISSION_RATE` to the commission your pool charges. Default is assumed to be the Mina Foundation maximum rate of .05 if a value is not provided.
 
@@ -61,8 +63,12 @@ The private key value can be retrieved from a pk file by running the mina advanc
     ```
     DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
     ```
+    - Note piconbello is providing a public archive accessible at: 
+    - postgresql://piconbello:piconbello@34.90.12.167:5432/archive  (provided with permission, and _do your own research_)
 
 - Set `SEND_PAYMENT_GRAPHQL_ENDPOINT` to the url of a graphql server that can send transactions. (e.g. http://127.0.0.1:3085/graphql ) This is required to transmit payout transactions; payouts will be broadcast via this endpoint.
+    - Note @vanphandinh / beaconchain#8571 has provided a graphql proxy https://github.com/vanphandinh/mina-graphql-proxy which can be used to transmit payments 
+    - beaconchain is providing a public endpoint here: https://minagraph.com/graphql (provided with permission, and _do your own research_)
 
 - Set `MINAEXPLORER_GRAPHQL_ENDPOINT` to the url of the mina explorer graphql api if block data source is set to minaexplorer.
 
