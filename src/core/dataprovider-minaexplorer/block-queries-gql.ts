@@ -104,7 +104,7 @@ export async function getBlocksFromMinaExplorer (key: string, minHeight: number,
     {
       creator: key,
       blockHeight_gte: minHeight,
-      blockHeight_lte: (maxHeight - minHeight)
+      blockHeight_lte: maxHeight
     },
     graphqlEndpoint
   );
