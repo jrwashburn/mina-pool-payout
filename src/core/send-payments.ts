@@ -60,7 +60,7 @@ async function sendSignedPayment (payment: signed<payment>) {
 
 export async function getNonce (publicKey: string) {
   const operationsDoc = `
-    query GetNonce($publicKey: String) {
+    query GetNonce($publicKey: PublicKey!) {
       account(publicKey: $publicKey) {
         inferredNonce
       }
