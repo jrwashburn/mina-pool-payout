@@ -63,8 +63,6 @@ The private key value can be retrieved from a pk file by running the mina advanc
     ```
     DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
     ```
-    - Note piconbello is providing a public archive accessible at: 
-    - postgresql://piconbello:piconbello@34.90.12.167:5432/archive  (provided with permission, and _do your own research_)
 
 - Set `SEND_PAYMENT_GRAPHQL_ENDPOINT` to the url of a graphql server that can send transactions. (e.g. http://127.0.0.1:3085/graphql ) This is required to transmit payout transactions; payouts will be broadcast via this endpoint.
     - Note @vanphandinh / beaconchain#8571 has provided a graphql proxy https://github.com/vanphandinh/mina-graphql-proxy which can be used to transmit payments 
