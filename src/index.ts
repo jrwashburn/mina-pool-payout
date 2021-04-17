@@ -1,6 +1,6 @@
 import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payout-calculator";
 import { getStakesFromFile } from "./core/dataprovider-archivedb/staking-ledger-json-file";
-import { getBlocksFromArchive, getLatestHeightFromArchive, getHeightMissing, getNullParents  } from "./core/dataprovider-archivedb/block-queries-sql";
+import { getBlocksFromArchive, getLatestHeightFromArchive } from "./core/dataprovider-archivedb/block-queries-sql";
 import { getBlocksFromMinaExplorer, getLatestHeightFromMinaExplorer } from './core/dataprovider-minaexplorer/block-queries-gql'
 import { getStakesFromMinaExplorer } from './core/dataprovider-minaexplorer/staking-ledger-gql'
 import { Blocks } from "./core/dataprovider-types";
@@ -44,14 +44,6 @@ async function main () {
 
   let blocks: Blocks = [];
   if (blockDataSource === 'ARCHIVEDB'){
-    const missingHeights = await getHeightMissing(minimumHeight, maximumHeight);
-    if ((minimumHeight === 0 && (missingHeights.length > 1 || missingHeights[0] != 0)) || (minimumHeight > 0 && missingHeights.length > 0)) {
-      throw new Error(`Archive database is missing blocks in the specified range. Import them and try again. Missing blocks were: ${JSON.stringify(missingHeights)}`);
-    }
-    const nullParents = await getNullParents(minimumHeight, maximumHeight);
-    if ((minimumHeight === 0 && (nullParents.length > 1 || nullParents[0] != 1)) || (minimumHeight > 0 && nullParents.length > 0)) {
-      throw new Error(`Archive database has null parents in the specified range. Import them and try again. Blocks with null parents were: ${JSON.stringify(nullParents)}`);
-    }
     blocks = await getBlocksFromArchive(stakingPoolPublicKey, minimumHeight, maximumHeight)
   } else if (blockDataSource == "MINAEXPLORER") {
     blocks = await getBlocksFromMinaExplorer(stakingPoolPublicKey, minimumHeight, maximumHeight)
