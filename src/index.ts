@@ -1,6 +1,4 @@
 import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payout-calculator";
-import { getStakesFromFile } from "./core/dataprovider-archivedb/staking-ledger-json-file";
-import { getStakesFromMinaExplorer } from './core/dataprovider-minaexplorer/staking-ledger-gql'
 import { Blocks } from "./core/dataprovider-types";
 import hash from "object-hash";
 import yargs, { boolean } from "yargs";
@@ -39,17 +37,21 @@ async function main () {
     throw new Error ('Unkown Data Source')
   }
 
-  const dataProvider = (blockDataSource == "ARCHIVEDB") ?
+  const blockProvider = (blockDataSource == "ARCHIVEDB") ?
     require("./core/dataprovider-archivedb/block-queries-sql") :
     require("./core/dataprovider-minaexplorer/block-queries-gql")
+
+  const stakesProvider = (blockDataSource == "ARCHIVEDB") ?
+    require("./core/dataprovider-archivedb/staking-ledger-json-file") :
+    require("./core/dataprovider-minaexplorer/staking-ledger-gql")
   
   // get current maximum block height from database and determine what max block height for this run will be
-    const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, await dataProvider.getLatestHeight());
+    const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, await blockProvider.getLatestHeight());
 
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
   let blocks: Blocks = [];
-  blocks = await dataProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight)
+  blocks = await blockProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight)
      
   let payouts: PayoutTransaction[] = [];
   let storePayout: PayoutDetails[] = [];
@@ -60,10 +62,7 @@ async function main () {
   Promise.all(ledgerHashes.map(async ledgerHash => {
     console.log(`### Calculating payouts for ledger ${ledgerHash}`)
     
-    const [stakers, totalStake] = (blockDataSource == "MINAEXPLORER") ?
-      await getStakesFromMinaExplorer(ledgerHash, stakingPoolPublicKey) :
-      getStakesFromFile(ledgerHash, stakingPoolPublicKey) 
-    
+    const [stakers, totalStake] = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey)
     console.log(`The pool total staking balance is ${totalStake}`);
 
     // run the payout calculation for those blocks
