@@ -86,7 +86,7 @@ const getNullParentsQuery = `
   SELECT height FROM blocks WHERE parent_id is null AND height >= $1 AND height <= $2
 `;
 
-export async function getLatestHeightFromArchive () {
+export async function getLatestHeight () {
   const result = await db.one<height>(`
         SELECT MAX(height) AS height FROM public.blocks
     `);
@@ -103,7 +103,7 @@ async function getNullParents(minHeight: number, maxHeight: number) {
   return heights.map(x=> x.height);
 }
 
-export async function getBlocksFromArchive (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
+export async function getBlocks (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
   let blocks: Blocks = await db.any(blockQuery, [key, minHeight, maxHeight]);
 
   const missingHeights = await getHeightMissing(minHeight, maxHeight);

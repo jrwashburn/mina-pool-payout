@@ -87,7 +87,7 @@ query LatestHeight {
   }
 }`
 
-export async function getLatestHeightFromMinaExplorer () {
+export async function getLatestHeight () {
   const { errors, data } = await fetchGraphQL(
     tipQuery,
     'LatestHeight',
@@ -96,7 +96,7 @@ export async function getLatestHeightFromMinaExplorer () {
   return (data.blocks[0].blockHeight);
 }
 
-export async function getBlocksFromMinaExplorer (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
+export async function getBlocks (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
   let flatBlocks: Blocks = []
   const { errors, data } = await fetchGraphQL(
     blockQuery,
