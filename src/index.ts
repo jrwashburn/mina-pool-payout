@@ -23,6 +23,8 @@ async function main () {
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const payoutMemo: string = process.env.POOL_MEMO || "";
   const payorSendTransactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
+  // TODO: validate and then move this downt to send-payments to consolidated client-sdk 
+  // TODO: introduce -network flag to support test, pass to send-payments
   let senderKeys: keypair = {
     privateKey: process.env.SEND_PRIVATE_KEY || "",
     publicKey: process.env.SEND_PUBLIC_KEY || ""
