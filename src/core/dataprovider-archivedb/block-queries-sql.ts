@@ -86,25 +86,34 @@ const getNullParentsQuery = `
   SELECT height FROM blocks WHERE parent_id is null AND height >= $1 AND height <= $2
 `;
 
-export async function getLatestHeightFromArchive () {
+export async function getLatestHeight () {
   const result = await db.one<height>(`
         SELECT MAX(height) AS height FROM public.blocks
     `);
   return result.height;
 }
 
-export async function getHeightMissing(minHeight: number, maxHeight: number) {
+async function getHeightMissing(minHeight: number, maxHeight: number) {
   const heights: Array<height> = await db.any(getHeightsMissingQuery, [minHeight, maxHeight]);
   return heights.map(x=> x.height);
 }
 
-export async function getNullParents(minHeight: number, maxHeight: number) {
+async function getNullParents(minHeight: number, maxHeight: number) {
   const heights: Array<height> = await db.any(getNullParentsQuery, [minHeight, maxHeight]);
   return heights.map(x=> x.height);
 }
 
-export async function getBlocksFromArchive (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
+export async function getBlocks (key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
   let blocks: Blocks = await db.any(blockQuery, [key, minHeight, maxHeight]);
+
+  const missingHeights = await getHeightMissing(minHeight, maxHeight);
+  if ((minHeight === 0 && (missingHeights.length > 1 || missingHeights[0] != 0)) || (minHeight > 0 && missingHeights.length > 0)) {
+    throw new Error(`Archive database is missing blocks in the specified range. Import them and try again. Missing blocks were: ${JSON.stringify(missingHeights)}`);
+  }
+  const nullParents = await getNullParents(minHeight, maxHeight);
+  if ((minHeight === 0 && (nullParents.length > 1 || nullParents[0] != 1)) || (minHeight > 0 && nullParents.length > 0)) {
+    throw new Error(`Archive database has null parents in the specified range. Import them and try again. Blocks with null parents were: ${JSON.stringify(nullParents)}`);
+  }
 
   const blockFile = `${__dirname}/../../data/.paidblocks`;
 

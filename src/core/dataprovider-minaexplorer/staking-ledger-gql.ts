@@ -22,7 +22,7 @@ query stakingLedger( $ledgerHash: String, $delegate: String) {
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards
-export async function getStakesFromMinaExplorer (ledgerHash: string, key: string): Promise<[Stake[], number]> {
+export async function getStakes (ledgerHash: string, key: string): Promise<[Stake[], number]> {
   let totalStakingBalance: number = 0;
   let stakers: Stake[] = [];
   const { errors, data } = await fetchGraphQL(

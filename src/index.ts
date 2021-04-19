@@ -1,8 +1,4 @@
-import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payout-calculator";
-import { getStakesFromFile } from "./core/dataprovider-archivedb/staking-ledger-json-file";
-import { getBlocksFromArchive, getLatestHeightFromArchive, getHeightMissing, getNullParents  } from "./core/dataprovider-archivedb/block-queries-sql";
-import { getBlocksFromMinaExplorer, getLatestHeightFromMinaExplorer } from './core/dataprovider-minaexplorer/block-queries-gql'
-import { getStakesFromMinaExplorer } from './core/dataprovider-minaexplorer/staking-ledger-gql'
+import { getPayouts, PayoutDetails, PayoutTransaction, substituteAndExcludePayToAddresses } from "./core/payout-calculator";
 import { Blocks } from "./core/dataprovider-types";
 import hash from "object-hash";
 import yargs, { boolean } from "yargs";
@@ -27,6 +23,8 @@ async function main () {
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const payoutMemo: string = process.env.POOL_MEMO || "";
   const payorSendTransactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
+  // TODO: validate and then move this downt to send-payments to consolidated client-sdk 
+  // TODO: introduce -network flag to support test, pass to send-payments
   let senderKeys: keypair = {
     privateKey: process.env.SEND_PRIVATE_KEY || "",
     publicKey: process.env.SEND_PUBLIC_KEY || ""
@@ -37,27 +35,25 @@ async function main () {
   const blockDataSource = process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB'
   const verbose = args.verbose;
 
+  if ( blockDataSource != "ARCHIVEDB" && blockDataSource != "MINAEXPLORER" ) {
+    throw new Error ('Unkown Data Source')
+  }
+
+  const blockProvider = (blockDataSource == "ARCHIVEDB") ?
+    require("./core/dataprovider-archivedb/block-queries-sql") :
+    require("./core/dataprovider-minaexplorer/block-queries-gql")
+
+  const stakesProvider = (blockDataSource == "ARCHIVEDB") ?
+    require("./core/dataprovider-archivedb/staking-ledger-json-file") :
+    require("./core/dataprovider-minaexplorer/staking-ledger-gql")
+  
   // get current maximum block height from database and determine what max block height for this run will be
-  const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, blockDataSource);
+  const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, await blockProvider.getLatestHeight());
 
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
   let blocks: Blocks = [];
-  if (blockDataSource === 'ARCHIVEDB'){
-    const missingHeights = await getHeightMissing(minimumHeight, maximumHeight);
-    if ((minimumHeight === 0 && (missingHeights.length > 1 || missingHeights[0] != 0)) || (minimumHeight > 0 && missingHeights.length > 0)) {
-      throw new Error(`Archive database is missing blocks in the specified range. Import them and try again. Missing blocks were: ${JSON.stringify(missingHeights)}`);
-    }
-    const nullParents = await getNullParents(minimumHeight, maximumHeight);
-    if ((minimumHeight === 0 && (nullParents.length > 1 || nullParents[0] != 1)) || (minimumHeight > 0 && nullParents.length > 0)) {
-      throw new Error(`Archive database has null parents in the specified range. Import them and try again. Blocks with null parents were: ${JSON.stringify(nullParents)}`);
-    }
-    blocks = await getBlocksFromArchive(stakingPoolPublicKey, minimumHeight, maximumHeight)
-  } else if (blockDataSource == "MINAEXPLORER") {
-    blocks = await getBlocksFromMinaExplorer(stakingPoolPublicKey, minimumHeight, maximumHeight)
-  } else {
-    throw new Error ('Unkown Data Source')
-  }
+  blocks = await blockProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight)
      
   let payouts: PayoutTransaction[] = [];
   let storePayout: PayoutDetails[] = [];
@@ -68,10 +64,7 @@ async function main () {
   Promise.all(ledgerHashes.map(async ledgerHash => {
     console.log(`### Calculating payouts for ledger ${ledgerHash}`)
     
-    const [stakers, totalStake] = (blockDataSource == "MINAEXPLORER") ?
-      await getStakesFromMinaExplorer(ledgerHash, stakingPoolPublicKey) :
-      getStakesFromFile(ledgerHash, stakingPoolPublicKey) 
-    
+    const [stakers, totalStake] = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey)
     console.log(`The pool total staking balance is ${totalStake}`);
 
     // run the payout calculation for those blocks
@@ -83,23 +76,29 @@ async function main () {
     // Output total results and transaction files for input to next process, details file for audit log
     console.log(`We won these blocks: ${blocksIncluded}`);
     console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
-  })).then(() => {
+  })).then( async () => {
     // Aggregate to a single transaction per key and track the total for funding transaction
     let totalPayoutFundsNeeded = 0
-    const transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
+    let transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
         fee: 0,
       });
       item.amount += o.amount;
       item.fee = payorSendTransactionFee;
-      totalPayoutFundsNeeded += item.amount + item.fee;
       return r.set(o.publicKey, item);
     }, new Map).values()];
 
     if (verbose) {
-    console.table(storePayout, ["publicKey", "blockHeight", "shareClass", "stakingBalance", "effectiveNPSPoolWeighting", "effectiveCommonPoolWeighting", "coinbase", "totalRewards", "totalRewardsNPSPool", "totalRewardsCommonPool", "payout"]);
+      console.table(storePayout, ["publicKey", "blockHeight", "shareClass", "stakingBalance", "effectiveNPSPoolWeighting", "effectiveCommonPoolWeighting", "coinbase", "totalRewards", "totalRewardsNPSPool", "totalRewardsCommonPool", "payout"]);
     }
+
+    console.log(`before substitutions and exclusions`)
+    console.table(transactions);
+    const payoutHash = hash(storePayout, { algorithm: "sha256" });
+    transactions = await substituteAndExcludePayToAddresses ( transactions );
+    transactions.map((t) => {totalPayoutFundsNeeded += t.amount + t.fee});
+    console.log(`after substitutions and exclusions`)
     console.table(transactions);
 
     const runDateTime = new Date();
@@ -117,13 +116,12 @@ async function main () {
     });
 
     console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
-    console.log('Potential Ledger Command:');
-    console.log(`mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000}`);
+    console.log(`Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000}`);
 
-    const payoutHash = hash(storePayout, { algorithm: "sha256" });
     if (args.payouthash) {
       console.log(`### Processing signed payout for hash ${args.payouthash}...`)
       if (args.payouthash == payoutHash) {
+        // TODO: replace destination key, remove excluded sends 
         sendSignedTransactions(transactions, senderKeys, payoutMemo);
         const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, { flags: 'a' });
         blocks.forEach((block) => {
@@ -139,15 +137,13 @@ async function main () {
   });
 }
 
-async function determineLastBlockHeightToProcess (maximumHeight: number, minimumConfirmations: number, blockDataSource: string): Promise<number> {
+async function determineLastBlockHeightToProcess (maximumHeight: number, minimumConfirmations: number, latestHeight: number): Promise<number> {
   // Finality is understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork
   // Alternatively, stop processing at maximum height if lower than finality
   // TODO: where does this really belong?
   let maximum = 0
   // TODO #13 get "getBlocks" and "getLatestHeight" based on data souce
-  const finalityHeight = (blockDataSource == "MINAEXPLORER") ?
-    await getLatestHeightFromMinaExplorer() - minimumConfirmations : 
-    await getLatestHeightFromArchive() - minimumConfirmations;
+  const finalityHeight = latestHeight - minimumConfirmations;
   
   if (finalityHeight > maximumHeight) {
     maximum = maximumHeight;

@@ -4,7 +4,7 @@ import fs from "fs";
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards
-export function getStakesFromFile (ledgerHash: string, key: string): [Stake[], number] {
+export function getStakes (ledgerHash: string, key: string): [Stake[], number] {
   let totalStakingBalance: number = 0;
   // get the stakes from staking ledger json
   // TODO: this might need to be reworked for large files
