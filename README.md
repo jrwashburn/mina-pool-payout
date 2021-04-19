@@ -89,6 +89,21 @@ The private key value can be retrieved from a pk file by running the mina advanc
     mina ledger hash --ledger-file staking-epoch-ledger.json | xargs -I % cp staking-epoch-ledger.json %.json
     mina ledger hash --ledger-file next-epoch-ledger.json | xargs -I % cp next-epoch-ledger.json %.json
     ```
+ 
+## Handling special accounts - suppressing or redirecting payouts 
+You can control whether payouts for a specific key should be skipped or redirected to another key. This is configured with a file named ".substitutePayTo" which should be placed in the src/data directory.  
+The file is pipe-delimited and contains 2 columns - the first column is the public key to consider, and the second is either the keyword "EXCLUDE", or the payout address to redirect payments to.
+- Public Key|EXCLUDE
+- Public Key|Redirected To Public Key
+
+In the example content below, the first row would cause any payouts to the first key to not be sent. This may be useful for the pool operator's keys. The second row would cause any payouts to the key ending in WCvh to be sent instead to the key ending in Ez3yB. This is useful for redirecting new tokens that would be paid to a locked account to go to an unlocked account instead. 
+
+    ```
+    B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|EXCLUDE
+    B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|B62qoigHEtJCoZ5ekbGHWyr9hYfc6fkZ2A41h9vvVZuvty9amzEz3yB
+    ```
+
+To enable these features, create a file src/data/.substitutePayTo and configure according to your situation.  
 
 # Running the script
 

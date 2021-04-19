@@ -1,4 +1,4 @@
-import { getPayouts, PayoutDetails, PayoutTransaction } from "./core/payout-calculator";
+import { getPayouts, PayoutDetails, PayoutTransaction, substituteAndExcludePayToAddresses } from "./core/payout-calculator";
 import { Blocks } from "./core/dataprovider-types";
 import hash from "object-hash";
 import yargs, { boolean } from "yargs";
@@ -48,7 +48,7 @@ async function main () {
     require("./core/dataprovider-minaexplorer/staking-ledger-gql")
   
   // get current maximum block height from database and determine what max block height for this run will be
-    const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, await blockProvider.getLatestHeight());
+  const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, await blockProvider.getLatestHeight());
 
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
 
@@ -76,23 +76,29 @@ async function main () {
     // Output total results and transaction files for input to next process, details file for audit log
     console.log(`We won these blocks: ${blocksIncluded}`);
     console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
-  })).then(() => {
+  })).then( async () => {
     // Aggregate to a single transaction per key and track the total for funding transaction
     let totalPayoutFundsNeeded = 0
-    const transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
+    let transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
         fee: 0,
       });
       item.amount += o.amount;
       item.fee = payorSendTransactionFee;
-      totalPayoutFundsNeeded += item.amount + item.fee;
       return r.set(o.publicKey, item);
     }, new Map).values()];
 
     if (verbose) {
-    console.table(storePayout, ["publicKey", "blockHeight", "shareClass", "stakingBalance", "effectiveNPSPoolWeighting", "effectiveCommonPoolWeighting", "coinbase", "totalRewards", "totalRewardsNPSPool", "totalRewardsCommonPool", "payout"]);
+      console.table(storePayout, ["publicKey", "blockHeight", "shareClass", "stakingBalance", "effectiveNPSPoolWeighting", "effectiveCommonPoolWeighting", "coinbase", "totalRewards", "totalRewardsNPSPool", "totalRewardsCommonPool", "payout"]);
     }
+
+    console.log(`before substitutions and exclusions`)
+    console.table(transactions);
+    const payoutHash = hash(storePayout, { algorithm: "sha256" });
+    transactions = await substituteAndExcludePayToAddresses ( transactions );
+    transactions.map((t) => {totalPayoutFundsNeeded += t.amount + t.fee});
+    console.log(`after substitutions and exclusions`)
     console.table(transactions);
 
     const runDateTime = new Date();
@@ -110,13 +116,12 @@ async function main () {
     });
 
     console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
-    console.log('Potential Ledger Command:');
-    console.log(`mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000}`);
+    console.log(`Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000}`);
 
-    const payoutHash = hash(storePayout, { algorithm: "sha256" });
     if (args.payouthash) {
       console.log(`### Processing signed payout for hash ${args.payouthash}...`)
       if (args.payouthash == payoutHash) {
+        // TODO: replace destination key, remove excluded sends 
         sendSignedTransactions(transactions, senderKeys, payoutMemo);
         const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, { flags: 'a' });
         blocks.forEach((block) => {

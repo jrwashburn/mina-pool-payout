@@ -1,6 +1,7 @@
 import { signPayment, keypair, signed, payment } from "@o1labs/client-sdk";
 import { PayoutTransaction } from "./payout-calculator";
 import fs from "fs";
+import parse from "csv-parse";
 import { fetchGraphQL } from "../infrastructure/graphql";
 
 const graphqlEndpoint = process.env.SEND_PAYMENT_GRAPHQL_ENDPOINT || "https://localhost:3085";
