@@ -1,0 +1,15 @@
+
+Main-> Main: Setup
+Main->Database:GetLatesHeight
+Main->Database:GetBlocks
+Main->Main: FilterBlocks (getLederHashes)
+note over Main: Start Loop Build Payments Async
+note over Main: for each ledger hash
+Main->Database:GetStakes
+Main->PayoutCalculator: getPayouts(ledgerBlocks, stakers, totalStake, commissionRate)
+note over Main: End Loop Build Payments Async
+Main->Main: BuildTransactions
+Main->Main:SubstituteAndExcludePayToAddresses
+Main->Main:GenerateOuputFileName
+Main->File:WriteTransactions
+Main->PaymentEndopoint:SendPayments

@@ -5,17 +5,31 @@ import yargs, { boolean } from "yargs";
 import { keypair } from "@o1labs/client-sdk";
 import { sendSignedTransactions } from "./core/send-payments";
 import fs from "fs";
+import { Payment } from "./Payment/Payment";
+
 
 // TODO: create mina currency types
 
-const args = yargs.options({
+const oargs = yargs.options({
   "payouthash": { type: "string", alias: ["h", "hash"] },
   "minheight": { type: "number", alias: ["m", "min"], demandOption: true },
   "maxheight": { type: "number", alias: ["x", "max"], default: Number.MAX_VALUE },
-  "verbose": {type: "boolean", alias: ["v"], default: false}
+  "verbose": {type: "boolean", alias: ["v"], default: false},
+  "dryrun": {type: "boolean", alias: ["dr"], default: false}
 }).argv;
 
-async function main () {
+const main = async () => {
+  const { dryrun } = oargs
+  if (dryrun){
+    //Do nothing, for now
+    const payment = new Payment()
+    payment.run(oargs)
+  } else {
+    run(oargs)
+  }
+}
+
+async function run (args: any) {
   // TODO: Error handling
   // TODO: Add parameter to run read-only vs. write which would persist max height processed so it is not re-processed in future
   // TODO: Fail if any required values missing from .env
@@ -48,6 +62,8 @@ async function main () {
     require("./core/dataprovider-minaexplorer/staking-ledger-gql")
   
   // get current maximum block height from database and determine what max block height for this run will be
+
+  //JCR: What is the Height?
   const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, await blockProvider.getLatestHeight());
 
   console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
