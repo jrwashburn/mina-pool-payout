@@ -19,8 +19,16 @@ export interface PaymentConfiguration {
     verbose: boolean
 }
 
-export interface Builder {
-    build() : Promise<void>
+export interface IPaymentBuilder {
+    build() : Promise<{payouts: PayoutTransaction[], storePayout: PayoutDetails[]}>
+}
+
+export interface ITransactionBuilder {
+    build(payouts: PayoutTransaction[], storePayout: PayoutDetails[], config: PaymentConfiguration) : Promise<PayoutTransaction[]>
+}
+
+export interface ITransactionWriter {
+    write(transactions: PayoutTransaction[], config: PaymentConfiguration, maximumHeight: number, totalPayoutFundsNeeded: number): Promise<void>
 }
 
 export interface BlockHandler {
