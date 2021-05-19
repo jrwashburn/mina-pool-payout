@@ -2,6 +2,8 @@ import { BlockProcessor } from "./BlockProcessor";
 import { PaymentGenerator, PaymentConfiguration } from "./Model";
 import { PaymentBuilder } from "./PaymentBuilder";
 import { PayoutProcessor } from "./PayoutProcessor";
+import { TransactionBuilder } from "./TransactionBuilder";
+import { TransactionWriter } from "./TransactionWriter";
 
 export class Payment implements PaymentGenerator {
     
@@ -10,12 +12,22 @@ export class Payment implements PaymentGenerator {
         //USE IOC
         const blockHandler  = new BlockProcessor()
         const payoutCalculator = new PayoutProcessor()
+
         const payments = new PaymentBuilder(configuration,blockHandler,payoutCalculator)
+        
+        const transactionBuilder = new TransactionBuilder()
+
+        const transactionWriter = new TransactionWriter()
 
         if (this.isValid(configuration)) {
-            payments.build()
-            //buildTransactions
+            // chage this to its out wrapper
+            const { payouts, storePayout } = await payments.build()
+            
+            const transactions = await transactionBuilder.build(payouts, storePayout,configuration)
+            
             //writeTransactions
+            await transactionWriter.write(transactions, configuration, 1,2) //use correct numbers from wrapper
+            
             //sendPayments
         } else {
             //TODO: Use a custom error class
@@ -40,7 +52,6 @@ export class Payment implements PaymentGenerator {
             configuredMaximum : args.maxheight,
             blockDataSource : process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB',
             verbose : args.verbose,
-            
         }
 
         return configuration

@@ -1,8 +1,8 @@
 import { Block, Blocks } from "../core/dataprovider-types";
 import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator";
-import { BlockHandler, Builder, PaymentConfiguration, PayoutCalculator } from "./Model";
+import { BlockHandler, IPaymentBuilder, PaymentConfiguration, PayoutCalculator } from "./Model";
 
-export class PaymentBuilder implements Builder {
+export class PaymentBuilder implements IPaymentBuilder {
     
     private blockProvider : any
     private stakesProvider : any
@@ -25,7 +25,7 @@ export class PaymentBuilder implements Builder {
         require("./core/dataprovider-minaexplorer/staking-ledger-gql")
     }
 
-    async build(): Promise<void> {
+    async build(): Promise<{payouts: PayoutTransaction[], storePayout: PayoutDetails[]}> {
         
         const { configuredMaximum, minimumConfirmations, minimumHeight, stakingPoolPublicKey, commissionRate } = this.config
         
@@ -43,7 +43,7 @@ export class PaymentBuilder implements Builder {
 
         const ledgerHashes = [...new Set(blocks.map(block => block.stakingledgerhash))]
 
-        Promise.all(ledgerHashes.map(async ledgerHash => {
+        return Promise.all(ledgerHashes.map(async ledgerHash => {
             console.log(`### Calculating payouts for ledger ${ledgerHash}`)
 
             const [stakers, totalStake] = await this.stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey)
@@ -63,12 +63,7 @@ export class PaymentBuilder implements Builder {
             console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
         })).then( async () => {
             
+            return { payouts, storePayout}
         })
-
-        
-
-        
-
-
     }
 }
