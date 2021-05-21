@@ -5,7 +5,7 @@ import yargs, { boolean } from "yargs";
 import { keypair } from "@o1labs/client-sdk";
 import { sendSignedTransactions } from "./core/send-payments";
 import fs from "fs";
-import { Payment } from "./Payment/Payment";
+import { PaymentProcessor } from "./Payment/PaymentProcessor";
 
 
 // TODO: create mina currency types
@@ -22,7 +22,7 @@ const main = async () => {
   const { dryrun } = oargs
   if (dryrun){
     //Do nothing, for now
-    const payment = new Payment()
+    const payment = new PaymentProcessor()
     payment.run(oargs)
   } else {
     run(oargs)

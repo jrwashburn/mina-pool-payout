@@ -1,39 +1,60 @@
+import { FileWriter } from "../Shared/FileWriter";
 import { BlockProcessor } from "./BlockProcessor";
-import { PaymentGenerator, PaymentConfiguration } from "./Model";
+import { IPaymentProcessor as IPaymentProcessor, PaymentConfiguration } from "./Model";
 import { PaymentBuilder } from "./PaymentBuilder";
 import { PayoutProcessor } from "./PayoutProcessor";
 import { TransactionBuilder } from "./TransactionBuilder";
-import { TransactionWriter } from "./TransactionWriter";
+import { TransactionProcessor } from "./TransactionWriter";
+import hash from "object-hash";
+import { TransactionSender } from "./TrasactionSender";
+import { PayoutTransaction } from "../core/payout-calculator";
 
-export class Payment implements PaymentGenerator {
+export class PaymentProcessor implements IPaymentProcessor {
     
     async run(args: any): Promise<void> {
         const configuration = await this.setup(args)
-        //USE IOC
-        const blockHandler  = new BlockProcessor()
+        //use a container for this
+        const blockProcessor  = new BlockProcessor()
         const payoutCalculator = new PayoutProcessor()
+        const fileWriter = new FileWriter()
 
-        const payments = new PaymentBuilder(configuration,blockHandler,payoutCalculator)
+        const payments = new PaymentBuilder(configuration,blockProcessor,payoutCalculator)
         
         const transactionBuilder = new TransactionBuilder()
 
-        const transactionWriter = new TransactionWriter()
+        const transactionWriter = new TransactionProcessor(fileWriter)
+
+        const sender = new TransactionSender();
 
         if (this.isValid(configuration)) {
-            // chage this to its out wrapper
-            const { payouts, storePayout } = await payments.build()
+            
+            const { payouts, storePayout, maximumHeight, blocks } = await payments.build() //This needs to be its own class
             
             const transactions = await transactionBuilder.build(payouts, storePayout,configuration)
+
+            const payoutHash = hash(storePayout, { algorithm: "sha256" }); 
+
+            const totalPayoutFundsNeeded = await this.calculateTotalPayoutFundsNeeded(transactions)
             
-            //writeTransactions
-            await transactionWriter.write(transactions, configuration, 1,2) //use correct numbers from wrapper
+            await transactionWriter.write(transactions, configuration, maximumHeight, totalPayoutFundsNeeded, storePayout) 
+
+            await sender.send(configuration, payoutHash, transactions, blocks)
             
-            //sendPayments
         } else {
             //TODO: Use a custom error class
             throw new Error ('Unkown Data Source')
         }
         
+    }
+
+    private async calculateTotalPayoutFundsNeeded(transactions: PayoutTransaction[]) : Promise<number> {
+        let totalPayoutFundsNeeded = 0
+
+        transactions.map((t) => {totalPayoutFundsNeeded += t.amount + t.fee}); //probably move this
+
+        console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
+
+        return totalPayoutFundsNeeded
     }
 
     private async setup(args: any) : Promise<PaymentConfiguration> {
@@ -52,6 +73,7 @@ export class Payment implements PaymentGenerator {
             configuredMaximum : args.maxheight,
             blockDataSource : process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB',
             verbose : args.verbose,
+            payoutHash: args.payouthash 
         }
 
         return configuration

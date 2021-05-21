@@ -1,9 +1,20 @@
-import { PayoutTransaction } from "../core/payout-calculator";
-import { ITransactionWriter, PaymentConfiguration } from "./Model";
+import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator";
+import { ITransactionProcessor as ITransactionProcessor, PaymentConfiguration } from "./Model";
 import fs from "fs";
+import { IFileWriter } from "../Shared/Model";
 
-export class TransactionWriter implements ITransactionWriter {
-    async write(transactions: PayoutTransaction[], config: PaymentConfiguration, maximumHeight: number, totalPayoutFundsNeeded: number): Promise<void> {
+export class TransactionProcessor implements ITransactionProcessor {
+    
+  private fileWriter : IFileWriter
+
+  constructor(fileWriter : IFileWriter) {
+    this.fileWriter = fileWriter
+  }
+  async write(transactions: PayoutTransaction[], 
+              config: PaymentConfiguration, 
+              maximumHeight: number, 
+              totalPayoutFundsNeeded: number,
+              storePayout: PayoutDetails[]): Promise<void> {
         
         const runDateTime = new Date();
 
@@ -11,20 +22,11 @@ export class TransactionWriter implements ITransactionWriter {
         
         const payoutTransactionsFileName = this.generateOutputFileName("payout_transactions", runDateTime, minimumHeight, maximumHeight);
     
-        fs.writeFile(payoutTransactionsFileName, JSON.stringify(transactions), function (err: any) {
-          if (err) throw err;
-          console.log(`wrote payouts transactions to ${payoutTransactionsFileName}`);
-        });
-    
+        this.fileWriter.write(payoutTransactionsFileName, JSON.stringify(transactions))
+
         const payoutDetailsFileName = this.generateOutputFileName("payout_details", runDateTime, minimumHeight, maximumHeight);
-        //storePayout 
-        //Abstract this behavior
-        //fs.writeFile(payoutDetailsFileName, JSON.stringify(storePayout), function (err: any)
-        fs.writeFile(payoutDetailsFileName, JSON.stringify(transactions), function (err: any) {
-          if (err) throw err;
-          console.log(`wrote payout details to ${payoutDetailsFileName}`);
-        });
-    
+        
+        this.fileWriter.write(payoutDetailsFileName, JSON.stringify(storePayout))
         
         console.log(`Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${config.senderKeys.publicKey} ${totalPayoutFundsNeeded / 1000000000}`);
     

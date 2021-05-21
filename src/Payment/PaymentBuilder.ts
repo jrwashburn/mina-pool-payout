@@ -1,16 +1,16 @@
 import { Block, Blocks } from "../core/dataprovider-types";
 import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator";
-import { BlockHandler, IPaymentBuilder, PaymentConfiguration, PayoutCalculator } from "./Model";
+import { IBlockProcessor, IPaymentBuilder, PaymentConfiguration, PayoutCalculator } from "./Model";
 
 export class PaymentBuilder implements IPaymentBuilder {
     
     private blockProvider : any
     private stakesProvider : any
     private config : PaymentConfiguration
-    private blockHandler : BlockHandler
+    private blockHandler : IBlockProcessor
     private payoutCalculator : PayoutCalculator
 
-    public constructor(configuration : PaymentConfiguration, blockHandler: BlockHandler, payoutCalculator: PayoutCalculator) {
+    public constructor(configuration : PaymentConfiguration, blockHandler: IBlockProcessor, payoutCalculator: PayoutCalculator) {
         this.config = configuration
         this.blockHandler = blockHandler
         this.payoutCalculator = payoutCalculator
@@ -25,7 +25,7 @@ export class PaymentBuilder implements IPaymentBuilder {
         require("./core/dataprovider-minaexplorer/staking-ledger-gql")
     }
 
-    async build(): Promise<{payouts: PayoutTransaction[], storePayout: PayoutDetails[]}> {
+    async build(): Promise<{payouts: PayoutTransaction[], storePayout: PayoutDetails[], maximumHeight: number, blocks: Block[]}> {
         
         const { configuredMaximum, minimumConfirmations, minimumHeight, stakingPoolPublicKey, commissionRate } = this.config
         
@@ -63,7 +63,7 @@ export class PaymentBuilder implements IPaymentBuilder {
             console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
         })).then( async () => {
             
-            return { payouts, storePayout}
+            return { payouts, storePayout, maximumHeight, blocks}
         })
     }
 }
