@@ -1,50 +1,66 @@
 import { FileWriter } from "../Shared/FileWriter";
 import { BlockProcessor } from "./BlockProcessor";
-import { IPaymentProcessor as IPaymentProcessor, PaymentConfiguration } from "./Model";
+import { IPaymentProcessor as IPaymentProcessor  } from "./Model";
 import { PaymentBuilder } from "./PaymentBuilder";
 import { PayoutProcessor } from "./PayoutProcessor";
 import { TransactionBuilder } from "./TransactionBuilder";
 import { TransactionProcessor } from "./TransactionWriter";
-import hash from "object-hash";
 import { TransactionSender } from "./TrasactionSender";
 import { PayoutTransaction } from "../core/payout-calculator";
+import { PaymentConfiguration } from "../Configuration/Model";
+import { ConfigurationManager } from "../Configuration/ConfigurationManager";
+import { BlockDataProviderFactory } from "../DataProvider/BlockDataProviderFactory";
+import { StakeDataProviderFactory } from "../DataProvider/StakeDataProviderFactory";
 
 export class PaymentProcessor implements IPaymentProcessor {
     
     async run(args: any): Promise<void> {
-        const configuration = await this.setup(args)
-        //use a container for this
-        const blockProcessor  = new BlockProcessor()
-        const payoutCalculator = new PayoutProcessor()
-        const fileWriter = new FileWriter()
-
-        const payments = new PaymentBuilder(configuration,blockProcessor,payoutCalculator)
+        const configuration = await ConfigurationManager.setup(args)
         
-        const transactionBuilder = new TransactionBuilder()
-
-        const transactionWriter = new TransactionProcessor(fileWriter)
-
-        const sender = new TransactionSender();
+        const { paymentBuilder, transactionBuilder, transactionProcessor, sender } = await this.behaviorSetup(configuration)
 
         if (this.isValid(configuration)) {
             
-            const { payouts, storePayout, maximumHeight, blocks } = await payments.build() //This needs to be its own class
+            let paymentProcess = await paymentBuilder.build() 
             
-            const transactions = await transactionBuilder.build(payouts, storePayout,configuration)
+            let transactions = await transactionBuilder.build(paymentProcess,configuration)
 
-            const payoutHash = hash(storePayout, { algorithm: "sha256" }); 
-
-            const totalPayoutFundsNeeded = await this.calculateTotalPayoutFundsNeeded(transactions)
+            paymentProcess.totalPayoutFundsNeeded = await this.calculateTotalPayoutFundsNeeded(transactions)
             
-            await transactionWriter.write(transactions, configuration, maximumHeight, totalPayoutFundsNeeded, storePayout) 
+            await transactionProcessor.write(transactions, configuration, paymentProcess) 
 
-            await sender.send(configuration, payoutHash, transactions, blocks)
+            await sender.send(configuration, transactions, paymentProcess)
             
         } else {
             //TODO: Use a custom error class
             throw new Error ('Unkown Data Source')
         }
         
+    }
+
+    private async behaviorSetup(configuration: PaymentConfiguration) : Promise<{ paymentBuilder: PaymentBuilder, transactionBuilder: TransactionBuilder, transactionProcessor: TransactionProcessor, sender: TransactionSender }> {
+        
+        //Replace this with a container
+        
+        const blockProcessor  = new BlockProcessor()
+
+        const payoutCalculator = new PayoutProcessor()
+
+        const fileWriter = new FileWriter()
+
+        const blockDataProviderFactory = new BlockDataProviderFactory()
+
+        const stakeDataProviderFactory = new StakeDataProviderFactory()
+
+        const paymentBuilder = new PaymentBuilder(configuration,blockProcessor,payoutCalculator, blockDataProviderFactory,stakeDataProviderFactory )
+        
+        const transactionBuilder = new TransactionBuilder()
+
+        const transactionProcessor = new TransactionProcessor(fileWriter)
+
+        const sender = new TransactionSender();  
+        
+        return { paymentBuilder, transactionBuilder, transactionProcessor, sender }
     }
 
     private async calculateTotalPayoutFundsNeeded(transactions: PayoutTransaction[]) : Promise<number> {
@@ -55,28 +71,6 @@ export class PaymentProcessor implements IPaymentProcessor {
         console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
 
         return totalPayoutFundsNeeded
-    }
-
-    private async setup(args: any) : Promise<PaymentConfiguration> {
-        //move this outside
-        let configuration : PaymentConfiguration = {
-            commissionRate: Number(process.env.COMMISSION_RATE) || 0.05,
-            stakingPoolPublicKey : process.env.POOL_PUBLIC_KEY || "",
-            payoutMemo : process.env.POOL_MEMO || "",
-            senderKeys : {
-                privateKey: process.env.SEND_PRIVATE_KEY || "",
-                publicKey: process.env.SEND_PUBLIC_KEY || ""
-            },
-            payorSendTransactionFee : (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000,
-            minimumConfirmations : Number(process.env.MIN_CONFIRMATIONS) || 290,
-            minimumHeight : args.minheight,
-            configuredMaximum : args.maxheight,
-            blockDataSource : process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB',
-            verbose : args.verbose,
-            payoutHash: args.payouthash 
-        }
-
-        return configuration
     }
 
     private async isValid(config : PaymentConfiguration) : Promise<boolean> {

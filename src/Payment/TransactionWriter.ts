@@ -1,7 +1,9 @@
 import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator";
-import { ITransactionProcessor as ITransactionProcessor, PaymentConfiguration } from "./Model";
+import { ITransactionProcessor as ITransactionProcessor, PaymentProcess } from "./Model";
 import fs from "fs";
 import { IFileWriter } from "../Shared/Model";
+import hash from "object-hash";
+import { PaymentConfiguration } from "../Configuration/Model";
 
 export class TransactionProcessor implements ITransactionProcessor {
     
@@ -12,11 +14,11 @@ export class TransactionProcessor implements ITransactionProcessor {
   }
   async write(transactions: PayoutTransaction[], 
               config: PaymentConfiguration, 
-              maximumHeight: number, 
-              totalPayoutFundsNeeded: number,
-              storePayout: PayoutDetails[]): Promise<void> {
+              paymentProcess: PaymentProcess): Promise<void> {
         
         const runDateTime = new Date();
+
+        const { storePayout, maximumHeight, totalPayoutFundsNeeded } = paymentProcess
 
         const { minimumHeight} = config
         

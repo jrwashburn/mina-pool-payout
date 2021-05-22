@@ -1,12 +1,17 @@
 import { PayoutTransaction } from "../core/payout-calculator";
 import { sendSignedTransactions } from "../core/send-payments";
-import { ISender, PaymentConfiguration } from "./Model";
+import { ISender, PaymentProcess } from "./Model";
 import fs from "fs"
-import { Block } from "../core/dataprovider-types";
+import hash from "object-hash";
+import { PaymentConfiguration } from "../Configuration/Model";
 
 export class TransactionSender implements ISender {
-    async send(config: PaymentConfiguration, calculatedHash: string, transactions: PayoutTransaction[], blocks: Block[]): Promise<void> {
+    async send(config: PaymentConfiguration, transactions: PayoutTransaction[], paymentProcess: PaymentProcess): Promise<void> {
         const { payoutHash, senderKeys, payoutMemo } = config
+        
+        const { blocks } = paymentProcess
+
+        const calculatedHash = hash(paymentProcess.storePayout, { algorithm: "sha256" }); 
         
         if (payoutHash) {
             console.log(`### Processing signed payout for hash ${payoutHash}...`)

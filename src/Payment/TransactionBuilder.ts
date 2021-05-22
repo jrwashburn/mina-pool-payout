@@ -1,10 +1,13 @@
-import { PayoutDetails, PayoutTransaction, substituteAndExcludePayToAddresses } from "../core/payout-calculator";
-import { ITransactionBuilder, PaymentConfiguration } from "./Model";
+import { PaymentConfiguration } from "../Configuration/Model";
+import { PayoutTransaction, substituteAndExcludePayToAddresses } from "../core/payout-calculator";
+import { ITransactionBuilder, PaymentProcess } from "./Model";
 
 export class TransactionBuilder implements ITransactionBuilder {
-    async build(payouts: PayoutTransaction[], storePayout: PayoutDetails[], config: PaymentConfiguration): Promise<PayoutTransaction[]> {
+    async build(paymentProcess: PaymentProcess, config: PaymentConfiguration): Promise<PayoutTransaction[]> {
             // Aggregate to a single transaction per key and track the total for funding transaction
-    let transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
+
+      let { payouts, storePayout } = paymentProcess
+      let transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
         fee: 0,

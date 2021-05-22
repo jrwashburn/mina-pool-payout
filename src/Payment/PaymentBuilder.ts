@@ -1,31 +1,28 @@
-import { Block, Blocks } from "../core/dataprovider-types";
+import { PaymentConfiguration } from "../Configuration/Model";
+import { Block } from "../core/dataprovider-types";
 import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator";
-import { IBlockProcessor, IPaymentBuilder, PaymentConfiguration, PayoutCalculator } from "./Model";
+import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from "../DataProvider/Models";
+import { IBlockProcessor, IPaymentBuilder, PaymentProcess, PayoutCalculator } from "./Model";
 
 export class PaymentBuilder implements IPaymentBuilder {
     
-    private blockProvider : any
-    private stakesProvider : any
     private config : PaymentConfiguration
     private blockHandler : IBlockProcessor
     private payoutCalculator : PayoutCalculator
+    private blockProvider: IBlockDataProvider
+    private stakesProvider: IStakeDataProvider
 
-    public constructor(configuration : PaymentConfiguration, blockHandler: IBlockProcessor, payoutCalculator: PayoutCalculator) {
+    public constructor(configuration : PaymentConfiguration, blockHandler: IBlockProcessor, payoutCalculator: PayoutCalculator,
+                        blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>, stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>) {
+                            
         this.config = configuration
         this.blockHandler = blockHandler
         this.payoutCalculator = payoutCalculator
-
-        //TODO: remove this to a factory, and use an interface for non-concrete implementations
-        this.blockProvider = (this.config.blockDataSource == "ARCHIVEDB") ?
-        require("./core/dataprovider-archivedb/block-queries-sql") :
-        require("./core/dataprovider-minaexplorer/block-queries-gql")
-
-        this.stakesProvider = (this.config.blockDataSource == "ARCHIVEDB") ?
-        require("./core/dataprovider-archivedb/staking-ledger-json-file") :
-        require("./core/dataprovider-minaexplorer/staking-ledger-gql")
+        this.stakesProvider = stakeDataProviderFactory.build(this.config.blockDataSource)
+        this.blockProvider = blockDataProviderFactory.build(this.config.blockDataSource)
     }
 
-    async build(): Promise<{payouts: PayoutTransaction[], storePayout: PayoutDetails[], maximumHeight: number, blocks: Block[]}> {
+    async build(): Promise<PaymentProcess> {
         
         const { configuredMaximum, minimumConfirmations, minimumHeight, stakingPoolPublicKey, commissionRate } = this.config
         
@@ -63,7 +60,9 @@ export class PaymentBuilder implements IPaymentBuilder {
             console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
         })).then( async () => {
             
-            return { payouts, storePayout, maximumHeight, blocks}
+            let paymentProcess : PaymentProcess = { payouts, storePayout, maximumHeight, blocks, totalPayoutFundsNeeded: 0}
+
+            return paymentProcess
         })
     }
 }
