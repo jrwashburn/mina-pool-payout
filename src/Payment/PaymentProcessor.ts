@@ -2,7 +2,7 @@ import { FileWriter } from "../Shared/FileWriter";
 import { BlockProcessor } from "./BlockProcessor";
 import { IPaymentProcessor as IPaymentProcessor  } from "./Model";
 import { PaymentBuilder } from "./PaymentBuilder";
-import { PayoutProcessor } from "./PayoutProcessor";
+import { PayoutCalculator } from "./PayoutCalculator";
 import { TransactionBuilder } from "./TransactionBuilder";
 import { TransactionProcessor } from "./TransactionWriter";
 import { TransactionSender } from "./TrasactionSender";
@@ -44,7 +44,7 @@ export class PaymentProcessor implements IPaymentProcessor {
         
         const blockProcessor  = new BlockProcessor()
 
-        const payoutCalculator = new PayoutProcessor()
+        const payoutCalculator = new PayoutCalculator()
 
         const fileWriter = new FileWriter()
 

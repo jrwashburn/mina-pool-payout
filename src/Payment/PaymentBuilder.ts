@@ -2,17 +2,17 @@ import { PaymentConfiguration } from "../Configuration/Model";
 import { Block } from "../core/dataprovider-types";
 import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator";
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from "../DataProvider/Models";
-import { IBlockProcessor, IPaymentBuilder, PaymentProcess, PayoutCalculator } from "./Model";
+import { IBlockProcessor, IPaymentBuilder, PaymentProcess, IPayoutCalculator } from "./Model";
 
 export class PaymentBuilder implements IPaymentBuilder {
     
     private config : PaymentConfiguration
     private blockHandler : IBlockProcessor
-    private payoutCalculator : PayoutCalculator
+    private payoutCalculator : IPayoutCalculator
     private blockProvider: IBlockDataProvider
     private stakesProvider: IStakeDataProvider
 
-    public constructor(configuration : PaymentConfiguration, blockHandler: IBlockProcessor, payoutCalculator: PayoutCalculator,
+    public constructor(configuration : PaymentConfiguration, blockHandler: IBlockProcessor, payoutCalculator: IPayoutCalculator,
                         blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>, stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>) {
                             
         this.config = configuration

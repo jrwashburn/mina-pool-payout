@@ -34,7 +34,7 @@ export interface IBlockProcessor {
     determineLastBlockHeightToProcess(max: number, min:number, latestHeight: number) : Promise<number>
 }
 
-export interface PayoutCalculator {
+export interface IPayoutCalculator {
     getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commisionRate: number ) 
     : Promise<[
         payoutJson: PayoutTransaction[], 
