@@ -7,7 +7,7 @@ import { IBlockProcessor, IPaymentBuilder, PaymentProcess, IPayoutCalculator } f
 export class PaymentBuilder implements IPaymentBuilder {
     
     private config : PaymentConfiguration
-    private blockHandler : IBlockProcessor
+    private blockProcessor : IBlockProcessor
     private payoutCalculator : IPayoutCalculator
     private blockProvider: IBlockDataProvider
     private stakesProvider: IStakeDataProvider
@@ -16,7 +16,7 @@ export class PaymentBuilder implements IPaymentBuilder {
                         blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>, stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>) {
                             
         this.config = configuration
-        this.blockHandler = blockHandler
+        this.blockProcessor = blockHandler
         this.payoutCalculator = payoutCalculator
         this.stakesProvider = stakeDataProviderFactory.build(this.config.blockDataSource)
         this.blockProvider = blockDataProviderFactory.build(this.config.blockDataSource)
@@ -28,7 +28,7 @@ export class PaymentBuilder implements IPaymentBuilder {
         
         const latestHeight = await this.blockProvider.getLatestHeight()
         
-        const maximumHeight = await this.blockHandler.determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, latestHeight)
+        const maximumHeight = await this.blockProcessor.determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, latestHeight)
         
         console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`)
 
