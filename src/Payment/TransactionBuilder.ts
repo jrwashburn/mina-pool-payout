@@ -1,9 +1,15 @@
 import { PaymentConfiguration } from "../Configuration/Model";
-import { PayoutTransaction, substituteAndExcludePayToAddresses } from "../core/payout-calculator";
-import { ITransactionBuilder, PaymentProcess } from "./Model";
+import { PayoutTransaction } from "../core/payout-calculator";
+import { ITransactionBuilder, PaymentProcess, IAddressRemover } from "./Model";
 
 export class TransactionBuilder implements ITransactionBuilder {
-    async build(paymentProcess: PaymentProcess, config: PaymentConfiguration): Promise<PayoutTransaction[]> {
+
+  private addressRemover: IAddressRemover
+
+  constructor(addressRemover: IAddressRemover) {
+    this.addressRemover = addressRemover
+  }
+  async build(paymentProcess: PaymentProcess, config: PaymentConfiguration): Promise<PayoutTransaction[]> {
             // Aggregate to a single transaction per key and track the total for funding transaction
 
       let { payouts, storePayout } = paymentProcess
@@ -25,7 +31,7 @@ export class TransactionBuilder implements ITransactionBuilder {
     
     console.table(transactions);
 
-    transactions = await substituteAndExcludePayToAddresses ( transactions );
+    transactions = await this.addressRemover.remove(transactions);
     
     console.log(`after substitutions and exclusions`)
     

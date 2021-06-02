@@ -11,6 +11,7 @@ import { PaymentConfiguration } from "../Configuration/Model";
 import { ConfigurationManager } from "../Configuration/ConfigurationManager";
 import { BlockDataProviderFactory } from "../DataProvider/BlockDataProviderFactory";
 import { StakeDataProviderFactory } from "../DataProvider/StakeDataProviderFactory";
+import { AddressRemover } from "./AddressRemover";
 
 export class PaymentProcessor implements IPaymentProcessor {
     
@@ -54,7 +55,9 @@ export class PaymentProcessor implements IPaymentProcessor {
 
         const paymentBuilder = new PaymentBuilder(configuration,blockProcessor,payoutCalculator, blockDataProviderFactory,stakeDataProviderFactory )
         
-        const transactionBuilder = new TransactionBuilder()
+        const addressRemover = new AddressRemover()
+
+        const transactionBuilder = new TransactionBuilder(addressRemover)
 
         const transactionProcessor = new TransactionProcessor(fileWriter)
 

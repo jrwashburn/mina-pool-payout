@@ -30,6 +30,10 @@ export interface ITransactionProcessor {
     write(transactions: PayoutTransaction[], config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void>
 }
 
+export interface IAddressRemover {
+    remove(transactions: PayoutTransaction[]) : Promise<PayoutTransaction[]>
+}
+
 export interface IBlockProcessor {
     determineLastBlockHeightToProcess(max: number, min:number, latestHeight: number) : Promise<number>
 }
