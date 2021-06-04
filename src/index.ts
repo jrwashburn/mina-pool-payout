@@ -15,13 +15,13 @@ const oargs = yargs.options({
   "minheight": { type: "number", alias: ["m", "min"], demandOption: true },
   "maxheight": { type: "number", alias: ["x", "max"], default: Number.MAX_VALUE },
   "verbose": {type: "boolean", alias: ["v"], default: false},
-  "dryrun": {type: "boolean", alias: ["dr"], default: false}
+  "alternate": {type: "boolean", alias: ["a"], default: false}
 }).argv;
 
 const main = async () => {
-  const { dryrun } = oargs
-  if (dryrun){
-    //Do nothing, for now
+  const { alternate } = oargs
+  if (alternate){
+    console.log("Running through new path.")
     const payment = new PaymentProcessor()
     payment.run(oargs)
   } else {
