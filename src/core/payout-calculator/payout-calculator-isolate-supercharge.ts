@@ -155,6 +155,7 @@ export async function getPayouts(
           totalRewards: totalRewards,
           totalRewardsNPSPool: totalNPSPoolRewards,
           totalRewardsCommonPool: totalCommonPoolRewards,
+          totalRewardsSuperchargedPool: totalSuperchargedPoolRewards,
           payout: blockTotal,
         });
       });
@@ -208,6 +209,7 @@ export type PayoutDetails = {
   totalRewards: number;
   totalRewardsNPSPool: number;
   totalRewardsCommonPool: number;
+  totalRewardsSuperchargedPool: number;
   payout: number;
 };
 
