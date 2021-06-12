@@ -5,4 +5,5 @@ node_modules
 .env
 /src/data/*
 !/src/data/ledger/
+!/src/data/nps-addresses/
 package-lock.json
