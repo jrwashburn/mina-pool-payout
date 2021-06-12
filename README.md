@@ -1,14 +1,13 @@
 # mina-pool-payout
 
 _Inspired by [minaexplorer - mina-payout-script](https://github.com/garethtdavies/mina-payout-script)_
-This started out as a port from the original, but has morphed a fair amount. With major updates we will try to compare the output with MinaExplorer's approach, but we are not necessarily committed to maintaining parity.
-There are now two main differences vs. the original Mina Explorer implementation:
+This started out as a port from the original, but has morphed a fair amount. As of PR 59, direct comparisons between the two are no longer expected to produce the same results. The main differences vs. the Mina Explorer implementation include:
 - mina-payout-script spreads an unlocked key's weighted supercharged award across the entire epoch if it will unlock at any point during the epoch. mina-pool-payout will only supercharge an account after it is unlocked.
-- Additionally, mina-pool-payout will (as of 6/12/21) reserve supercharged rewards entirely for unlocked keys versus spreading their supercharged amount across normal coinbase blocks as well. This will result in more variability in unlocked payout using mina-pool-payout.
+- mina-pool-payout will (as of PR 59) reserve supercharged rewards entirely for unlocked keys versus spreading the supercharged award across normal coinbase blocks as well. This will result in more variability in unlocked payout versus mina-payout-script.
 
 # Dependencies
 - This code uses language features of Typescript v3.7 and Node 14.
-- The host this runs from will either require access to a Mina Archive database, or to the MinaExplorer grapql API.
+- The host this runs from will either require access to a Mina Archive database, or to the MinaExplorer graphql API.
 - If payments are to be sent, access to a graphql endpoint that can send signed transactions is required.
 
 # Operational Overview
