@@ -223,7 +223,7 @@ export type PayoutTransaction = {
 };
 
 export async function substituteAndExcludePayToAddresses(
-  transactions: PayoutTransaction[]
+  transactions: PayoutTransaction[], payoutThreshold: number
 ): Promise<PayoutTransaction[]> {
   // load susbtitutes from file
   // expects format:
@@ -241,7 +241,10 @@ export async function substituteAndExcludePayToAddresses(
           transactions = transactions
             .filter(
               (transaction) =>
-                !(transaction.publicKey == record[0] && record[1] == "EXCLUDE")
+                (
+                  !(transaction.publicKey == record[0] && record[1] == "EXCLUDE") &&
+                  !(transaction.amount <= payoutThreshold)
+                )
             )
             .map((t) => {
               if (t.publicKey == record[0]) t.publicKey = record[1];

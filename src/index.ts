@@ -34,6 +34,7 @@ async function main () {
   const configuredMaximum = args.maxheight;
   const blockDataSource = process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB'
   const verbose = args.verbose;
+  const payoutThreshold = Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0;
 
   if ( blockDataSource != "ARCHIVEDB" && blockDataSource != "MINAEXPLORER" ) {
     throw new Error ('Unkown Data Source')
@@ -96,7 +97,7 @@ async function main () {
     console.log(`before substitutions and exclusions`)
     console.table(transactions);
     const payoutHash = hash(storePayout, { algorithm: "sha256" });
-    transactions = await substituteAndExcludePayToAddresses ( transactions );
+    transactions = await substituteAndExcludePayToAddresses ( transactions, payoutThreshold );
     transactions.map((t) => {totalPayoutFundsNeeded += t.amount + t.fee});
     console.log(`after substitutions and exclusions`)
     console.table(transactions);
