@@ -90,15 +90,18 @@ export async function getPayouts(
       }
 
       stakers.forEach((staker: Stake) => {
-        const effectiveNPSPoolWeighting =
-          effectivePoolStakes[staker.publicKey].npsStake /
-          sumEffectiveNPSPoolStakes;
-        const effectiveCommonPoolWeighting =
-          effectivePoolStakes[staker.publicKey].commonStake /
-          sumEffectiveCommonPoolStakes;
-        const effectiveSuperchargedPoolWeighting =
-          effectivePoolStakes[staker.publicKey].superchargedStake /
-          sumEffectiveSuperchargedPoolStakes;
+        const effectiveNPSPoolWeighting = (sumEffectiveNPSPoolStakes > 0)
+          ? effectivePoolStakes[staker.publicKey].npsStake /
+          sumEffectiveNPSPoolStakes
+          : 0;
+        const effectiveCommonPoolWeighting = (sumEffectiveCommonPoolStakes > 0)
+          ? effectivePoolStakes[staker.publicKey].commonStake /
+          sumEffectiveCommonPoolStakes
+          : 0;
+        const effectiveSuperchargedPoolWeighting = (sumEffectiveSuperchargedPoolStakes > 0)
+          ? effectivePoolStakes[staker.publicKey].superchargedStake /
+          sumEffectiveSuperchargedPoolStakes
+          : 0;
 
         let blockTotal = 0;
         if (staker.shareClass == "Common") {
@@ -124,7 +127,7 @@ export async function getPayouts(
               totalNPSPoolRewards *
               effectiveNPSPoolWeighting
           );
-        }
+        } else throw new Error('Staker share class is unknown');
 
         staker.total += blockTotal;
 
