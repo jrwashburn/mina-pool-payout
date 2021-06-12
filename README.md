@@ -43,6 +43,8 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
 
 - Set `SEND_TRANSACTION_FEE` to the transaction fee for payout transactions. It is specified in the .env file in MINA, but will be translated to NANOMINA for the actual payment transactions. Double check that this is in Mina!
 
+- Set `SEND_PAYOUT_THRESHOLD` to a minimum threshold which payout amounts must exceed to be sent. Default is 0, and payout transaction amount must _exceed_ this number to be sent. Also specified in Mina!
+
 - Set `SEND_PRIVATE_KEY` to the sender private key
 The private key value can be retrieved from a pk file by running the mina advanced dump-keypair command, e.g.
 
