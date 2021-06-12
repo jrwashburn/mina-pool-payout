@@ -3,6 +3,6 @@
 dist
 node_modules
 .env
-/src/data/
-!/src/data/ledger
+/src/data/*
+!/src/data/ledger/
 package-lock.json
