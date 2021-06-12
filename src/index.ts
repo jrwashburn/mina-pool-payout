@@ -1,4 +1,4 @@
-import { getPayouts, PayoutDetails, PayoutTransaction, substituteAndExcludePayToAddresses } from "./core/payout-calculator";
+import { getPayouts, PayoutDetails, PayoutTransaction, substituteAndExcludePayToAddresses } from "./core/payout-calculator/payout-calculator-isolate-supercharge";
 import { Blocks } from "./core/dataprovider-types";
 import hash from "object-hash";
 import yargs, { boolean } from "yargs";
