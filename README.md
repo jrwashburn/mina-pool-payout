@@ -2,8 +2,9 @@
 
 _Inspired by [minaexplorer - mina-payout-script](https://github.com/garethtdavies/mina-payout-script)_
 This started out as a port from the original, but has morphed a fair amount. With major updates we will try to compare the output with MinaExplorer's approach, but we are not necessarily committed to maintaining parity.
-The main difference is that Mina Explorer spreads an unlocked key's supercharged award across the entire epoch when it will unlock during the epoch. mina-pool-payout will simply attribute supercharged rewards when a key unlocks.
-Other than that known difference, the payout rules are the same. In our last parity test (on 3/21/2021), both approaches generated exactly the same payout calculations.
+There are now two main differences vs. the original Mina Explorer implementation:
+- mina-payout-script spreads an unlocked key's weighted supercharged award across the entire epoch if it will unlock at any point during the epoch. mina-pool-payout will only supercharge an account after it is unlocked.
+- Additionally, mina-pool-payout will (as of 6/12/21) reserve supercharged rewards entirely for unlocked keys versus spreading their supercharged amount across normal coinbase blocks as well. This will result in more variability in unlocked payout using mina-pool-payout.
 
 # Dependencies
 - This code uses language features of Typescript v3.7 and Node 14.
