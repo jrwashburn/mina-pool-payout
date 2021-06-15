@@ -2,12 +2,15 @@ import { PayoutTransaction } from "../core/payout-calculator";
 import { ITransactionProcessor as ITransactionProcessor, PaymentProcess } from "./Model";
 import { IFileWriter } from "../Shared/Model";
 import { PaymentConfiguration } from "../Configuration/Model";
+import { inject, injectable } from "inversify";
+import TYPES from "../Composition/Types";
 
+@injectable()
 export class TransactionProcessor implements ITransactionProcessor {
     
   private fileWriter : IFileWriter
 
-  constructor(fileWriter : IFileWriter) {
+  constructor(@inject(TYPES.IFileWriter) fileWriter : IFileWriter) {
     this.fileWriter = fileWriter
   }
   async write(transactions: PayoutTransaction[], 

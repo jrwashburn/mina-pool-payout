@@ -19,7 +19,7 @@
                 "-a"
             ],
             "env": {"NODE_ENV": "development", 
-                    "DATABASE_URL": ""}
+                    "DATABASE_URL": "postgres://postgres:friends@localhost:5432/archivedb"}
         }
     ]
 }

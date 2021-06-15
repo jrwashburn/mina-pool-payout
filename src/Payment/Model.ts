@@ -1,6 +1,8 @@
 import { PaymentConfiguration } from "../Configuration/Model";
 import { Block, Stake } from "../core/dataprovider-types";
 import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator";
+import { injectable } from "inversify"
+
 
 export interface IPaymentProcessor {
     run(args: any) : Promise<void>

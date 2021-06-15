@@ -30,9 +30,11 @@
   "dependencies": {
     "@o1labs/client-sdk": "1.0.0",
     "csv": "^5.4.0",
+    "inversify": "^5.1.1",
     "node-fetch": "^2.6.1",
     "object-hash": "^2.1.1",
     "pg-promise": "^10.9.2",
+    "reflect-metadata": "^0.1.13",
     "yargs": "^16.2.0"
   }
 }

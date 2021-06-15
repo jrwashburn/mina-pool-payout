@@ -4,8 +4,8 @@ import { PayoutTransaction } from '../../core/payout-calculator'
 import { PaymentConfiguration } from '../../Configuration/Model'
 
 describe('Transaction Builder Tests', () => {
-    it('Should be successful', () => {
-        it('when paymentProcess is success',() => {
+    describe('Should be successful', () => {
+        it('when paymentProcess is success',async () => {
             
             const mockAddressRemover:IAddressRemover = { remove: (mockTransactions) => { return new Promise(() => mockTransactions)}}
 

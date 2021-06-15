@@ -2,11 +2,13 @@ import { Block, Stake } from "../core/dataprovider-types";
 import { PayoutTransaction, PayoutDetails } from "../core/payout-calculator";
 import { IPayoutCalculator } from "./Model";
 import { stakeIsLocked } from "../core/staking-ledger-util";
+import { injectable } from "inversify";
 
 // per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
 // see https://minaprotocol.com/docs/advanced/foundation-delegation-program
 const npsCommissionRate = 0.05;
 
+@injectable()
 export class PayoutCalculator implements IPayoutCalculator {
     async getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number): Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]> {
         // Initialize some stuff

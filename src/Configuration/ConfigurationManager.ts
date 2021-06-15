@@ -1,9 +1,11 @@
 import { PaymentConfiguration } from "./Model"
 
 export class ConfigurationManager {
-    public static async setup(args: any) : Promise<PaymentConfiguration> {
+
+    public static Setup : PaymentConfiguration
+    public static async build(args: any) {
         //move this outside
-        let configuration : PaymentConfiguration = {
+        this.Setup = {
             commissionRate: Number(process.env.COMMISSION_RATE) || 0.05,
             stakingPoolPublicKey : process.env.POOL_PUBLIC_KEY || "",
             payoutMemo : process.env.POOL_MEMO || "",
@@ -19,7 +21,6 @@ export class ConfigurationManager {
             verbose : args.verbose,
             payoutHash: args.payouthash 
         }
-
-        return configuration
     }
+
 }

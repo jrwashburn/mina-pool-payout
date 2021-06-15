@@ -1,38 +1,47 @@
-import { PaymentConfiguration } from "../Configuration/Model";
+import { inject, injectable } from "inversify";
+import TYPES from "../Composition/Types";
+import { ConfigurationManager } from "../Configuration/ConfigurationManager";
 import { Block } from "../core/dataprovider-types";
 import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator";
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from "../DataProvider/Models";
 import { IBlockProcessor, IPaymentBuilder, PaymentProcess, IPayoutCalculator } from "./Model";
 
+@injectable()
 export class PaymentBuilder implements IPaymentBuilder {
     
-    private config : PaymentConfiguration
     private blockProcessor : IBlockProcessor
     private payoutCalculator : IPayoutCalculator
-    private blockProvider: IBlockDataProvider
-    private stakesProvider: IStakeDataProvider
+    private stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>
+    private blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>
 
-    public constructor(configuration : PaymentConfiguration, blockHandler: IBlockProcessor, payoutCalculator: IPayoutCalculator,
-                        blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>, stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>) {
+    public constructor( @inject(TYPES.IBlockProcessor) blockHandler: IBlockProcessor, 
+                        @inject(TYPES.IPayoutCalculator) payoutCalculator: IPayoutCalculator,
+                        @inject(TYPES.BlockDataProviderFactory) blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>, 
+                        @inject(TYPES.StakeDataProviderFactory) stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>) {
                             
-        this.config = configuration
         this.blockProcessor = blockHandler
         this.payoutCalculator = payoutCalculator
-        this.stakesProvider = stakeDataProviderFactory.build(this.config.blockDataSource)
-        this.blockProvider = blockDataProviderFactory.build(this.config.blockDataSource)
+        this.blockDataProviderFactory = blockDataProviderFactory
+        this.stakeDataProviderFactory = stakeDataProviderFactory
     }
 
     async build(): Promise<PaymentProcess> {
         
-        const { configuredMaximum, minimumConfirmations, minimumHeight, stakingPoolPublicKey, commissionRate } = this.config
+        const config = ConfigurationManager.Setup
+
+        const stakesProvider = this.stakeDataProviderFactory.build(config.blockDataSource)
         
-        const latestHeight = await this.blockProvider.getLatestHeight()
+        const blockProvider = this.blockDataProviderFactory.build(config.blockDataSource)
+
+        const { configuredMaximum, minimumConfirmations, minimumHeight, stakingPoolPublicKey, commissionRate } = config
+        
+        const latestHeight = await blockProvider.getLatestHeight()
         
         const maximumHeight = await this.blockProcessor.determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, latestHeight)
         
         console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`)
 
-        let blocks : Block[] = await this.blockProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight)
+        let blocks : Block[] = await blockProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight)
 
         let payouts: PayoutTransaction[] = []
           
@@ -43,7 +52,7 @@ export class PaymentBuilder implements IPaymentBuilder {
         return Promise.all(ledgerHashes.map(async ledgerHash => {
             console.log(`### Calculating payouts for ledger ${ledgerHash}`)
 
-            const [stakers, totalStake] = await this.stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey)
+            const [stakers, totalStake] = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey)
             
             console.log(`The pool total staking balance is ${totalStake}`);
 

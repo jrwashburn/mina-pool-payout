@@ -4,7 +4,9 @@ import { ISender, PaymentProcess } from "./Model";
 import fs from "fs"
 import hash from "object-hash";
 import { PaymentConfiguration } from "../Configuration/Model";
+import { injectable } from "inversify";
 
+@injectable()
 export class TransactionSender implements ISender {
     async send(config: PaymentConfiguration, transactions: PayoutTransaction[], paymentProcess: PaymentProcess): Promise<void> {
         const { payoutHash, senderKeys, payoutMemo } = config

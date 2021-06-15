@@ -1,5 +1,7 @@
 import { IBlockProcessor as IBlockProcessor } from "./Model";
+import { injectable } from "inversify";
 
+@injectable()
 export class BlockProcessor implements IBlockProcessor {
     async determineLastBlockHeightToProcess(max: number, min: number, latestHeight: number): Promise<number> {
           // Finality is understood to be max height minus k blocks. unsafe to process blocks above maxHeight since they could change if there is a long running, short-range fork

@@ -2,7 +2,9 @@ import { PayoutTransaction } from "../core/payout-calculator";
 import { IAddressRemover } from "./Model";
 import fs from "fs";
 import parse from "csv-parse";
+import { injectable } from "inversify";
 
+@injectable()
 export class AddressRemover implements IAddressRemover {
     async remove(transactions: PayoutTransaction[]): Promise<PayoutTransaction[]> {
           // load susbtitutes from file

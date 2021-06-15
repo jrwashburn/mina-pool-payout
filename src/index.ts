@@ -5,8 +5,9 @@ import yargs, { boolean } from "yargs";
 import { keypair } from "@o1labs/client-sdk";
 import { sendSignedTransactions } from "./core/send-payments";
 import fs from "fs";
-import { PaymentProcessor } from "./Payment/PaymentProcessor";
-
+import Container from './Composition/inversify.config'
+import { IPaymentProcessor } from "./Payment/Model";
+import TYPES from "./Composition/Types";
 
 // TODO: create mina currency types
 
@@ -22,7 +23,7 @@ const main = async () => {
   const { alternate } = oargs
   if (alternate){
     console.log("Running through new path.")
-    const payment = new PaymentProcessor()
+    const payment = Container.get<IPaymentProcessor>(TYPES.IPaymentProcessor)
     payment.run(oargs)
   } else {
     run(oargs)

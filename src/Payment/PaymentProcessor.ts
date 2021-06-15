@@ -1,36 +1,46 @@
-import { FileWriter } from "../Shared/FileWriter";
-import { BlockProcessor } from "./BlockProcessor";
-import { IPaymentProcessor as IPaymentProcessor  } from "./Model";
-import { PaymentBuilder } from "./PaymentBuilder";
-import { PayoutCalculator } from "./PayoutCalculator";
-import { TransactionBuilder } from "./TransactionBuilder";
-import { TransactionProcessor } from "./TransactionWriter";
-import { TransactionSender } from "./TrasactionSender";
+import { IPaymentBuilder, IPaymentProcessor as IPaymentProcessor, ISender, ITransactionBuilder, ITransactionProcessor  } from "./Model";
 import { PayoutTransaction } from "../core/payout-calculator";
 import { PaymentConfiguration } from "../Configuration/Model";
 import { ConfigurationManager } from "../Configuration/ConfigurationManager";
-import { BlockDataProviderFactory } from "../DataProvider/BlockDataProviderFactory";
-import { StakeDataProviderFactory } from "../DataProvider/StakeDataProviderFactory";
-import { AddressRemover } from "./AddressRemover";
+import { inject, injectable } from "inversify";
+import TYPES from "../Composition/Types";
 
+@injectable()
 export class PaymentProcessor implements IPaymentProcessor {
     
+    private paymentBuilder : IPaymentBuilder
+    private transactionBuilder : ITransactionBuilder
+    private transactionProcessor : ITransactionProcessor
+    private sender : ISender
+
+    public constructor(
+        @inject(TYPES.IPaymentBuilder) paymentBuilder: IPaymentBuilder,
+        @inject(TYPES.ITransactionBuilder) transactionBuilder: ITransactionBuilder,
+        @inject(TYPES.ITransactionProcessor) transactionProcessor: ITransactionProcessor,
+        @inject(TYPES.ISender) sender: ISender
+    ) {
+        this.paymentBuilder = paymentBuilder,
+        this.transactionBuilder = transactionBuilder,
+        this.transactionProcessor = transactionProcessor,
+        this.sender = sender
+    }
+
     async run(args: any): Promise<void> {
-        const configuration = await ConfigurationManager.setup(args)
+        ConfigurationManager.build(args)
         
-        const { paymentBuilder, transactionBuilder, transactionProcessor, sender } = await this.behaviorSetup(configuration)
+        const configuration = ConfigurationManager.Setup 
 
         if (this.isValid(configuration)) {
             
-            let paymentProcess = await paymentBuilder.build() 
+            let paymentProcess = await this.paymentBuilder.build() 
             
-            let transactions = await transactionBuilder.build(paymentProcess,configuration)
+            let transactions = await this.transactionBuilder.build(paymentProcess,configuration)
 
             paymentProcess.totalPayoutFundsNeeded = await this.calculateTotalPayoutFundsNeeded(transactions)
             
-            await transactionProcessor.write(transactions, configuration, paymentProcess) 
+            await this.transactionProcessor.write(transactions, configuration, paymentProcess) 
 
-            await sender.send(configuration, transactions, paymentProcess)
+            await this.sender.send(configuration, transactions, paymentProcess)
             
         } else {
             //TODO: Use a custom error class
@@ -38,7 +48,7 @@ export class PaymentProcessor implements IPaymentProcessor {
         }
         
     }
-
+/*
     private async behaviorSetup(configuration: PaymentConfiguration) : Promise<{ paymentBuilder: PaymentBuilder, transactionBuilder: TransactionBuilder, transactionProcessor: TransactionProcessor, sender: TransactionSender }> {
         
         //Replace this with a container
@@ -64,7 +74,7 @@ export class PaymentProcessor implements IPaymentProcessor {
         const sender = new TransactionSender();  
         
         return { paymentBuilder, transactionBuilder, transactionProcessor, sender }
-    }
+    }*/
 
     private async calculateTotalPayoutFundsNeeded(transactions: PayoutTransaction[]) : Promise<number> {
         let totalPayoutFundsNeeded = 0
