@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import TYPES from "../Composition/Types";
 import { ConfigurationManager } from "../Configuration/ConfigurationManager";
 import { Block } from "../core/dataprovider-types";
-import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator";
+import { PayoutDetails, PayoutTransaction } from "../core/payout-calculator/payout-calculator-original";
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from "../DataProvider/Models";
 import { IBlockProcessor, IPaymentBuilder, PaymentProcess, IPayoutCalculator } from "./Model";
 

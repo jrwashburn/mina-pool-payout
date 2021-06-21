@@ -1,5 +1,5 @@
 import { Block, Stake } from "../core/dataprovider-types";
-import { PayoutTransaction, PayoutDetails } from "../core/payout-calculator";
+import { PayoutTransaction, PayoutDetails } from "../core/payout-calculator/payout-calculator-original";
 import { IPayoutCalculator } from "./Model";
 import { stakeIsLocked } from "../core/staking-ledger-util";
 import { injectable } from "inversify";
