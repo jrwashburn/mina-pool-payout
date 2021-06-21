@@ -1,13 +1,13 @@
 # mina-pool-payout
 
 _Inspired by [minaexplorer - mina-payout-script](https://github.com/garethtdavies/mina-payout-script)_
-This started out as a port from the original, but has morphed a fair amount. With major updates we will try to compare the output with MinaExplorer's approach, but we are not necessarily committed to maintaining parity.
-The main difference is that Mina Explorer spreads an unlocked key's supercharged award across the entire epoch when it will unlock during the epoch. mina-pool-payout will simply attribute supercharged rewards when a key unlocks.
-Other than that known difference, the payout rules are the same. In our last parity test (on 3/21/2021), both approaches generated exactly the same payout calculations.
+This started out as a port from the original, but has morphed a fair amount. As of PR 59, direct comparisons between the two are no longer expected to produce the same results. The main differences vs. the Mina Explorer implementation include:
+- mina-payout-script spreads an unlocked key's weighted supercharged award across the entire epoch if it will unlock at any point during the epoch. mina-pool-payout will only supercharge an account after it is unlocked.
+- mina-pool-payout will (as of PR 59) reserve supercharged rewards entirely for unlocked keys versus spreading the supercharged award across normal coinbase blocks as well. This will result in more variability in unlocked payout versus mina-payout-script.
 
 # Dependencies
 - This code uses language features of Typescript v3.7 and Node 14.
-- The host this runs from will either require access to a Mina Archive database, or to the MinaExplorer grapql API.
+- The host this runs from will either require access to a Mina Archive database, or to the MinaExplorer graphql API.
 - If payments are to be sent, access to a graphql endpoint that can send signed transactions is required.
 
 # Operational Overview
@@ -42,6 +42,8 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
 - Set `POOL_MEMO` to the DiscordID or other message to be sent in the payout memo field
 
 - Set `SEND_TRANSACTION_FEE` to the transaction fee for payout transactions. It is specified in the .env file in MINA, but will be translated to NANOMINA for the actual payment transactions. Double check that this is in Mina!
+
+- Set `SEND_PAYOUT_THRESHOLD` to a minimum threshold which payout amounts must exceed to be sent. Default is 0, and payout transaction amount must _exceed_ this number to be sent. Also specified in Mina!
 
 - Set `SEND_PRIVATE_KEY` to the sender private key
 The private key value can be retrieved from a pk file by running the mina advanced dump-keypair command, e.g.

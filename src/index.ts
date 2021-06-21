@@ -1,4 +1,4 @@
-import { getPayouts, PayoutDetails, PayoutTransaction, substituteAndExcludePayToAddresses } from "./core/payout-calculator";
+import { getPayouts, PayoutDetails, PayoutTransaction, substituteAndExcludePayToAddresses } from "./core/payout-calculator/payout-calculator-isolate-supercharge";
 import { Blocks } from "./core/dataprovider-types";
 import hash from "object-hash";
 import yargs, { boolean } from "yargs";
@@ -49,6 +49,7 @@ async function run (args: any) {
   const configuredMaximum = args.maxheight;
   const blockDataSource = process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB'
   const verbose = args.verbose;
+  const payoutThreshold = Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0;
 
   if ( blockDataSource != "ARCHIVEDB" && blockDataSource != "MINAEXPLORER" ) {
     throw new Error ('Unkown Data Source')
@@ -113,7 +114,7 @@ async function run (args: any) {
     console.log(`before substitutions and exclusions`)
     console.table(transactions);
     const payoutHash = hash(storePayout, { algorithm: "sha256" });
-    transactions = await substituteAndExcludePayToAddresses ( transactions );
+    transactions = await substituteAndExcludePayToAddresses ( transactions, payoutThreshold );
     transactions.map((t) => {totalPayoutFundsNeeded += t.amount + t.fee});
     console.log(`after substitutions and exclusions`)
     console.table(transactions);

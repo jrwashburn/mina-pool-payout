@@ -1,5 +1,5 @@
 import { signPayment, keypair, signed, payment } from "@o1labs/client-sdk";
-import { PayoutTransaction } from "./payout-calculator";
+import { PayoutTransaction } from "./payout-calculator/payout-calculator-isolate-supercharge";
 import fs from "fs";
 import { fetchGraphQL } from "../infrastructure/graphql";
 
