@@ -48,33 +48,6 @@ export class PaymentProcessor implements IPaymentProcessor {
         }
         
     }
-/*
-    private async behaviorSetup(configuration: PaymentConfiguration) : Promise<{ paymentBuilder: PaymentBuilder, transactionBuilder: TransactionBuilder, transactionProcessor: TransactionProcessor, sender: TransactionSender }> {
-        
-        //Replace this with a container
-        
-        const blockProcessor  = new BlockProcessor()
-
-        const payoutCalculator = new PayoutCalculator()
-
-        const fileWriter = new FileWriter()
-
-        const blockDataProviderFactory = new BlockDataProviderFactory()
-
-        const stakeDataProviderFactory = new StakeDataProviderFactory()
-
-        const paymentBuilder = new PaymentBuilder(configuration,blockProcessor,payoutCalculator, blockDataProviderFactory,stakeDataProviderFactory )
-        
-        const addressRemover = new AddressRemover()
-
-        const transactionBuilder = new TransactionBuilder(addressRemover)
-
-        const transactionProcessor = new TransactionProcessor(fileWriter)
-
-        const sender = new TransactionSender();  
-        
-        return { paymentBuilder, transactionBuilder, transactionProcessor, sender }
-    }*/
 
     private async calculateTotalPayoutFundsNeeded(transactions: PayoutTransaction[]) : Promise<number> {
         let totalPayoutFundsNeeded = 0
