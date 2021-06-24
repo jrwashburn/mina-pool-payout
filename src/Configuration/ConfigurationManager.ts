@@ -19,7 +19,8 @@ export class ConfigurationManager {
             configuredMaximum : args.maxheight,
             blockDataSource : process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB',
             verbose : args.verbose,
-            payoutHash: args.payouthash 
+            payoutHash: args.payouthash,
+            payoutThreshold : Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0
         }
     }
 

@@ -11,5 +11,6 @@ export interface PaymentConfiguration {
     configuredMaximum: number,
     blockDataSource: string,
     verbose: boolean,
-    payoutHash: string
+    payoutHash: string,
+    payoutThreshold: number
 }
