@@ -78,7 +78,7 @@ const blockQuery = `
 const getHeightsMissingQuery = `
   SELECT h as height
   FROM (SELECT h::int FROM generate_series($1 , $2) h
-  LEFT JOIN blocks b 
+  LEFT JOIN blocks b
   ON h = b.height where b.height is null) as v
 `;
 
@@ -115,7 +115,7 @@ export async function getBlocks (key: string, minHeight: number, maxHeight: numb
     throw new Error(`Archive database has null parents in the specified range. Import them and try again. Blocks with null parents were: ${JSON.stringify(nullParents)}`);
   }
 
-  const blockFile = `${__dirname}/../../data/.paidblocks`;
+  const blockFile = `${__dirname}/../../../data/.paidblocks`;
 
   const filterBlocks = () => {
     return new Promise((resolve, reject) => {
