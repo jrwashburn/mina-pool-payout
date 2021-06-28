@@ -1,12 +1,12 @@
 import { PayoutTransaction } from "../payoutCalculator/Model";
-import { IAddressRemover } from "./Model"
+import { ISubstituteAndExcludePayToAddresses } from "./Model"
 import fs from "fs";
 import parse from "csv-parse";
 import { injectable } from "inversify";
 import { ConfigurationManager } from "../../configuration/ConfigurationManager";
 
 @injectable()
-export class AddressRemoverForSuperCharge implements IAddressRemover {
+export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubstituteAndExcludePayToAddresses {
     async remove(transactions: PayoutTransaction[]): Promise<PayoutTransaction[]> {
  // load susbtitutes from file
   // expects format:

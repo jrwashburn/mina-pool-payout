@@ -19,7 +19,7 @@ export interface IPaymentBuilder {
 
 
 
-export interface IAddressRemover {
+export interface ISubstituteAndExcludePayToAddresses {
     remove(transactions: PayoutTransaction[]) : Promise<PayoutTransaction[]>
 }
 

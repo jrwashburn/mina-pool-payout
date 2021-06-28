@@ -3,7 +3,7 @@ import TYPES from "./Types"
 import "reflect-metadata"
 
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from "../core/dataProvider/Models"
-import { IAddressRemover, IBlockProcessor, IPaymentBuilder, IPaymentProcessor } from '../core/payment/Model'
+import { ISubstituteAndExcludePayToAddresses, IBlockProcessor, IPaymentBuilder, IPaymentProcessor } from '../core/payment/Model'
 import { IPayoutCalculator } from "../core/payoutCalculator/Model"
 import { BlockProcessor } from "../core/payment/BlockProcessor"
 import { PaymentBuilder } from "../core/payment/PaymentBuilder"
@@ -17,7 +17,7 @@ import { ISender, ITransactionBuilder, ITransactionProcessor } from "../core/tra
 import { TransactionSender } from "../core/transaction/TrasactionSender"
 import { TransactionProcessor } from "../core/transaction/TransactionProcessor"
 import { PayoutCalculatorIsolateSuperCharge } from "../core/payoutCalculator/PayoutCalculatorIsolateSuperCharge"
-import { AddressRemoverForSuperCharge } from "../core/payment/SubstituteAndExcludePayToAddressesForSuperCharge"
+import { SubstituteAndExcludePayToAddressesForSuperCharge } from "../core/payment/SubstituteAndExcludePayToAddressesForSuperCharge"
 
 
 var container = new Container()
@@ -34,5 +34,5 @@ container.bind<IDataProviderFactory<IStakeDataProvider>>(TYPES.StakeDataProvider
 container.bind<IFileWriter>(TYPES.IFileWriter).to(FileWriter)
 //Add a factory to change Calculator based on a setting or argument
 container.bind<IPayoutCalculator>(TYPES.IPayoutCalculator).to(PayoutCalculatorIsolateSuperCharge) 
-container.bind<IAddressRemover>(TYPES.IAddressRemover).to(AddressRemoverForSuperCharge)
+container.bind<ISubstituteAndExcludePayToAddresses>(TYPES.IAddressRemover).to(SubstituteAndExcludePayToAddressesForSuperCharge)
 export default container

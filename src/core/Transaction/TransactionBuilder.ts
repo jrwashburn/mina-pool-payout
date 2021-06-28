@@ -1,16 +1,16 @@
 import { inject, injectable } from "inversify";
 import TYPES from "../../composition/Types";
 import { PaymentConfiguration } from "../../configuration/Model";
-import { IAddressRemover, PaymentProcess } from "../payment/Model";
+import { ISubstituteAndExcludePayToAddresses, PaymentProcess } from "../payment/Model";
 import { PayoutTransaction } from "../payoutCalculator/Model";
 import { ITransactionBuilder } from "./Model";
 
 @injectable()
 export class TransactionBuilder implements ITransactionBuilder {
 
-  private addressRemover: IAddressRemover
+  private addressRemover: ISubstituteAndExcludePayToAddresses
 
-  constructor(@inject(TYPES.IAddressRemover) addressRemover: IAddressRemover) {
+  constructor(@inject(TYPES.IAddressRemover) addressRemover: ISubstituteAndExcludePayToAddresses) {
     this.addressRemover = addressRemover
   }
   async build(paymentProcess: PaymentProcess, config: PaymentConfiguration): Promise<PayoutTransaction[]> {

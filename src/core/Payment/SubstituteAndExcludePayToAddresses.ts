@@ -1,5 +1,5 @@
 import { PayoutTransaction } from "../payoutCalculator/Model";
-import { IAddressRemover as ISubstituteAndExcludePayToAddresses } from "./Model";
+import { ISubstituteAndExcludePayToAddresses } from "./Model";
 import fs from "fs";
 import parse from "csv-parse";
 import { injectable } from "inversify";

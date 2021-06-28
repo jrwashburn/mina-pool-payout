@@ -1,6 +1,6 @@
 import Module from "pg-promise";
 
-const databaseUrl = process.env.DATABASE_URL;
+const databaseUrl = process.env.DATABASE_URL 
 
 if (!databaseUrl) {
   throw Error("DATABASE_URL must be specified");
