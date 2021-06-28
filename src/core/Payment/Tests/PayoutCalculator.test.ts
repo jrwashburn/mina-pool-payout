@@ -1,5 +1,5 @@
-import { Block, Stake } from '../../DataProvider/dataprovider-types'
-import { PayoutCalculator } from '../../PayoutCalculator/PayoutCalculator'
+import { Block, Stake } from '../../dataProvider/dataprovider-types'
+import { PayoutCalculator } from '../../payoutCalculator/PayoutCalculator'
 
 describe('Payout Calculator tests', () => {
     describe('should be sucessful', () => {

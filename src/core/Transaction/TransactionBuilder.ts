@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify";
-import TYPES from "../../Composition/Types";
-import { PaymentConfiguration } from "../../Configuration/Model";
-import { PayoutTransaction } from "../PayoutCalculator/Model";
-import { PaymentProcess, IAddressRemover } from "../Payment/Model";
-import {ITransactionBuilder} from './Model'
+import TYPES from "../../composition/Types";
+import { PaymentConfiguration } from "../../configuration/Model";
+import { IAddressRemover, PaymentProcess } from "../payment/Model";
+import { PayoutTransaction } from "../payoutCalculator/Model";
+import { ITransactionBuilder } from "./Model";
 
 @injectable()
 export class TransactionBuilder implements ITransactionBuilder {

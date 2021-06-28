@@ -1,9 +1,9 @@
 
+import { injectable } from "inversify";
+import { getBlocks, getLatestHeight } from "./dataprovider-archivedb/block-queries-sql";
+import { Blocks } from "./dataprovider-types";
 import { IBlockDataProvider } from "./Models";
 
-import { getBlocks, getLatestHeight } from './dataprovider-archivedb/block-queries-sql'
-import { injectable } from "inversify";
-import { Blocks } from "./dataprovider-types";
 
 @injectable()
 export class ArchiveBlockDataProvider implements IBlockDataProvider {

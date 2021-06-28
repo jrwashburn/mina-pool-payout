@@ -1,4 +1,4 @@
-import { db } from "../../../Infrastructure/database";
+import { db } from "../../../infrastructure/database";
 import fs from "fs";
 import parse from "csv-parse";
 import { Blocks } from "../dataprovider-types";

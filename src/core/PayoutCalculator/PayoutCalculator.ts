@@ -1,8 +1,7 @@
-import { Block, Stake } from "../DataProvider/dataprovider-types";
-import { IPayoutCalculator } from "./Model";
-import { PayoutDetails,PayoutTransaction } from "./Model"
-import { stakeIsLocked } from "../../Utils/staking-ledger-util";
+import { stakeIsLocked } from "../../utils/staking-ledger-util";
 import { injectable } from "inversify";
+import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from "./Model";
+import { Block, Stake } from "../dataProvider/dataprovider-types";
 
 // per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
 // see https://minaprotocol.com/docs/advanced/foundation-delegation-program

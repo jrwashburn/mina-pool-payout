@@ -1,18 +1,21 @@
-import { PayoutTransaction } from "../PayoutCalculator/Model";
-import { IAddressRemover } from "./Model";
+import { PayoutTransaction } from "../payoutCalculator/Model";
+import { IAddressRemover } from "./Model"
 import fs from "fs";
 import parse from "csv-parse";
 import { injectable } from "inversify";
+import { ConfigurationManager } from "../../configuration/ConfigurationManager";
 
 @injectable()
-export class AddressRemover implements IAddressRemover {
+export class AddressRemoverForSuperCharge implements IAddressRemover {
     async remove(transactions: PayoutTransaction[]): Promise<PayoutTransaction[]> {
-          // load susbtitutes from file
+ // load susbtitutes from file
   // expects format:
   //  B62... | B62...
   //  B62... | EXCLUDE
   // remove excluded addresses
   // swap mapped addresses
+  const payoutThreshold = ConfigurationManager.Setup.payoutThreshold
+
   const path = require("path");
   const substitutePayToFile = path.join("src", "data", ".substitutePayTo");
   const filterPayouts = () => {
@@ -23,7 +26,10 @@ export class AddressRemover implements IAddressRemover {
           transactions = transactions
             .filter(
               (transaction) =>
-                !(transaction.publicKey == record[0] && record[1] == "EXCLUDE")
+                (
+                  !(transaction.publicKey == record[0] && record[1] == "EXCLUDE") &&
+                  !(transaction.amount <= payoutThreshold)
+                )
             )
             .map((t) => {
               if (t.publicKey == record[0]) t.publicKey = record[1];

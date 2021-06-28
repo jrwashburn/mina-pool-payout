@@ -4,7 +4,6 @@ export class ConfigurationManager {
 
     public static Setup : PaymentConfiguration
     public static async build(args: any) {
-        //move this outside
         this.Setup = {
             commissionRate: Number(process.env.COMMISSION_RATE) || 0.05,
             stakingPoolPublicKey : process.env.POOL_PUBLIC_KEY || "",
@@ -22,6 +21,7 @@ export class ConfigurationManager {
             payoutHash: args.payouthash,
             payoutThreshold : Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0
         }
+        
     }
 
 }

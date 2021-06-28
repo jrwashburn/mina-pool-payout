@@ -1,27 +1,12 @@
-import { PaymentBuilder  } from '../PaymentBuilder'
-import { PaymentConfiguration } from '../../../Configuration/Model'
-import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../../DataProvider/Models';
-import { IBlockProcessor, PaymentProcess } from '../Model';
-import { Block } from '../../DataProvider/dataprovider-types';
-import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from '../../PayoutCalculator/Model';
+
+import { Block } from "../../dataProvider/dataprovider-types"
+import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from "../../dataProvider/Models"
+import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from "../../payoutCalculator/Model"
+import { IBlockProcessor, PaymentProcess } from "../Model"
+import { PaymentBuilder } from "../PaymentBuilder"
+
 
 describe('Payment Builder Tests', () => {
-    const configurationMock : PaymentConfiguration = {
-        commissionRate : 0.05,
-        stakingPoolPublicKey: "",
-        payoutMemo: "",
-        senderKeys: {
-            privateKey: "",
-            publicKey: "",
-        },
-        payorSendTransactionFee: 0 * 1000000000,
-        minimumConfirmations: 290,
-        minimumHeight: 1,
-        configuredMaximum: 10, 
-        blockDataSource: 'ARCHIVEDB',
-        verbose: false,
-        payoutHash: ''
-    }
 
     const mockedBlockProcessor: IBlockProcessor = {determineLastBlockHeightToProcess: () => new Promise(() => 10)} 
     

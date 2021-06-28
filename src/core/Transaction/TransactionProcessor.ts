@@ -1,10 +1,11 @@
-import { PayoutTransaction } from "../PayoutCalculator/Model";
-import { ITransactionProcessor as ITransactionProcessor } from "./Model";
-import { IFileWriter } from "../../Shared/Model";
-import { PaymentConfiguration } from "../../Configuration/Model";
+import { IFileWriter } from "../../shared/Model";
+import { PaymentConfiguration } from "../../configuration/Model";
 import { inject, injectable } from "inversify";
-import TYPES from "../../Composition/Types";
-import { PaymentProcess } from "../Payment/Model";
+import TYPES from "../../composition/Types";
+import { ITransactionProcessor } from "./Model";
+import { PayoutTransaction } from "../payoutCalculator/Model";
+import { PaymentProcess } from "../payment/Model";
+
 
 @injectable()
 export class TransactionProcessor implements ITransactionProcessor {

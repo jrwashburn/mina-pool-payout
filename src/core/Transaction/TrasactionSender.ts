@@ -1,11 +1,12 @@
-import { PayoutTransaction } from "../PayoutCalculator/Model";
-import { sendSignedTransactions } from "../../Utils/send-payments";
-import { ISender } from "./Model";
+
+import { sendSignedTransactions } from "../../utils/send-payments";
 import fs from "fs"
 import hash from "object-hash";
-import { PaymentConfiguration } from "../../Configuration/Model";
+import { PaymentConfiguration } from "../../configuration/Model";
 import { injectable } from "inversify";
-import { PaymentProcess } from "../Payment/Model";
+import { ISender } from "./Model";
+import { PayoutTransaction } from "../payoutCalculator/Model";
+import { PaymentProcess } from "../payment/Model";
 
 @injectable()
 export class TransactionSender implements ISender {

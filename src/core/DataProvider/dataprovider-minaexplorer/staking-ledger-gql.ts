@@ -1,6 +1,6 @@
-import { fetchGraphQL } from '../../../Infrastructure/graphql';
+import { fetchGraphQL } from '../../../infrastructure/graphql';
 import { Stake, LedgerEntry } from '../dataprovider-types'
-import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../Utils/staking-ledger-util'
+import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util'
 
 const graphqlEndpoint = process.env.MINAEXPLORER_GRAPHQL_ENDPOINT || "https://localhost:3085";
 

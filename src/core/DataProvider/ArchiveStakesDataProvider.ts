@@ -1,8 +1,8 @@
-import { Stake } from "./dataprovider-types";
-import { IStakeDataProvider as IStakeDataProvider } from "./Models";
-
-import { getStakes } from './dataprovider-archivedb/staking-ledger-json-file'
 import { injectable } from "inversify";
+import { getStakes } from "./dataprovider-archivedb/staking-ledger-json-file";
+import { Stake } from "./dataprovider-types";
+import { IStakeDataProvider } from "./Models";
+
 
 @injectable()
 export class ArchiveStakeDataProvider implements IStakeDataProvider {

@@ -1,7 +1,7 @@
-import { TransactionBuilder } from '../../Transaction/TransactionBuilder'
+import { TransactionBuilder } from '../../transaction/TransactionBuilder'
 import { IAddressRemover, PaymentProcess } from '../Model'
-import { PaymentConfiguration } from '../../../Configuration/Model'
-import { PayoutTransaction } from '../../PayoutCalculator/Model'
+import { PaymentConfiguration } from '../../../configuration/Model'
+import { PayoutTransaction } from '../../payoutCalculator/Model'
 
 describe('Transaction Builder Tests', () => {
     describe('Should be successful', () => {
@@ -27,7 +27,8 @@ describe('Transaction Builder Tests', () => {
                 configuredMaximum: 10, 
                 blockDataSource: 'ARCHIVEDB',
                 verbose: false,
-                payoutHash: ''
+                payoutHash: '',
+                payoutThreshold: 0
             }
 
             const builder = new TransactionBuilder(mockAddressRemover)

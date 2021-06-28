@@ -1,9 +1,8 @@
 
 import { injectable } from "inversify";
-import { Block, Stake } from "../DataProvider/dataprovider-types";
-import { IPayoutCalculator } from "./Model";
-import { PayoutDetails,PayoutTransaction } from "./Model"
-import { stakeIsLocked } from "../../Utils/staking-ledger-util";
+import { stakeIsLocked } from "../../utils/staking-ledger-util";
+import { Block, Stake } from "../dataProvider/dataprovider-types";
+import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from "./Model";
 
 // per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
 // see https://minaprotocol.com/docs/advanced/foundation-delegation-program
@@ -11,7 +10,7 @@ const npsCommissionRate = 0.05;
 
 @injectable()
 export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
-    async getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commisionRate: number): Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]> {
+    async getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number): Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]> {
     
     //TODO: JC - Shared Logic must be moved into its own class, then isolate change in behaviors
         // Initialize some stuff
@@ -101,17 +100,17 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
         if (staker.shareClass == "Common") {
           blockTotal =
             Math.floor(
-              (1 - commisionRate) *
+              (1 - commissionRate) *
                 totalNPSPoolRewards *
                 effectiveNPSPoolWeighting
             ) +
             Math.floor(
-              (1 - commisionRate) *
+              (1 - commissionRate) *
                 totalCommonPoolRewards *
                 effectiveCommonPoolWeighting
             ) + 
             Math.floor(
-              (1 - commisionRate) *
+              (1 - commissionRate) *
                 totalSuperchargedPoolRewards *
                 effectiveSuperchargedPoolWeighting
             );

@@ -1,7 +1,8 @@
-import { Blocks } from "./dataprovider-types";
-import { IBlockDataProvider } from "./Models";
-import { getBlocks, getLatestHeight } from './dataprovider-minaexplorer/block-queries-gql'
+
 import { injectable } from "inversify";
+import { IBlockDataProvider } from "./Models";
+import { getBlocks, getLatestHeight } from "./dataprovider-minaexplorer/block-queries-gql";
+import { Blocks } from "./dataprovider-types";
 
 @injectable()
 export class MinaExplorerBlockDataProvider implements IBlockDataProvider{

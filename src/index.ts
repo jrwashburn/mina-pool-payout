@@ -1,8 +1,8 @@
 
 import yargs from "yargs";
-import Container from './Composition/inversify.config'
-import { IPaymentProcessor } from "./Core/Payment/Model";
-import TYPES from "./Composition/Types";
+import Container from './composition/inversify.config'
+import { IPaymentProcessor } from "./core/payment/Model";
+import TYPES from "./composition/Types";
 
 // TODO: create mina currency types
 

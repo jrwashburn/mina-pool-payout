@@ -1,10 +1,10 @@
-import { IPaymentBuilder, IPaymentProcessor as IPaymentProcessor  } from "./Model";
-import { PayoutTransaction } from "../PayoutCalculator/Model";
-import { PaymentConfiguration } from "../../Configuration/Model";
-import { ConfigurationManager } from "../../Configuration/ConfigurationManager";
+import { IPaymentBuilder, IPaymentProcessor as IPaymentProcessor  } from "./Model"
+import { PayoutTransaction } from "../payoutCalculator/Model";
+import { PaymentConfiguration } from "../../configuration/Model";
+import { ConfigurationManager } from "../../configuration/ConfigurationManager";
 import { inject, injectable } from "inversify";
-import TYPES from "../../Composition/Types";
-import { ISender, ITransactionBuilder, ITransactionProcessor } from "../Transaction/Model";
+import TYPES from "../../composition/Types";
+import { ISender, ITransactionBuilder, ITransactionProcessor } from "../transaction/Model";
 
 @injectable()
 export class PaymentProcessor implements IPaymentProcessor {

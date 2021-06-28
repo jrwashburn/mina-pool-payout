@@ -1,6 +1,5 @@
-import { PaymentConfiguration } from "../../Configuration/Model";
-import { Block } from "../DataProvider/dataprovider-types";
-import {PayoutDetails,PayoutTransaction} from "../PayoutCalculator/Model"
+import { Block } from "../dataProvider/dataprovider-types";
+import {PayoutDetails,PayoutTransaction} from "../payoutCalculator/Model"
 
 export interface IPaymentProcessor {
     run(args: any) : Promise<void>

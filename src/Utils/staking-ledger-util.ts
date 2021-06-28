@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { Stake, LedgerEntry, Block } from '../Core/DataProvider/dataprovider-types'
+import { Stake, LedgerEntry, Block } from '../core/dataProvider/dataprovider-types'
 
 export function stakeIsLocked (stake: Stake, block: Block) {
   return stake.untimedAfterSlot && stake.untimedAfterSlot > block.globalslotsincegenesis

@@ -1,5 +1,5 @@
-import { LedgerEntry } from '../Core/DataProvider/dataprovider-types'
-import { calculateUntimedSlot } from '../Utils/staking-ledger-util'
+import { LedgerEntry } from '../core/dataProvider/dataprovider-types'
+import { calculateUntimedSlot } from '../utils/staking-ledger-util'
 
 describe('Should be succesful calculating untimed slot', () => {
     it('when ledger is valid', () => {

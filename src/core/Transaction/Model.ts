@@ -1,6 +1,6 @@
-import { PaymentConfiguration } from "../../Configuration/Model";
-import { PaymentProcess } from "../Payment/Model";
-import { PayoutTransaction } from "../PayoutCalculator/Model";
+import { PaymentConfiguration } from "../../configuration/Model";
+import { PaymentProcess } from "../payment/Model";
+import { PayoutTransaction } from "../payoutCalculator/Model";
 
 
 export interface ITransactionBuilder {

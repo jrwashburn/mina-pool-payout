@@ -1,4 +1,5 @@
-import { Block, Stake } from "../DataProvider/dataprovider-types";
+import { Block, Stake } from "../dataProvider/dataprovider-types";
+
 
 export type PayoutDetails = {
     publicKey: string,
