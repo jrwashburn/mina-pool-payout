@@ -19,11 +19,15 @@ async function main () {
   // TODO: Error handling
   // TODO: Add parameter to run read-only vs. write which would persist max height processed so it is not re-processed in future
   // TODO: Fail if any required values missing from .env
-  const commissionRate = Number(process.env.COMMISSION_RATE) || 0.05;
+
+  const commissionRate = Number(process.env.COMMISSION_RATE);
+  if (Number.isNaN(commissionRate)) {
+    throw new Error ('Comission Rate is not a number - please correct .env configuration')
+  }
   const stakingPoolPublicKey: string = process.env.POOL_PUBLIC_KEY || "";
   const payoutMemo: string = process.env.POOL_MEMO || "";
   const payorSendTransactionFee = (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000;
-  // TODO: validate and then move this downt to send-payments to consolidated client-sdk 
+  // TODO: validate and then move this downt to send-payments to consolidated client-sdk
   // TODO: introduce -network flag to support test, pass to send-payments
   let senderKeys: keypair = {
     privateKey: process.env.SEND_PRIVATE_KEY || "",
@@ -47,7 +51,7 @@ async function main () {
   const stakesProvider = (blockDataSource == "ARCHIVEDB") ?
     require("./core/dataprovider-archivedb/staking-ledger-json-file") :
     require("./core/dataprovider-minaexplorer/staking-ledger-gql")
-  
+
   // get current maximum block height from database and determine what max block height for this run will be
   const maximumHeight = await determineLastBlockHeightToProcess(configuredMaximum, minimumConfirmations, await blockProvider.getLatestHeight());
 
@@ -55,7 +59,7 @@ async function main () {
 
   let blocks: Blocks = [];
   blocks = await blockProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight)
-     
+
   let payouts: PayoutTransaction[] = [];
   let storePayout: PayoutDetails[] = [];
 
@@ -64,7 +68,7 @@ async function main () {
   console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey} `)
   Promise.all(ledgerHashes.map(async ledgerHash => {
     console.log(`### Calculating payouts for ledger ${ledgerHash}`)
-    
+
     const [stakers, totalStake] = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey)
     console.log(`The pool total staking balance is ${totalStake}`);
 
@@ -122,7 +126,7 @@ async function main () {
     if (args.payouthash) {
       console.log(`### Processing signed payout for hash ${args.payouthash}...`)
       if (args.payouthash == payoutHash) {
-        // TODO: replace destination key, remove excluded sends 
+        // TODO: replace destination key, remove excluded sends
         sendSignedTransactions(transactions, senderKeys, payoutMemo);
         const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, { flags: 'a' });
         blocks.forEach((block) => {
@@ -145,7 +149,7 @@ async function determineLastBlockHeightToProcess (maximumHeight: number, minimum
   let maximum = 0
   // TODO #13 get "getBlocks" and "getLatestHeight" based on data souce
   const finalityHeight = latestHeight - minimumConfirmations;
-  
+
   if (finalityHeight > maximumHeight) {
     maximum = maximumHeight;
   } else {
