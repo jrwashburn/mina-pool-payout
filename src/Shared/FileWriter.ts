@@ -6,7 +6,7 @@ export class FileWriter implements IFileWriter {
     async write(fileName: string, jsonObject: any): Promise<void> {
         fs.writeFile(fileName, jsonObject, function (err: any) {
             if (err) throw err;
-                console.log(`wrote payout details to ${fileName}`);
+                console.log(`wrote payout information to ${fileName}`);
           });
     }
 
