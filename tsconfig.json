@@ -2,10 +2,12 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "lib": [
-      "es2020"
+      "es2020", "DOM"
     ],
     "module": "commonjs",
+    "moduleResolution": "node",
     "target": "es2020",
+    "types": ["reflect-metadata", "node", "jest"],
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
@@ -13,6 +15,8 @@
     "rootDir": "src",
     "skipLibCheck": true,
     "sourceMap": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }

@@ -1,4 +1,4 @@
-import { fetchGraphQL } from '../../infrastructure/graphql';
+import { fetchGraphQL } from '../../../infrastructure/graphql';
 import { Blocks } from "../dataprovider-types";
 import fs from "fs";
 import parse from "csv-parse";

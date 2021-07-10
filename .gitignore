@@ -2,7 +2,8 @@
 .DS_Store
 dist
 node_modules
-.vscode
 .env
-/src/data/
+/src/data/*
+!/src/data/ledger/
+!/src/data/nps-addresses/
 package-lock.json

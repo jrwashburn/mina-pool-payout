@@ -1,26 +1,16 @@
-import { Block, Stake } from "../dataprovider-types";
-import { stakeIsLocked } from "../staking-ledger-util";
-import parse from "csv-parse";
-import fs from "fs";
+import { stakeIsLocked } from "../../utils/staking-ledger-util";
+import { injectable } from "inversify";
+import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from "./Model";
+import { Block, Stake } from "../dataProvider/dataprovider-types";
 
 // per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
 // see https://minaprotocol.com/docs/advanced/foundation-delegation-program
 const npsCommissionRate = 0.05;
 
-export async function getPayouts(
-  blocks: Block[],
-  stakers: Stake[],
-  totalStake: number,
-  commissionRate: number
-): Promise<
-  [
-    payoutJson: PayoutTransaction[],
-    storePayout: PayoutDetails[],
-    blocksIncluded: number[],
-    totalPayout: number
-  ]
-> {
-  // Initialize some stuff
+@injectable()
+export class PayoutCalculator implements IPayoutCalculator {
+    async getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number): Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]> {
+        // Initialize some stuff
   let blocksIncluded: number[] = [];
   let storePayout: PayoutDetails[] = [];
 
@@ -32,7 +22,7 @@ export async function getPayouts(
     if (typeof block.coinbase === "undefined" || block.coinbase == 0) {
       // no coinbase, don't need to do anything
     } else {
-      const winner = getWinner(stakers, block);
+      const winner = this.getWinner(stakers, block);
 
       let sumEffectiveCommonPoolStakes = 0;
       let sumEffectiveNPSPoolStakes = 0;
@@ -140,6 +130,11 @@ export async function getPayouts(
           totalRewardsNPSPool: totalNPSPoolRewards,
           totalRewardsCommonPool: totalCommonPoolRewards,
           payout: blockTotal,
+          isEffectiveSuperCharge: false,
+          effectiveSuperchargedPoolWeighting: 0, 
+          effectiveSuperchargedPoolStakes: 0, 
+          sumEffectiveSuperchargedPoolStakes: 0, 
+          totalRewardsSuperchargedPool: 0
         });
       });
     }
@@ -159,77 +154,14 @@ export async function getPayouts(
     }
   });
   return [payoutJson, storePayout, blocksIncluded, totalPayout];
-}
+    }
 
-function getWinner(stakers: Stake[], block: Block): Stake {
-  const winners = stakers.filter((x) => x.publicKey == block.winnerpublickey);
-  if (winners.length != 1) {
-    throw new Error("Should have exactly 1 winner.");
+private getWinner (stakers: Stake[], block: Block): Stake {
+    const winners = stakers.filter((x) => x.publicKey == block.winnerpublickey);
+        if (winners.length != 1) {
+          throw new Error("Should have exactly 1 winner.");
+        }
+        return winners[0];
   }
-  return winners[0];
-}
 
-export type PayoutDetails = {
-  publicKey: string;
-  blockHeight: number;
-  globalSlot: number;
-  publicKeyUntimedAfter: number;
-  shareClass: "NPS" | "Common";
-  stateHash: string;
-  effectiveNPSPoolWeighting: number;
-  effectiveNPSPoolStakes: number;
-  effectiveCommonPoolWeighting: number;
-  effectiveCommonPoolStakes: number;
-  stakingBalance: number;
-  sumEffectiveNPSPoolStakes: number;
-  sumEffectiveCommonPoolStakes: number;
-  superchargedWeightingDiscount: number;
-  dateTime: number;
-  coinbase: number;
-  totalRewards: number;
-  totalRewardsNPSPool: number;
-  totalRewardsCommonPool: number;
-  payout: number;
-};
-
-export type PayoutTransaction = {
-  publicKey: string;
-  amount: number;
-  fee: number;
-};
-
-export async function substituteAndExcludePayToAddresses(
-  transactions: PayoutTransaction[]
-): Promise<PayoutTransaction[]> {
-  // load susbtitutes from file
-  // expects format:
-  //  B62... | B62...
-  //  B62... | EXCLUDE
-  // remove excluded addresses
-  // swap mapped addresses
-  const path = require("path");
-  const substitutePayToFile = path.join("src", "data", ".substitutePayTo");
-  const filterPayouts = () => {
-    return new Promise((resolve, reject) => {
-      fs.createReadStream(substitutePayToFile)
-        .pipe(parse({ delimiter: "|" }))
-        .on("data", (record) => {
-          transactions = transactions
-            .filter(
-              (transaction) =>
-                !(transaction.publicKey == record[0] && record[1] == "EXCLUDE")
-            )
-            .map((t) => {
-              if (t.publicKey == record[0]) t.publicKey = record[1];
-              return t;
-            });
-        })
-        .on("end", resolve)
-        .on("error", reject);
-    });
-  };
-  if (fs.existsSync(substitutePayToFile)) {
-    await filterPayouts();
-  }
-  return transactions;
 }
