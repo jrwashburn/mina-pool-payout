@@ -22,7 +22,7 @@ export class TransactionSender implements ISender {
             if (payoutHash == calculatedHash) {
               // TODO: replace destination key, remove excluded sends 
               sendSignedTransactions(transactions, senderKeys, payoutMemo);
-              const paidblockStream = fs.createWriteStream(`${__dirname}/data/.paidblocks`, { flags: 'a' });
+              const paidblockStream = fs.createWriteStream(`${__dirname}/../../data/.paidblocks`, { flags: 'a' });
               blocks.forEach((block) => {
                 paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
               });
