@@ -6,7 +6,7 @@ const graphqlEndpoint = process.env.MINAEXPLORER_GRAPHQL_ENDPOINT || "https://lo
 
 const ledgerQuery = `
 query stakingLedger( $ledgerHash: String, $delegate: String) {
-  stakes(limit: 1000, query: {ledgerHash: $ledgerHash, delegate: $delegate}) {
+  stakes(limit: 10000, query: {ledgerHash: $ledgerHash, delegate: $delegate}) {
     pk
     balance
     delegate
