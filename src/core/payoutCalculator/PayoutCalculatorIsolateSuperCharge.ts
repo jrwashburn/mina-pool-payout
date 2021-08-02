@@ -11,7 +11,7 @@ const npsCommissionRate = 0.05;
 @injectable()
 export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
     async getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commissionRate: number): Promise<[payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]> {
-    
+
     //TODO: JC - Shared Logic must be moved into its own class, then isolate change in behaviors
         // Initialize some stuff
   let blocksIncluded: number[] = [];
@@ -81,6 +81,9 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
           "Common share must equal total common stake"
         );
       }
+      if (totalSuperchargedPoolRewards > 0 && totalSuperchargedPoolRewards !== 720000000000) {
+        throw new Error("Winner unlocked, but supercharged coinbase share is not 720 MINA");
+      }
 
       stakers.forEach((staker: Stake) => {
         const effectiveNPSPoolWeighting = (sumEffectiveNPSPoolStakes > 0)
@@ -108,7 +111,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
               (1 - commissionRate) *
                 totalCommonPoolRewards *
                 effectiveCommonPoolWeighting
-            ) + 
+            ) +
             Math.floor(
               (1 - commissionRate) *
                 totalSuperchargedPoolRewards *
@@ -140,7 +143,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
           effectiveCommonPoolStakes:
             effectivePoolStakes[staker.publicKey].commonStake,
           effectiveSuperchargedPoolWeighting: effectiveSuperchargedPoolWeighting,
-          effectiveSuperchargedPoolStakes: 
+          effectiveSuperchargedPoolStakes:
             effectivePoolStakes[staker.publicKey].superchargedStake,
           sumEffectiveNPSPoolStakes: sumEffectiveNPSPoolStakes,
           sumEffectiveCommonPoolStakes: sumEffectiveCommonPoolStakes,
@@ -182,9 +185,5 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
             }
             return winners[0];
       }
-    
+
  }
-
-
-
-
