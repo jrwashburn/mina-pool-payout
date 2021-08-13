@@ -17,8 +17,8 @@ export interface PaymentProcess {
 export interface PaymentTotals {
     coinBaseSum: number,
     userCommandTransactionFeeSum: number,
-    freeTransferFromCoinBaseSum: number,
-    netCoinBaseReceveid: number,
+    feeTransferFromCoinBaseSum: number,
+    netCoinBaseReceived: number,
     payoutAmountsSum: number,
     payoutFeesSum: number,
     netMinaToPoolOperator: number

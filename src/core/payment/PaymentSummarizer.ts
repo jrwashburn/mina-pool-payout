@@ -40,9 +40,9 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
 
         base.totals = {
             coinBaseSum: coinbasesum,
-            freeTransferFromCoinBaseSum: feetransferfromcoinbasesum,
+            feeTransferFromCoinBaseSum: feetransferfromcoinbasesum,
             userCommandTransactionFeeSum: usercommandtransactionfeessum,
-            netCoinBaseReceveid: coinbasesum - feetransferfromcoinbasesum - usercommandtransactionfeessum,
+            netCoinBaseReceived: coinbasesum - feetransferfromcoinbasesum + usercommandtransactionfeessum,
             payoutAmountsSum: amountsum,
             payoutFeesSum: feesum,
             netMinaToPoolOperator: netcoinbasereceived - amountsum - feesum
@@ -54,8 +54,8 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
 
         console.log(`Total Coin Base Generated: ${base.totals?.coinBaseSum}`)
         console.log(`Total User Transaction Fees Generated: ${base.totals?.userCommandTransactionFeeSum}`)
-        console.log(`Total Snark Fees Paid: ${base.totals?.freeTransferFromCoinBaseSum}`)
-        console.log(`Net Coinbase Received: ${base.totals?.netCoinBaseReceveid}`)
+        console.log(`Total Snark Fees Paid: ${base.totals?.feeTransferFromCoinBaseSum}`)
+        console.log(`Net Coinbase Received: ${base.totals?.netCoinBaseReceived}`)
         console.log(`Total Payouts Sent: ${base.totals?.payoutAmountsSum}`)
         console.log(`Total Payout Transaction Fees: ${base.totals?.payoutFeesSum}`)
         console.log(`Net MINA to Pool Operator: ${base.totals?.netMinaToPoolOperator}`)
