@@ -14,7 +14,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
             blocks.forEach (block => {
                 coinbasesum += block.coinbase ?? 0
                 feetransferfromcoinbasesum += block.feetransferfromcoinbase ?? 0
-                usercommandtransactionfeessum += block.usercommandtransactionfees
+                usercommandtransactionfeessum += block.usercommandtransactionfees ?? 0
             })
 
             return {coinbasesum, feetransferfromcoinbasesum, usercommandtransactionfeessum}
