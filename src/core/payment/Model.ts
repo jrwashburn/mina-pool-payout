@@ -32,7 +32,7 @@ export interface IPaymentBuilder {
 
 
 export interface ISubstituteAndExcludePayToAddresses {
-    remove(transactions: PayoutTransaction[]) : Promise<PayoutTransaction[]>
+    run(transactions: PayoutTransaction[]) : Promise<PayoutTransaction[]>
 }
 
 export interface IBlockProcessor {

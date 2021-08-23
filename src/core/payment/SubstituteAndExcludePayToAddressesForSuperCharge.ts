@@ -7,7 +7,7 @@ import { ConfigurationManager } from "../../configuration/ConfigurationManager";
 
 @injectable()
 export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubstituteAndExcludePayToAddresses {
-    async remove(transactions: PayoutTransaction[]): Promise<PayoutTransaction[]> {
+    async run(transactions: PayoutTransaction[]): Promise<PayoutTransaction[]> {
  // load susbtitutes from file
   // expects format:
   //  B62... | B62...

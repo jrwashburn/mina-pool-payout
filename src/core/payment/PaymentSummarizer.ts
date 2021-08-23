@@ -23,7 +23,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
         const getTotalPayouts = (transactions: PayoutTransaction[]) => {
             let amountsum = 0
             let feesum = 0
-
+            
             transactions.forEach(transaction => {
                 amountsum += transaction.amount ?? 0
                 feesum += transaction.fee ?? 0
