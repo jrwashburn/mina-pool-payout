@@ -38,13 +38,13 @@ export class PaymentProcessor implements IPaymentProcessor {
             
             let paymentProcess = await this.paymentBuilder.build() 
             
-            let transactions = await this.transactionBuilder.build(paymentProcess,configuration)
+            await this.transactionBuilder.build(paymentProcess,configuration)
 
-            paymentProcess.totalPayoutFundsNeeded = await this.calculateTotalPayoutFundsNeeded(transactions)
+            await this.calculateTotalPayoutFundsNeeded(paymentProcess)
             
-            await this.transactionProcessor.write(transactions, configuration, paymentProcess) 
+            await this.transactionProcessor.write(configuration, paymentProcess) 
 
-            await this.sender.send(configuration, transactions, paymentProcess)
+            await this.sender.send(configuration, paymentProcess)
 
             await this.summarizer.calculateTotals(paymentProcess)
 
@@ -57,14 +57,14 @@ export class PaymentProcessor implements IPaymentProcessor {
         
     }
 
-    private async calculateTotalPayoutFundsNeeded(transactions: PayoutTransaction[]) : Promise<number> {
+    private async calculateTotalPayoutFundsNeeded(paymentProcess: PaymentProcess) {
         let totalPayoutFundsNeeded = 0
 
-        transactions.map((t) => {totalPayoutFundsNeeded += t.amount + t.fee}); //probably move this
+        paymentProcess.payouts.map((t) => {totalPayoutFundsNeeded += t.amount + t.fee}); 
+
+        paymentProcess.totalPayoutFundsNeeded = totalPayoutFundsNeeded
 
         console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
-
-        return totalPayoutFundsNeeded
     }
 
     private async isValid(config : PaymentConfiguration) : Promise<boolean> {

@@ -51,7 +51,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
 
     async printTotals(base: PaymentProcess): Promise<void> {
         console.log('------------------- Summary & Totals ------------------')
-        console.log('Calculations based on entire pool - ignoring substitutions and exclusions.')
+        console.log('Calculations based on entire pool')
 
         console.log(`Total Coin Base Generated: ${base.totals?.coinBaseSum}`)
         console.log(`User Transaction Fees Generated (net of snark fees): ${base.totals?.userCommandTransactionFeeSum}`)
@@ -61,7 +61,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
         console.log(`Total Payout Transaction Fees: ${base.totals?.payoutFeesSum}`)
         console.log(`Net MINA to Pool Operator (before send transaction fees): ${base.totals?.netMinaToPoolOperator}`)
 
-        console.log('------------------- Summary && Totals ------------------')
+        console.log('------------------- Summary & Totals ------------------')
 
     }
 
