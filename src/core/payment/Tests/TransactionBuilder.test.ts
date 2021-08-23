@@ -11,7 +11,7 @@ describe('Transaction Builder Tests', () => {
 
             const mockExpectedTransactions:PayoutTransaction[] = []
 
-            const mockPaymentProcess: PaymentProcess = {blocks: [], maximumHeight: 1, payouts: [], storePayout: [], totalPayoutFundsNeeded: 11, }
+            const mockPaymentProcess: PaymentProcess = {blocks: [], maximumHeight: 1, payouts: [], storePayout: [], totalPayoutFundsNeeded: 11, payoutsBeforeExclusions: []}
             //TODO: MOVE THIS TO ITS A SETUP FILE
             const configurationMock : PaymentConfiguration = {
                 commissionRate : 0.05,

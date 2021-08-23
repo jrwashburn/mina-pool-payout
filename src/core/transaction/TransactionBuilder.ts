@@ -17,6 +17,7 @@ export class TransactionBuilder implements ITransactionBuilder {
             // Aggregate to a single transaction per key and track the total for funding transaction
 
       let { payouts, storePayout } = paymentProcess
+
       let transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
@@ -34,6 +35,8 @@ export class TransactionBuilder implements ITransactionBuilder {
     console.log(`before substitutions and exclusions`)
     
     console.table(transactions);
+
+    paymentProcess.payoutsBeforeExclusions = transactions
 
     transactions = await this.substituteAndExcludePayToAddresses.run(transactions);
     

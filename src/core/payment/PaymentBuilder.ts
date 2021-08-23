@@ -71,7 +71,7 @@ export class PaymentBuilder implements IPaymentBuilder {
             console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
         })).then( async () => {
 
-            let paymentProcess : PaymentProcess = { payouts, storePayout, maximumHeight, blocks, totalPayoutFundsNeeded: 0}
+            let paymentProcess : PaymentProcess = { payouts, storePayout, maximumHeight, blocks, totalPayoutFundsNeeded: 0, payoutsBeforeExclusions: []}
 
             return paymentProcess
         })

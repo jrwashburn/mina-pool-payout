@@ -20,23 +20,33 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
             return {coinbasesum, feetransferfromcoinbasesum, usercommandtransactionfeessum}
         }
 
-        const getTotalPayouts = (transactions: PayoutTransaction[]) => {
+        const getTotalAmountSum = (transactions: PayoutTransaction[]) => {
             let amountsum = 0
-            let feesum = 0
             
             transactions.forEach(transaction => {
                 amountsum += transaction.amount ?? 0
+            })
+
+            return amountsum
+        }
+
+        const getTotalFeeSum = (transactions: PayoutTransaction[]) => {
+            let feesum = 0
+            
+            transactions.forEach(transaction => {
                 feesum += transaction.fee ?? 0
             })
 
-            return {amountsum,feesum}
+            return feesum
         }
 
         const {coinbasesum, feetransferfromcoinbasesum, usercommandtransactionfeessum} = getTotalsFromBlocks(base.blocks)
 
         const netcoinbasereceived = coinbasesum - feetransferfromcoinbasesum + usercommandtransactionfeessum
 
-        const {amountsum,feesum} = getTotalPayouts(base.payouts)
+        const amountsum = getTotalAmountSum(base.payoutsBeforeExclusions)
+
+        const feesum = getTotalFeeSum(base.payouts)
 
         base.totals = {
             coinBaseSum: coinbasesum / 1000000000,
@@ -59,7 +69,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
         console.log(`Net Coinbase Received: ${base.totals?.netCoinBaseReceived}`)
         console.log(`Total Amounts Due To Stakers: ${base.totals?.payoutAmountsSum}`)
         console.log(`Total Payout Transaction Fees: ${base.totals?.payoutFeesSum}`)
-        console.log(`Net MINA to Pool Operator (before send transaction fees): ${base.totals?.netMinaToPoolOperator}`)
+        console.log(`Net MINA to Pool Operator (after send transaction fees): ${base.totals?.netMinaToPoolOperator}`)
 
         console.log('------------------- Summary & Totals ------------------')
 
