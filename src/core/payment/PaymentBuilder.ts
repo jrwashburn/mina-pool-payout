@@ -69,7 +69,7 @@ export class PaymentBuilder implements IPaymentBuilder {
             console.log(`We won these blocks: ${blocksIncluded}`);
 
             console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`)
-        })).then( async () => {
+        })).then(async () => {
 
             // added a sort because these payout details are hashed and need to be in a reliable order
             storePayout.sort(function (p1: PayoutDetails, p2: PayoutDetails) {
@@ -78,7 +78,7 @@ export class PaymentBuilder implements IPaymentBuilder {
                 return 0;
             });
 
-            let paymentProcess : PaymentProcess = { payouts, storePayout, maximumHeight, blocks, totalPayoutFundsNeeded: 0}
+            let paymentProcess : PaymentProcess = { payouts, storePayout, maximumHeight, blocks, totalPayoutFundsNeeded: 0, payoutsBeforeExclusions: []}
 
             return paymentProcess
         })

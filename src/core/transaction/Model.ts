@@ -8,9 +8,9 @@ export interface ITransactionBuilder {
 }
 
 export interface ITransactionProcessor {
-    write(transactions: PayoutTransaction[], config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void>
+    write(config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void>
 }
 
 export interface ISender {
-    send(config: PaymentConfiguration, transactions: PayoutTransaction[], paymentProcess: PaymentProcess) : Promise<void>
+    send(config: PaymentConfiguration, paymentProcess: PaymentProcess) : Promise<void>
 }

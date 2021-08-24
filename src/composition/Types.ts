@@ -14,7 +14,8 @@ const TYPES = {
     ITransactionProcessor: Symbol("ITransactionWriter"),
     ISender: Symbol("ITransactionSender"),
     IFileWriter: Symbol("IFileWriter"),
-    PaymentConfiguration: Symbol("PaymentConfiguration")
+    PaymentConfiguration: Symbol("PaymentConfiguration"),
+    PaymentSummarizer: Symbol("PaymentSummarizer")
 }
 
 export default TYPES

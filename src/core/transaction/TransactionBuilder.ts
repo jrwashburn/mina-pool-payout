@@ -8,15 +8,16 @@ import { ITransactionBuilder } from "./Model";
 @injectable()
 export class TransactionBuilder implements ITransactionBuilder {
 
-  private addressRemover: ISubstituteAndExcludePayToAddresses
+  private substituteAndExcludePayToAddresses: ISubstituteAndExcludePayToAddresses
 
   constructor(@inject(TYPES.IAddressRemover) addressRemover: ISubstituteAndExcludePayToAddresses) {
-    this.addressRemover = addressRemover
+    this.substituteAndExcludePayToAddresses = addressRemover
   }
   async build(paymentProcess: PaymentProcess, config: PaymentConfiguration): Promise<PayoutTransaction[]> {
             // Aggregate to a single transaction per key and track the total for funding transaction
 
       let { payouts, storePayout } = paymentProcess
+
       let transactions: PayoutTransaction[] = [...payouts.reduce((r, o) => {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
@@ -35,11 +36,15 @@ export class TransactionBuilder implements ITransactionBuilder {
     
     console.table(transactions);
 
-    transactions = await this.addressRemover.remove(transactions);
+    paymentProcess.payoutsBeforeExclusions = transactions
+
+    transactions = await this.substituteAndExcludePayToAddresses.run(transactions);
     
     console.log(`after substitutions and exclusions`)
     
     console.table(transactions);
+
+    paymentProcess.payouts = transactions
 
     return transactions
 

@@ -7,10 +7,23 @@ export interface IPaymentProcessor {
 
 export interface PaymentProcess {
     payouts: PayoutTransaction[],
+    payoutsBeforeExclusions: PayoutTransaction[],
     storePayout: PayoutDetails[],
     maximumHeight: number,
     blocks: Block[],
-    totalPayoutFundsNeeded: number
+    totalPayoutFundsNeeded: number,
+    totals?: PaymentTotals
+}
+
+export interface PaymentTotals {
+    coinBaseSum: number,
+    userCommandTransactionFeeSum: number,
+    feeTransferFromCoinBaseSum: number,
+    netCoinBaseReceived: number,
+    payoutAmountsSum: number,
+    payoutFeesSum: number,
+    netMinaToPoolOperator: number
+
 }
 
 export interface IPaymentBuilder {
@@ -20,11 +33,16 @@ export interface IPaymentBuilder {
 
 
 export interface ISubstituteAndExcludePayToAddresses {
-    remove(transactions: PayoutTransaction[]) : Promise<PayoutTransaction[]>
+    run(transactions: PayoutTransaction[]) : Promise<PayoutTransaction[]>
 }
 
 export interface IBlockProcessor {
     determineLastBlockHeightToProcess(max: number, min:number, latestHeight: number) : Promise<number>
+}
+
+export interface ISummarizer<T> {
+    calculateTotals(base: T) : Promise<void>
+    printTotals(base: T): Promise<void>
 }
 
 
