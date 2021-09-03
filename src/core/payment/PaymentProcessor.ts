@@ -8,7 +8,7 @@ import { ISender, ITransactionBuilder, ITransactionProcessor } from "../transact
 
 @injectable()
 export class PaymentProcessor implements IPaymentProcessor {
-    
+
     private paymentBuilder : IPaymentBuilder
     private transactionBuilder : ITransactionBuilder
     private transactionProcessor : ITransactionProcessor
@@ -31,36 +31,36 @@ export class PaymentProcessor implements IPaymentProcessor {
 
     async run(args: any): Promise<void> {
         ConfigurationManager.build(args)
-        
-        const configuration = ConfigurationManager.Setup 
 
-        if (this.isValid(configuration)) {
-            
-            let paymentProcess = await this.paymentBuilder.build() 
-            
+        const configuration = ConfigurationManager.Setup
+
+        if (await this.isValid(configuration)) {
+
+            let paymentProcess = await this.paymentBuilder.build()
+
             await this.transactionBuilder.build(paymentProcess,configuration)
 
             await this.calculateTotalPayoutFundsNeeded(paymentProcess)
-            
-            await this.transactionProcessor.write(configuration, paymentProcess) 
+
+            await this.transactionProcessor.write(configuration, paymentProcess)
 
             await this.sender.send(configuration, paymentProcess)
 
             await this.summarizer.calculateTotals(paymentProcess)
 
             await this.summarizer.printTotals(paymentProcess)
-            
+
         } else {
             //TODO: Use a custom error class
             throw new Error ('Unkown Data Source')
         }
-        
+
     }
 
     private async calculateTotalPayoutFundsNeeded(paymentProcess: PaymentProcess) {
         let totalPayoutFundsNeeded = 0
 
-        paymentProcess.payouts.map((t) => {totalPayoutFundsNeeded += t.amount + t.fee}); 
+        paymentProcess.payouts.map((t) => {totalPayoutFundsNeeded += t.amount + t.fee});
 
         paymentProcess.totalPayoutFundsNeeded = totalPayoutFundsNeeded
 
@@ -68,7 +68,7 @@ export class PaymentProcessor implements IPaymentProcessor {
     }
 
     private async isValid(config : PaymentConfiguration) : Promise<boolean> {
-        
+
         if (config.blockDataSource != "ARCHIVEDB" && config.blockDataSource != "MINAEXPLORER") {
             return false
         }
@@ -76,4 +76,3 @@ export class PaymentProcessor implements IPaymentProcessor {
         return true
         }
  }
-
