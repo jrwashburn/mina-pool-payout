@@ -122,7 +122,7 @@ export async function getBlocks (key: string, minHeight: number, maxHeight: numb
         globalslotsincegenesis: meBlock.protocolState.consensusState.slotSinceGenesis,
         creatorpublickey: meBlock.creatorAccount.publicKey,
         winnerpublickey: meBlock.winnerAccount.publicKey,
-        receiverpublickey: meBlock.transactions.coinbaseReceiverAccount?.publicKey,
+        receiverpublickey: meBlock.transactions.coinbaseReceiverAccount.publicKey,
         coinbase: +meBlock.transactions.coinbase,
         feetransfertoreceiver: meBlock.transactions.feeTransfer.filter(x => x.recipient === meBlock.transactions.coinbaseReceiverAccount.publicKey).reduce((sum, y) => sum + (+y.fee), 0),
         feetransferfromcoinbase: meBlock.transactions.feeTransfer.filter(x => x.type === 'Fee_transfer_via_coinbase').reduce((sum, y) => sum + (+y.fee), 0),
