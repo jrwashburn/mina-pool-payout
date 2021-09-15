@@ -28,18 +28,20 @@ export type PayoutDetails = {
     payout: number,
     isEffectiveSuperCharge: boolean
   };
-  
+
   export type PayoutTransaction = {
     publicKey: string,
     amount: number,
     fee: number,
+    amountMina: number,
+    feeMina: number,
   };
 
   export interface IPayoutCalculator {
-    getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commisionRate: number ) 
+    getPayouts(blocks: Block[], stakers: Stake[], totalStake: number, commisionRate: number )
     : Promise<[
-        payoutJson: PayoutTransaction[], 
-        storePayout: PayoutDetails[], 
+        payoutJson: PayoutTransaction[],
+        storePayout: PayoutDetails[],
         blocksIncluded: number[],
         totalPayout: number
     ]>
