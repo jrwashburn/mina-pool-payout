@@ -1,10 +1,19 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { Block } from "../dataProvider/dataprovider-types";
 import { PayoutTransaction } from "../payoutCalculator/Model";
+import { IFileWriter } from "../../shared/Model";
 import { ISummarizer, PaymentProcess } from "./Model";
+import { PaymentConfiguration } from "../../configuration/Model";
+import TYPES from "../../composition/Types";
 
 @injectable()
 export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
+    private fileWriter : IFileWriter
+
+    constructor(@inject(TYPES.IFileWriter) fileWriter : IFileWriter) {
+        this.fileWriter = fileWriter
+    }
+
     async calculateTotals(base: PaymentProcess) : Promise<void> {
 
         const getTotalsFromBlocks = (blocks: Block[]) => {
@@ -22,7 +31,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
 
         const getTotalAmountSum = (transactions: PayoutTransaction[]) => {
             let amountsum = 0
-            
+
             transactions.forEach(transaction => {
                 amountsum += transaction.amount ?? 0
             })
@@ -32,7 +41,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
 
         const getTotalFeeSum = (transactions: PayoutTransaction[]) => {
             let feesum = 0
-            
+
             transactions.forEach(transaction => {
                 feesum += transaction.fee ?? 0
             })
@@ -75,5 +84,27 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
 
     }
 
+    async writeTotals(config: PaymentConfiguration, base: PaymentProcess): Promise<void> {
+        const runDateTime = new Date()
 
+        const { maximumHeight, totals } = base
+        const { minimumHeight } = config
+        const payoutSummaryFileName = this.generateOutputFileName("payout_summary", runDateTime, minimumHeight, maximumHeight);
+
+        const data = {
+            ...totals,
+            commissionRate: config.commissionRate,
+            stakingPoolPublicKey: config.stakingPoolPublicKey
+        }
+
+        this.fileWriter.write(payoutSummaryFileName, JSON.stringify(data))
+    }
+
+    private generateOutputFileName (identifier: string, runDateTime: Date, minimumHeight: number, maximumHeight: number) {
+        return `./src/data/${identifier}_${this.longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`;
+    }
+
+    private longDateString (d: Date) {
+        return d.toISOString().replace(/\D/g, '')
+    }
 }

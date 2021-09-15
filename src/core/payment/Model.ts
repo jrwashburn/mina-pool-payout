@@ -1,4 +1,5 @@
 import { Block } from "../dataProvider/dataprovider-types";
+import { PaymentConfiguration } from "../../configuration/Model";
 import {PayoutDetails,PayoutTransaction} from "../payoutCalculator/Model"
 
 export interface IPaymentProcessor {
@@ -43,6 +44,7 @@ export interface IBlockProcessor {
 export interface ISummarizer<T> {
     calculateTotals(base: T) : Promise<void>
     printTotals(base: T): Promise<void>
+    writeTotals(config: PaymentConfiguration, base: T): Promise<void>
 }
 
 

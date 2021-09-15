@@ -50,6 +50,8 @@ export class PaymentProcessor implements IPaymentProcessor {
 
             await this.summarizer.printTotals(paymentProcess)
 
+            await this.summarizer.writeTotals(configuration, paymentProcess)
+
         } else {
             //TODO: Use a custom error class
             throw new Error ('Unkown Data Source')
