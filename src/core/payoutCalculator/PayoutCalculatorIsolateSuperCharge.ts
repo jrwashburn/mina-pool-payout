@@ -171,6 +171,8 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
         publicKey: staker.publicKey,
         amount: amount,
         fee: 0,
+        amountMina: 0,
+        feeMina: 0,
       });
       totalPayout += amount;
     }

@@ -22,9 +22,13 @@ export class TransactionBuilder implements ITransactionBuilder {
       const item: PayoutTransaction = r.get(o.publicKey) || Object.assign({}, o, {
         amount: 0,
         fee: 0,
+        amountMina: 0,
+        feeMina: 0,
       });
       item.amount += o.amount;
       item.fee = config.payorSendTransactionFee;
+      item.amountMina = item.amount / 1000000000;
+      item.feeMina = item.fee / 1000000000;
       return r.set(o.publicKey, item);
     }, new Map).values()];
 
@@ -33,15 +37,15 @@ export class TransactionBuilder implements ITransactionBuilder {
     }
 
     console.log(`before substitutions and exclusions`)
-    
+
     console.table(transactions);
 
     paymentProcess.payoutsBeforeExclusions = transactions
 
     transactions = await this.substituteAndExcludePayToAddresses.run(transactions);
-    
+
     console.log(`after substitutions and exclusions`)
-    
+
     console.table(transactions);
 
     paymentProcess.payouts = transactions
@@ -51,4 +55,3 @@ export class TransactionBuilder implements ITransactionBuilder {
     }
 
 }
-
