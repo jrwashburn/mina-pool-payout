@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 export async function fetchGraphQL(
     operationsDoc: string,
     operationName: string,
-    variables: {},
+    variables: Record<string, any>,
     graphqlEndpoint: string,
 ) {
     const result = await fetch(graphqlEndpoint, {

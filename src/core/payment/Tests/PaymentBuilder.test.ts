@@ -48,9 +48,14 @@ describe('Payment Builder Tests', () => {
         getLatestHeight: () => new Promise(() => 11),
     };
 
-    const mockStakeDataProvider: IStakeDataProvider = { getStakes: () => new Promise(() => {}) };
+    const mockStakeDataProvider: IStakeDataProvider = {
+        getStakes: () =>
+            new Promise(() => {
+                1;
+            }),
+    };
 
-    const mockedPayoutCalculator: IPayoutCalculator = { getPayouts: () => new Promise(() => []) };
+    const mockedPayoutCalculator: IPayoutCalculator = { getPayouts: () => new Promise(() => [1]) };
 
     const mockedBlockDataFactory: IDataProviderFactory<IBlockDataProvider> = {
         build: () => {
@@ -94,11 +99,15 @@ describe('Payment Builder Tests', () => {
                     amount: 100,
                     fee: 10,
                     publicKey: '123645789',
+                    amountMina: 0,
+                    feeMina: 0,
                 },
                 {
                     amount: 100,
                     fee: 10,
                     publicKey: '223645789',
+                    amountMina: 0,
+                    feeMina: 0,
                 },
             ];
 
@@ -165,6 +174,16 @@ describe('Payment Builder Tests', () => {
                 payouts: expectedPayoutTransaction,
                 storePayout: expectedStorePayouts,
                 totalPayoutFundsNeeded: 0,
+                payoutsBeforeExclusions: [],
+                totals: {
+                    coinBaseSum: 10,
+                    feeTransferFromCoinBaseSum: 10,
+                    netCoinBaseReceived: 10,
+                    netMinaToPoolOperator: 11,
+                    payoutAmountsSum: 12,
+                    payoutFeesSum: 13,
+                    userCommandTransactionFeeSum: 12,
+                },
             };
 
             builder.build().then((result) => {
@@ -185,11 +204,15 @@ describe('Payment Builder Tests', () => {
                     amount: 100,
                     fee: 10,
                     publicKey: '123645789',
+                    amountMina: 0,
+                    feeMina: 0,
                 },
                 {
                     amount: 100,
                     fee: 10,
                     publicKey: '223645789',
+                    amountMina: 0,
+                    feeMina: 0,
                 },
             ];
 
@@ -256,6 +279,16 @@ describe('Payment Builder Tests', () => {
                 payouts: expectedPayoutTransaction,
                 storePayout: expectedStorePayouts,
                 totalPayoutFundsNeeded: 0,
+                payoutsBeforeExclusions: [],
+                totals: {
+                    coinBaseSum: 10,
+                    feeTransferFromCoinBaseSum: 10,
+                    netCoinBaseReceived: 10,
+                    netMinaToPoolOperator: 11,
+                    payoutAmountsSum: 11,
+                    payoutFeesSum: 11,
+                    userCommandTransactionFeeSum: 11,
+                },
             };
 
             builder.build().then((result) => {

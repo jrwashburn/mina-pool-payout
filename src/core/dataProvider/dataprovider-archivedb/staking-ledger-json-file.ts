@@ -10,6 +10,8 @@ export function getStakes(ledgerHash: string, key: string): [Stake[], number] {
     const ledgerDirectory = '../../../data/ledger'; // TODO: Move this back to .env
     const ledgerFile = `${ledgerDirectory}/${ledgerHash}.json`;
     // if (!fs.existsSync(ledgerFile)){ throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`)}
+
+    //TODO: Find a different way to handle this without doing require in const
     const ledger = require(ledgerFile);
 
     const stakers: Stake[] = ledger

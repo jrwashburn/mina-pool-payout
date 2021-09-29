@@ -16,7 +16,9 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
         // swap mapped addresses
         const payoutThreshold = ConfigurationManager.Setup.payoutThreshold;
 
+        //TODO: Find a different way to handle this without doing require in const
         const path = require('path');
+
         const substitutePayToFile = path.join('src', 'data', '.substitutePayTo');
         const filterPayouts = () => {
             return new Promise((resolve, reject) => {
