@@ -1,15 +1,15 @@
-import fetch from "node-fetch";
+import fetch from 'node-fetch';
 
 export async function fetchGraphQL(
     operationsDoc: string,
     operationName: string,
     variables: {},
-    graphqlEndpoint: string
+    graphqlEndpoint: string,
 ) {
     const result = await fetch(graphqlEndpoint, {
-        method: "POST",
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
             query: operationsDoc,
