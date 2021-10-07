@@ -1,12 +1,12 @@
-import { signPayment, keypair, signed, payment } from "@o1labs/client-sdk";
-import fs from "fs";
-import { fetchGraphQL } from "../infrastructure/graphql";
-import { PayoutTransaction } from "../core/payoutCalculator/Model";
+import { signPayment, keypair, signed, payment } from '@o1labs/client-sdk';
+import fs from 'fs';
+import { fetchGraphQL } from '../infrastructure/graphql';
+import { PayoutTransaction } from '../core/payoutCalculator/Model';
 
-const graphqlEndpoint = process.env.SEND_PAYMENT_GRAPHQL_ENDPOINT || "https://localhost:3085";
+const graphqlEndpoint = process.env.SEND_PAYMENT_GRAPHQL_ENDPOINT || 'https://localhost:3085';
 
-async function sendSignedPayment (payment: signed<payment>) {
-  const operationsDoc = `
+async function sendSignedPayment(payment: signed<payment>) {
+    const operationsDoc = `
     mutation SendSignedPayment {
       __typename
       sendPayment(
@@ -42,62 +42,60 @@ async function sendSignedPayment (payment: signed<payment>) {
     }
   `;
 
-  fs.writeFileSync("./src/data/" + payment.payload.nonce + ".gql", operationsDoc);
+    fs.writeFileSync('./src/data/' + payment.payload.nonce + '.gql', operationsDoc);
 
-  console.log(operationsDoc);
-  const { errors, data } = await fetchGraphQL(
-    operationsDoc,
-    "SendSignedPayment",
-    {},
-    graphqlEndpoint
-  );
-  if (errors) {
-    // handle those errors like a pro
-    console.error(errors);
-  }
-  return data;
+    console.log(operationsDoc);
+    const { errors, data } = await fetchGraphQL(operationsDoc, 'SendSignedPayment', {}, graphqlEndpoint);
+    if (errors) {
+        // handle those errors like a pro
+        console.error(errors);
+    }
+    return data;
 }
 
-export async function getNonce (publicKey: string) {
-  const operationsDoc = `
+export async function getNonce(publicKey: string) {
+    const operationsDoc = `
     query GetNonce($publicKey: PublicKey!) {
       account(publicKey: $publicKey) {
         inferredNonce
       }
     }
   `;
-  const { errors, data } = await fetchGraphQL(
-    operationsDoc,
-    "GetNonce",
-    { "publicKey": publicKey },
-    graphqlEndpoint
-  );
-  if (errors) {
-    console.log(`not able to get the nonce`)
-    console.log(errors);
-  }
-  return data.account.inferredNonce ?? 0;
+    const { errors, data } = await fetchGraphQL(operationsDoc, 'GetNonce', { publicKey: publicKey }, graphqlEndpoint);
+    if (errors) {
+        console.log(`not able to get the nonce`);
+        console.log(errors);
+    }
+    return data.account.inferredNonce ?? 0;
 }
 
-export async function sendSignedTransactions (payoutsToSign: PayoutTransaction[], keys: keypair, memo: string) {
-  let nonce = await getNonce(keys.publicKey);
-  payoutsToSign.reduce(async (previousPromise, payout) => {
-    await previousPromise;
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(async () => {
-        console.log(`#### Processing nonce ${nonce}...`);
-        const paymentTransaction: payment = { to: payout.publicKey, from: keys.publicKey, fee: payout.fee, amount: payout.amount, nonce: nonce, memo: memo };
-        try {
-          const signedPayment = signPayment(paymentTransaction, keys);
-          const data = await sendSignedPayment(signedPayment);
-          // Writes them to a file by nonce for broadcasting
-          fs.writeFileSync("./src/data/" + nonce + ".json", JSON.stringify(data));
-          nonce++;
-        }
-        catch (Error) { console.log(Error); }
-        finally { };
-        resolve();
-      }, 5000); //TODO: Move timeout to .env
-    });
-  }, Promise.resolve());
-};
+export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair, memo: string) {
+    let nonce = await getNonce(keys.publicKey);
+    payoutsToSign.reduce(async (previousPromise, payout) => {
+        await previousPromise;
+        return new Promise<void>((resolve, reject) => {
+            setTimeout(async () => {
+                console.log(`#### Processing nonce ${nonce}...`);
+                const paymentTransaction: payment = {
+                    to: payout.publicKey,
+                    from: keys.publicKey,
+                    fee: payout.fee,
+                    amount: payout.amount,
+                    nonce: nonce,
+                    memo: memo,
+                };
+                try {
+                    const signedPayment = signPayment(paymentTransaction, keys);
+                    const data = await sendSignedPayment(signedPayment);
+                    // Writes them to a file by nonce for broadcasting
+                    fs.writeFileSync('./src/data/' + nonce + '.json', JSON.stringify(data));
+                    nonce++;
+                } catch (Error) {
+                    console.log(Error);
+                } finally {
+                }
+                resolve();
+            }, 5000); //TODO: Move timeout to .env
+        });
+    }, Promise.resolve());
+}
