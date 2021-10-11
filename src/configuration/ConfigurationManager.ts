@@ -1,4 +1,7 @@
-import { PaymentConfiguration } from './Model';
+import { PaymentConfiguration, KeyFee } from './Model';
+import fs from 'fs';
+import parse from 'csv-parse';
+
 
 export class ConfigurationManager {
     public static Setup: PaymentConfiguration;
@@ -12,6 +15,7 @@ export class ConfigurationManager {
                 publicKey: process.env.SEND_PUBLIC_KEY || '',
             },
             payorSendTransactionFee: (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000,
+            payorSpecificTransactionFees: getPayorSpecificFees(args.specificpayorfees),
             minimumConfirmations: Number(process.env.MIN_CONFIRMATIONS) || 290,
             minimumHeight: args.minheight,
             configuredMaximum: args.maxheight,
@@ -34,3 +38,19 @@ export class ConfigurationManager {
         }
     }
 }
+const getPayorSpecificFees = (specificpayorfees: boolean): KeyFee[] => {
+    if (specificpayorfees && fs.existsSync('../data/.negociatedFees'))
+    {
+        console.log('Using Payor Specific fees.')
+
+        const alt = fs.createReadStream('../data/.negociatedFees')
+            .pipe(parse({delimiter: '|'}))
+            .on('data', (keyfee) => {
+                return { publicKey: keyfee[0], fee: keyfee[1]}
+            })
+            
+   }
+
+   return []
+}
+
