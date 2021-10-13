@@ -3,14 +3,17 @@ import TYPES from '../../composition/Types';
 import { PaymentConfiguration } from '../../configuration/Model';
 import { ISubstituteAndExcludePayToAddresses, PaymentProcess } from '../payment/Model';
 import { PayoutTransaction } from '../payoutCalculator/Model';
-import { ITransactionBuilder } from './Model';
+import { ITransactionBuilder, IFeeCalculatorFactory, IFeeCalculator } from './Model';
 
 @injectable()
 export class TransactionBuilder implements ITransactionBuilder {
     private substituteAndExcludePayToAddresses: ISubstituteAndExcludePayToAddresses;
+    private feeCalculator: IFeeCalculator
 
-    constructor(@inject(TYPES.IAddressRemover) addressRemover: ISubstituteAndExcludePayToAddresses) {
+    constructor(@inject(TYPES.IAddressRemover) addressRemover: ISubstituteAndExcludePayToAddresses,
+    @inject(TYPES.FeeCalculatorFactory) feeCalculatorFactory: IFeeCalculatorFactory) {
         this.substituteAndExcludePayToAddresses = addressRemover;
+        this.feeCalculator = feeCalculatorFactory.create('none')
     }
     async build(paymentProcess: PaymentProcess, config: PaymentConfiguration): Promise<PayoutTransaction[]> {
         // Aggregate to a single transaction per key and track the total for funding transaction
@@ -29,9 +32,11 @@ export class TransactionBuilder implements ITransactionBuilder {
                             feeMina: 0,
                         });
                     item.amount += o.amount;
+                    this.feeCalculator.calculate(item, config);
                     item.fee = config.payorSendTransactionFee;
                     item.amountMina = item.amount / 1000000000;
                     item.feeMina = item.fee / 1000000000;
+                    
                     return r.set(o.publicKey, item);
                 }, new Map())
                 .values(),

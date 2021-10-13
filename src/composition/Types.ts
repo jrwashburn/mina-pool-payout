@@ -5,6 +5,8 @@ const TYPES = {
     MinaExplorerDataProvider: Symbol('MinaExplorerDataProvider'),
     MinaExplorerStakeDataProvider: Symbol('MinaExplorerStakeDataProvider'),
     StakeDataProviderFactory: Symbol('StakeDataProviderFactory'),
+    FeeCalculatorFactory: Symbol('FeeCalculatorFactory'),
+    IFeeCalculator: Symbol('IFeeCalculator'),
     IAddressRemover: Symbol('IAddressRemover'),
     IBlockProcessor: Symbol('IBlockProcessor'),
     IPaymentBuilder: Symbol('IPaymentBuilder'),

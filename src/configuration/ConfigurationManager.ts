@@ -47,8 +47,7 @@ const getPayorSpecificFees = (specificpayorfees: boolean): KeyFee[] => {
             .pipe(parse({delimiter: '|'}))
             .on('data', (keyfee) => {
                 return { publicKey: keyfee[0], fee: keyfee[1]}
-            })
-            
+            })  
    }
 
    return []
