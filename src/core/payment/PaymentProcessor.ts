@@ -28,7 +28,7 @@ export class PaymentProcessor implements IPaymentProcessor {
     }
 
     async run(args: any): Promise<void> {
-        ConfigurationManager.build(args);
+        await ConfigurationManager.build(args);
 
         const configuration = ConfigurationManager.Setup;
 

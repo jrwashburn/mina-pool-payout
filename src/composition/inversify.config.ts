@@ -11,7 +11,7 @@ import {
     ISummarizer,
     PaymentProcess,
 } from '../core/payment/Model';
-import { IPayoutCalculator } from '../core/payoutCalculator/Model';
+import { IFeeCalculatorFactory, IPayoutCalculator } from '../core/payoutCalculator/Model';
 import { BlockProcessor } from '../core/payment/BlockProcessor';
 import { PaymentBuilder } from '../core/payment/PaymentBuilder';
 import { PaymentProcessor } from '../core/payment/PaymentProcessor';
@@ -26,9 +26,11 @@ import { TransactionProcessor } from '../core/transaction/TransactionProcessor';
 import { PayoutCalculatorIsolateSuperCharge } from '../core/payoutCalculator/PayoutCalculatorIsolateSuperCharge';
 import { SubstituteAndExcludePayToAddressesForSuperCharge } from '../core/payment/SubstituteAndExcludePayToAddressesForSuperCharge';
 import { PaymentSummarizer } from '../core/payment/PaymentSummarizer';
+import { FeeCalculatorFactory } from '../core/transaction/FeeCalculatorFactory';
 
 const container = new Container();
 
+container.bind<IFeeCalculatorFactory>(TYPES.FeeCalculatorFactory).to(FeeCalculatorFactory);
 container.bind<IBlockProcessor>(TYPES.IBlockProcessor).to(BlockProcessor);
 container.bind<IPaymentBuilder>(TYPES.IPaymentBuilder).to(PaymentBuilder);
 container.bind<IPaymentProcessor>(TYPES.IPaymentProcessor).to(PaymentProcessor);

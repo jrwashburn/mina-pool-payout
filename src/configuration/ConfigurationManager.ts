@@ -1,7 +1,5 @@
 import { PaymentConfiguration, KeyFee } from './Model';
 import fs from 'fs';
-import parse from 'csv-parse';
-
 
 export class ConfigurationManager {
     public static Setup: PaymentConfiguration;
@@ -15,7 +13,7 @@ export class ConfigurationManager {
                 publicKey: process.env.SEND_PUBLIC_KEY || '',
             },
             payorSendTransactionFee: (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000,
-            payorSpecificTransactionFees: getPayorSpecificFees(args.specificpayorfees),
+            payorSpecificTransactionFees: await getPayorSpecificFees(args.specificpayorfees),
             minimumConfirmations: Number(process.env.MIN_CONFIRMATIONS) || 290,
             minimumHeight: args.minheight,
             configuredMaximum: args.maxheight,
@@ -23,6 +21,7 @@ export class ConfigurationManager {
             verbose: args.verbose,
             payoutHash: args.payouthash,
             payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0,
+            usepayorSpecificTransactionFees: args.specificpayorfees
         };
         if (Number.isNaN(this.Setup.commissionRate)) {
             console.log('ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file');
@@ -34,22 +33,34 @@ export class ConfigurationManager {
             );
         }
         if (this.Setup.stakingPoolPublicKey === '') {
-            console.log('WARNING: Staking Pool Public Key not provided - please specify POOL_PUBLIC_KEY in .env file');
+            console.log('WARNING: Staking Pool Public Key not prosvided - please specify POOL_PUBLIC_KEY in .env file');
         }
     }
 }
-const getPayorSpecificFees = (specificpayorfees: boolean): KeyFee[] => {
-    if (specificpayorfees && fs.existsSync('../data/.negociatedFees'))
-    {
-        console.log('Using Payor Specific fees.')
+const getPayorSpecificFees = (specificpayorfees: boolean): KeyFee => {
 
-        const alt = fs.createReadStream('../data/.negociatedFees')
-            .pipe(parse({delimiter: '|'}))
-            .on('data', (keyfee) => {
-                return { publicKey: keyfee[0], fee: keyfee[1]}
-            })  
+    const path = `${__dirname}/../data/.negociatedFees`
+
+    if (specificpayorfees && fs.existsSync(path))
+    {
+        let fees : KeyFee = {}
+
+        console.log('Found .negociatedFees file. Using Payor Specific fees.')
+
+        const raw = fs.readFileSync(path, 'utf-8');
+
+        const rows = raw.split(/\r?\n/);
+
+        rows.forEach(x => {
+            const arr = x.split('|');
+            fees[arr[0]] = { fee: Number.parseFloat(arr[1]) * 1000000000 };
+        })
+
+        return fees;
    }
 
-   return []
+   return {};
 }
+
+
 

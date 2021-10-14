@@ -16,7 +16,8 @@ export interface ISender {
 export interface IFeeCalculatorFactory {
     create(calculatorType: string): IFeeCalculator
 }
-
 export interface IFeeCalculator {
     calculate(transaction: PayoutTransaction, config: PaymentConfiguration): Promise<void>;
 }
+
+

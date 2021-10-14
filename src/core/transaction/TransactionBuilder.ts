@@ -31,12 +31,9 @@ export class TransactionBuilder implements ITransactionBuilder {
                             amountMina: 0,
                             feeMina: 0,
                         });
+
                     item.amount += o.amount;
                     this.feeCalculator.calculate(item, config);
-                    item.fee = config.payorSendTransactionFee;
-                    item.amountMina = item.amount / 1000000000;
-                    item.feeMina = item.fee / 1000000000;
-                    
                     return r.set(o.publicKey, item);
                 }, new Map())
                 .values(),

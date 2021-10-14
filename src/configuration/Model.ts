@@ -5,7 +5,7 @@ export interface PaymentConfiguration {
     stakingPoolPublicKey: string;
     payoutMemo: string;
     payorSendTransactionFee: number;
-    payorSpecificTransactionFees: KeyFee[];
+    payorSpecificTransactionFees: KeyFee;
     senderKeys: keypair;
     minimumConfirmations: number;
     minimumHeight: number;
@@ -14,6 +14,7 @@ export interface PaymentConfiguration {
     verbose: boolean;
     payoutHash: string;
     payoutThreshold: number;
+    usepayorSpecificTransactionFees: boolean;
 }
 
 export interface KeyFee {
