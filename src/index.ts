@@ -9,8 +9,7 @@ const oargs = yargs.options({
     payouthash: { type: 'string', alias: ['h', 'hash'] },
     minheight: { type: 'number', alias: ['m', 'min'], demandOption: true },
     maxheight: { type: 'number', alias: ['x', 'max'], default: Number.MAX_VALUE },
-    verbose: { type: 'boolean', alias: ['v'], default: false },
-    specificpayorfees: { type: 'boolean', alias: 'pf', default: false}
+    verbose: { type: 'boolean', alias: ['v'], default: false }
 }).argv;
 
 const main = async () => {

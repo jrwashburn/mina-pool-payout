@@ -1,3 +1,4 @@
+import { IFileWriter } from '../../../shared/Model';
 import { Block } from '../../dataProvider/dataprovider-types';
 import { PaymentProcess } from '../Model';
 import { PaymentSummarizer } from '../PaymentSummarizer';
@@ -5,7 +6,14 @@ import { PaymentSummarizer } from '../PaymentSummarizer';
 describe('Payment Summarizer tests', () => {
     describe('should be succesful', () => {
         it('when payment process is finished', () => {
-            const summarizer = new PaymentSummarizer();
+
+            const mockFileWriter: IFileWriter = {
+                write: (filename, obj) => {
+                    return new Promise(() => {})
+                }
+            };
+
+            const summarizer = new PaymentSummarizer(mockFileWriter);
 
             const mockedBlocks: Block[] = [
                 {

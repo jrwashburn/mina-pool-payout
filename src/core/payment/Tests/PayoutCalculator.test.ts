@@ -1,3 +1,4 @@
+import { KeyCommissionRate } from '../../../configuration/Model';
 import { Block, Stake } from '../../dataProvider/dataprovider-types';
 import { PayoutCalculator } from '../../payoutCalculator/PayoutCalculator';
 
@@ -162,7 +163,9 @@ describe('Payout Calculator tests', () => {
                 200,
             ];
 
-            return calculator.getPayouts(mockedBlocks, mockStakers, 200, 100).then((result) => {
+            let commissionRates : KeyCommissionRate = {}
+
+            return calculator.getPayouts(mockedBlocks, mockStakers, 11, 0.11, commissionRates).then((result) => {
                 expect(result).toStrictEqual(mockResult);
             });
         });
@@ -222,7 +225,9 @@ describe('Payout Calculator tests', () => {
             ];
             const totalStake = 10;
 
-            return calculator.getPayouts(mockedBlocks, mockStakers, 10, 100).then((result) => {
+            let commissionRates : KeyCommissionRate = {}
+
+            return calculator.getPayouts(mockedBlocks, mockStakers, 10, 100, commissionRates).then((result) => {
                 expect(result).toThrow();
             });
         });

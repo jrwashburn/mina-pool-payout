@@ -101,8 +101,9 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
 
         const data = {
             ...totals,
-            commissionRate: config.commissionRate,
+            defaultCommissionRate: config.defaultCommissionRate,
             stakingPoolPublicKey: config.stakingPoolPublicKey,
+            payorComissionRates: config.commissionRatesByPublicKey
         };
 
         this.fileWriter.write(payoutSummaryFileName, JSON.stringify(data));

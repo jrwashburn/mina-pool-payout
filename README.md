@@ -107,21 +107,16 @@ In the example content below, the first row would cause any payouts to the first
 
 To enable these features, create a file src/data/.substitutePayTo and configure according to your situation.  
 
-## Using payor specific Fees (New!)
-You can use payor specific fees. They will override the value of `SEND_TRANSACTION_FEE` based on the public key specified. To use this feature, 
-please create a file named ".negociatedFees" in the src/data directory. The file should contain a list of "public key|fee" combination. Note that the fee should be expressed in mina. Example:
+## Using payor specific commission rates (New!)
+You can use payor specific commission rates. They will override the value of `COMMISSION_RATE` based on the public key specified. To use this feature, 
+please create a file named ".negociatedFees" in the src/data directory. The file should contain a list of "public key|commission rate" combination. Note that the fee should be expressed as a number (can be a decimal). Example:
 
     ```
     B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|0.012573
     B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|0.012544
     ```
 
-To control whether you want to use the file or not, for execution add the `--pf` parameter. Here is an example:
-
-```npm run payout -- -m=0 -x=1000 --pf```
-
-Note that you can also especify the parameter as `-specificpayorfees`. If no parameter is provided, the file will be ignored. 
-
+If no file is present, the process will use the default `COMMISSION_RATE` value.  
 
 # Running the script
 

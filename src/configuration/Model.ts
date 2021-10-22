@@ -1,11 +1,11 @@
 import { keypair } from '@o1labs/client-sdk';
 
 export interface PaymentConfiguration {
-    commissionRate: number;
+    defaultCommissionRate: number;
+    commissionRatesByPublicKey: KeyCommissionRate,
     stakingPoolPublicKey: string;
     payoutMemo: string;
     payorSendTransactionFee: number;
-    payorSpecificTransactionFees: KeyFee;
     senderKeys: keypair;
     minimumConfirmations: number;
     minimumHeight: number;
@@ -14,9 +14,8 @@ export interface PaymentConfiguration {
     verbose: boolean;
     payoutHash: string;
     payoutThreshold: number;
-    usepayorSpecificTransactionFees: boolean;
 }
 
-export interface KeyFee {
-    [publicKey: string] : {fee: number}
+export interface KeyCommissionRate {
+    [publicKey: string] : {commissionRate: number}
 }

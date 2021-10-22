@@ -1,11 +1,13 @@
-import { PaymentConfiguration, KeyFee } from './Model';
+import { PaymentConfiguration, KeyCommissionRate } from './Model';
 import fs from 'fs';
+import { getCommentRange } from 'typescript';
 
 export class ConfigurationManager {
     public static Setup: PaymentConfiguration;
     public static async build(args: any) {
         this.Setup = {
-            commissionRate: Number(process.env.COMMISSION_RATE),
+            defaultCommissionRate: Number(process.env.COMMISSION_RATE),
+            commissionRatesByPublicKey: await getComissionRates(),
             stakingPoolPublicKey: process.env.POOL_PUBLIC_KEY || '',
             payoutMemo: process.env.POOL_MEMO || 'mina-pool-payout',
             senderKeys: {
@@ -13,17 +15,15 @@ export class ConfigurationManager {
                 publicKey: process.env.SEND_PUBLIC_KEY || '',
             },
             payorSendTransactionFee: (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000,
-            payorSpecificTransactionFees: await getPayorSpecificFees(args.specificpayorfees),
             minimumConfirmations: Number(process.env.MIN_CONFIRMATIONS) || 290,
             minimumHeight: args.minheight,
             configuredMaximum: args.maxheight,
             blockDataSource: process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB',
             verbose: args.verbose,
             payoutHash: args.payouthash,
-            payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0,
-            usepayorSpecificTransactionFees: args.specificpayorfees
+            payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0
         };
-        if (Number.isNaN(this.Setup.commissionRate)) {
+        if (Number.isNaN(this.Setup.defaultCommissionRate)) {
             console.log('ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file');
             throw new Error('.env COMMISSION_RATE not set');
         }
@@ -37,15 +37,15 @@ export class ConfigurationManager {
         }
     }
 }
-const getPayorSpecificFees = (specificpayorfees: boolean): KeyFee => {
+const getComissionRates = async (): Promise<KeyCommissionRate> => {
 
     const path = `${__dirname}/../data/.negociatedFees`
 
-    if (specificpayorfees && fs.existsSync(path))
+    if (fs.existsSync(path))
     {
-        let fees : KeyFee = {}
+        let commissionRates : KeyCommissionRate = {}
 
-        console.log('Found .negociatedFees file. Using Payor Specific fees.')
+        console.log('Found .negociatedFees file. Using Payor Specific Commission Rates.')
 
         const raw = fs.readFileSync(path, 'utf-8');
 
@@ -53,10 +53,10 @@ const getPayorSpecificFees = (specificpayorfees: boolean): KeyFee => {
 
         rows.forEach(x => {
             const arr = x.split('|');
-            fees[arr[0]] = { fee: Number.parseFloat(arr[1]) * 1000000000 };
+            commissionRates[arr[0]] = { commissionRate: Number.parseFloat(arr[1]) };
         })
 
-        return fees;
+        return commissionRates;
    }
 
    return {};

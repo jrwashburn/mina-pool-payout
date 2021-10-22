@@ -1,3 +1,4 @@
+import { KeyCommissionRate } from '../../configuration/Model';
 import { Block, Stake } from '../dataProvider/dataprovider-types';
 import { IFeeCalculator } from '../transaction/Model';
 
@@ -43,6 +44,7 @@ export interface IPayoutCalculator {
         stakers: Stake[],
         totalStake: number,
         commisionRate: number,
+        comissionRates: KeyCommissionRate
     ): Promise<
         [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]
     >;
