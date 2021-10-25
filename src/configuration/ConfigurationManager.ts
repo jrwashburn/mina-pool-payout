@@ -37,27 +37,31 @@ export class ConfigurationManager {
         }
     }
 }
+
 const getComissionRates = async (): Promise<KeyCommissionRate> => {
+    const path = `${__dirname}/../data/.negotiatedFees`;
 
-    const path = `${__dirname}/../data/.negotiatedFees`
-
-    if (fs.existsSync(path))
-    {
-        let commissionRates : KeyCommissionRate = {}
+    if (fs.existsSync(path)) {
+        let commissionRates: KeyCommissionRate = {}
 
         console.log('Found .negotiatedFees file. Using Payor Specific Commission Rates.')
 
         const raw = fs.readFileSync(path, 'utf-8');
 
         const rows = raw.split(/\r?\n/);
-
-        rows.forEach(x => {
+        let takeRate = 0.0;
+        rows.forEach((x) => {
             const arr = x.split('|');
-            commissionRates[arr[0]] = { commissionRate: Number.parseFloat(arr[1]) };
-        })
+            takeRate = Number.parseFloat(arr[1]);
+            if (takeRate < 0.0 || takeRate > 0.5) {
+                console.log('ERROR: Negotieated Fees are outside of acceptable ranges 0.0-0.5');
+                throw new Error('Key-specific .negotiatedFees are less than 0% or greater than 50% for ' + x);
+            }
+            commissionRates[arr[0]] = { commissionRate: takeRate };
+        });
 
         return commissionRates;
-   }
+    }
 
-   return {};
-}
+    return {};
+};
