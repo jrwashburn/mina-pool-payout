@@ -33,19 +33,19 @@ export class ConfigurationManager {
             );
         }
         if (this.Setup.stakingPoolPublicKey === '') {
-            console.log('WARNING: Staking Pool Public Key not prosvided - please specify POOL_PUBLIC_KEY in .env file');
+            console.log('WARNING: Staking Pool Public Key not provided - please specify POOL_PUBLIC_KEY in .env file');
         }
     }
 }
 const getComissionRates = async (): Promise<KeyCommissionRate> => {
 
-    const path = `${__dirname}/../data/.negociatedFees`
+    const path = `${__dirname}/../data/.negotiatedFees`
 
     if (fs.existsSync(path))
     {
         let commissionRates : KeyCommissionRate = {}
 
-        console.log('Found .negociatedFees file. Using Payor Specific Commission Rates.')
+        console.log('Found .negotiatedFees file. Using Payor Specific Commission Rates.')
 
         const raw = fs.readFileSync(path, 'utf-8');
 
@@ -61,6 +61,3 @@ const getComissionRates = async (): Promise<KeyCommissionRate> => {
 
    return {};
 }
-
-
-

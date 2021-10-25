@@ -30,7 +30,7 @@ export class TransactionBuilder implements ITransactionBuilder {
                         });
 
                     item.amount += o.amount;
-                    item.fee = config.payorSendTransactionFee
+                    item.fee = config.payorSendTransactionFee;
                     item.amountMina = item.amount / 1000000000;
                     item.feeMina = item.fee / 1000000000;
                     return r.set(o.publicKey, item);
