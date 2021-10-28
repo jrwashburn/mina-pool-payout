@@ -9,10 +9,12 @@ const oargs = yargs.options({
     payouthash: { type: 'string', alias: ['h', 'hash'] },
     minheight: { type: 'number', alias: ['m', 'min'], demandOption: true },
     maxheight: { type: 'number', alias: ['x', 'max'], default: Number.MAX_VALUE },
-    verbose: { type: 'boolean', alias: ['v'], default: false },
+    verbose: { type: 'boolean', alias: ['v'], default: false }
 }).argv;
 
 const main = async () => {
+    console.log('*** MINAPOOL PAYOUT v0.0.1 ***\n')
+
     const payment = Container.get<IPaymentProcessor>(TYPES.IPaymentProcessor);
     payment.run(oargs);
 };

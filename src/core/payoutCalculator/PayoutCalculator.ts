@@ -2,6 +2,7 @@ import { stakeIsLocked } from '../../utils/staking-ledger-util';
 import { injectable } from 'inversify';
 import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
 import { Block, Stake } from '../dataProvider/dataprovider-types';
+import { KeyCommissionRate } from '../../configuration/Model';
 
 // per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
 // see https://minaprotocol.com/docs/advanced/foundation-delegation-program
@@ -13,7 +14,8 @@ export class PayoutCalculator implements IPayoutCalculator {
         blocks: Block[],
         stakers: Stake[],
         totalStake: number,
-        commissionRate: number,
+        defaultCommissionRate: number,
+        commissionRates: KeyCommissionRate
     ): Promise<
         [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]
     > {
@@ -81,6 +83,8 @@ export class PayoutCalculator implements IPayoutCalculator {
                     const effectiveCommonPoolWeighting =
                         effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes;
 
+                    const commissionRate = commissionRates[staker.publicKey].commissionRate || defaultCommissionRate;
+
                     let blockTotal = 0;
                     if (staker.shareClass == 'Common') {
                         blockTotal =
@@ -135,6 +139,8 @@ export class PayoutCalculator implements IPayoutCalculator {
                     publicKey: staker.publicKey,
                     amount: amount,
                     fee: 0,
+                    amountMina: 0,
+                    feeMina: 0
                 });
                 totalPayout += amount;
             }

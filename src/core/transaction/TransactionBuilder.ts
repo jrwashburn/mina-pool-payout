@@ -28,6 +28,7 @@ export class TransactionBuilder implements ITransactionBuilder {
                             amountMina: 0,
                             feeMina: 0,
                         });
+
                     item.amount += o.amount;
                     item.fee = config.payorSendTransactionFee;
                     item.amountMina = item.amount / 1000000000;

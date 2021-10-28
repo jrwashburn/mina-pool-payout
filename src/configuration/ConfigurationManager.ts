@@ -1,10 +1,13 @@
-import { PaymentConfiguration } from './Model';
+import { PaymentConfiguration, KeyCommissionRate } from './Model';
+import fs from 'fs';
+import { getCommentRange } from 'typescript';
 
 export class ConfigurationManager {
     public static Setup: PaymentConfiguration;
     public static async build(args: any) {
         this.Setup = {
-            commissionRate: Number(process.env.COMMISSION_RATE),
+            defaultCommissionRate: Number(process.env.COMMISSION_RATE),
+            commissionRatesByPublicKey: await getComissionRates(),
             stakingPoolPublicKey: process.env.POOL_PUBLIC_KEY || '',
             payoutMemo: process.env.POOL_MEMO || 'mina-pool-payout',
             senderKeys: {
@@ -18,9 +21,9 @@ export class ConfigurationManager {
             blockDataSource: process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB',
             verbose: args.verbose,
             payoutHash: args.payouthash,
-            payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0,
+            payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0
         };
-        if (Number.isNaN(this.Setup.commissionRate)) {
+        if (Number.isNaN(this.Setup.defaultCommissionRate)) {
             console.log('ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file');
             throw new Error('.env COMMISSION_RATE not set');
         }
@@ -34,3 +37,31 @@ export class ConfigurationManager {
         }
     }
 }
+
+const getComissionRates = async (): Promise<KeyCommissionRate> => {
+    const path = `${__dirname}/../data/.negotiatedFees`;
+
+    if (fs.existsSync(path)) {
+        let commissionRates: KeyCommissionRate = {}
+
+        console.log('Found .negotiatedFees file. Using Payor Specific Commission Rates.')
+
+        const raw = fs.readFileSync(path, 'utf-8');
+
+        const rows = raw.split(/\r?\n/);
+        let takeRate = 0.0;
+        rows.forEach((x) => {
+            const arr = x.split('|');
+            takeRate = Number.parseFloat(arr[1]);
+            if (takeRate < 0.0 || takeRate > 0.5) {
+                console.log('ERROR: Negotieated Fees are outside of acceptable ranges 0.0-0.5');
+                throw new Error('Key-specific .negotiatedFees are less than 0% or greater than 50% for ' + x);
+            }
+            commissionRates[arr[0]] = { commissionRate: takeRate };
+        });
+
+        return commissionRates;
+    }
+
+    return {};
+};

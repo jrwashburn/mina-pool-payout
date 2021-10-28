@@ -1,4 +1,5 @@
 import { injectable } from 'inversify';
+import { KeyCommissionRate } from '../../configuration/Model';
 import { stakeIsLocked } from '../../utils/staking-ledger-util';
 import { Block, Stake } from '../dataProvider/dataprovider-types';
 import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
@@ -13,7 +14,8 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
         blocks: Block[],
         stakers: Stake[],
         totalStake: number,
-        commissionRate: number,
+        defaultCommissionRate: number,
+        commissionRates: KeyCommissionRate
     ): Promise<
         [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]
     > {
@@ -97,6 +99,9 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                             : 0;
 
                     let blockTotal = 0;
+
+                    const commissionRate = commissionRates[staker.publicKey]?.commissionRate || defaultCommissionRate;
+
                     if (staker.shareClass == 'Common') {
                         blockTotal =
                             Math.floor((1 - commissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting) +

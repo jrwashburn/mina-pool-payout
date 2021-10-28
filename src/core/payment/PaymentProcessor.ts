@@ -1,5 +1,4 @@
 import { IPaymentBuilder, IPaymentProcessor as IPaymentProcessor, ISummarizer, PaymentProcess } from './Model';
-import { PayoutTransaction } from '../payoutCalculator/Model';
 import { PaymentConfiguration } from '../../configuration/Model';
 import { ConfigurationManager } from '../../configuration/ConfigurationManager';
 import { inject, injectable } from 'inversify';
@@ -29,7 +28,7 @@ export class PaymentProcessor implements IPaymentProcessor {
     }
 
     async run(args: any): Promise<void> {
-        ConfigurationManager.build(args);
+        await ConfigurationManager.build(args);
 
         const configuration = ConfigurationManager.Setup;
 

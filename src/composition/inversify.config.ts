@@ -11,7 +11,7 @@ import {
     ISummarizer,
     PaymentProcess,
 } from '../core/payment/Model';
-import { IPayoutCalculator } from '../core/payoutCalculator/Model';
+import { IFeeCalculatorFactory, IPayoutCalculator } from '../core/payoutCalculator/Model';
 import { BlockProcessor } from '../core/payment/BlockProcessor';
 import { PaymentBuilder } from '../core/payment/PaymentBuilder';
 import { PaymentProcessor } from '../core/payment/PaymentProcessor';
