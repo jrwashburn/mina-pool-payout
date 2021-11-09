@@ -1,12 +1,13 @@
 import { PaymentConfiguration, KeyCommissionRate } from './Model';
 import fs from 'fs';
-import { getCommentRange } from 'typescript';
+import { getMinBlockHeight, getMaxBlockHeight } from '../core/dataProvider/dataprovider-minaexplorer/block-queries-gql'
 
 export class ConfigurationManager {
     public static Setup: PaymentConfiguration;
     public static async build(args: any) {
         this.Setup = {
             defaultCommissionRate: Number(process.env.COMMISSION_RATE),
+            epoch: args.epoch ?? Number(args.epoch),
             commissionRatesByPublicKey: await getComissionRates(),
             stakingPoolPublicKey: process.env.POOL_PUBLIC_KEY || '',
             payoutMemo: process.env.POOL_MEMO || 'mina-pool-payout',
@@ -34,6 +35,22 @@ export class ConfigurationManager {
         }
         if (this.Setup.stakingPoolPublicKey === '') {
             console.log('WARNING: Staking Pool Public Key not provided - please specify POOL_PUBLIC_KEY in .env file');
+        }
+
+        if (!this.Setup.epoch && (!this.Setup.minimumHeight || !this.Setup.configuredMaximum)) 
+        {
+            const msg = "ERROR: Minimum or maximum block height not provided.";
+            console.log(msg);
+            throw new Error(msg);
+        }
+
+        if (this.Setup.epoch) {
+            console.log(`Working for configured Epoch: ${this.Setup.epoch}`);
+            
+            this.Setup.minimumHeight = await getMinBlockHeight(this.Setup.epoch)
+            this.Setup.configuredMaximum = await getMaxBlockHeight(this.Setup.epoch)
+
+            console.log(`Epoch Minimum Height: ${this.Setup.minimumHeight} - Epoch Maximum Height: ${this.Setup.configuredMaximum}`);
         }
     }
 }

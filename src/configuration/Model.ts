@@ -2,6 +2,7 @@ import { keypair } from '@o1labs/client-sdk';
 
 export interface PaymentConfiguration {
     defaultCommissionRate: number;
+    epoch: number,
     commissionRatesByPublicKey: KeyCommissionRate,
     stakingPoolPublicKey: string;
     payoutMemo: string;
