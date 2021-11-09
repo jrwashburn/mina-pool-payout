@@ -134,7 +134,7 @@ You can run payout for full epoch by using the command `-e={EPOCH_NUMBER}`. This
 
 `npm run payout -- -e=14`
 
-The program will get min and max block height for the epoch from mina explorer.
+The program will get min and max block height for the epoch from mina explorer, or calculate based on fixed slots in epoch for Archivedb.
 
 # Running the script
 
