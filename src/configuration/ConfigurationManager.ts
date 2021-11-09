@@ -1,6 +1,8 @@
 import { PaymentConfiguration, KeyCommissionRate } from './Model';
 import fs from 'fs';
 import { getMinBlockHeight, getMaxBlockHeight } from '../core/dataProvider/dataprovider-minaexplorer/block-queries-gql'
+import { getMinBlockHeightBySlots, getMaxBlockHeightBySlots } from '../core/dataProvider/dataprovider-archivedb/block-queries-sql'
+
 
 export class ConfigurationManager {
     public static Setup: PaymentConfiguration;
@@ -8,6 +10,7 @@ export class ConfigurationManager {
         this.Setup = {
             defaultCommissionRate: Number(process.env.COMMISSION_RATE),
             epoch: args.epoch ?? Number(args.epoch),
+            slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
             commissionRatesByPublicKey: await getComissionRates(),
             stakingPoolPublicKey: process.env.POOL_PUBLIC_KEY || '',
             payoutMemo: process.env.POOL_MEMO || 'mina-pool-payout',
@@ -24,6 +27,35 @@ export class ConfigurationManager {
             payoutHash: args.payouthash,
             payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0
         };
+
+        await this.validate()
+
+        if (this.Setup.epoch) {
+            await this.setupEpochMode()
+        }
+    }
+    
+    private static async setupEpochMode() {
+        console.log(`Working for configured Epoch: ${this.Setup.epoch}`);
+        
+        if (this.Setup.blockDataSource === "ARCHIVEDB") {
+            const [minSlot,maxSlot] = await this.getMinMaxHeight(this.Setup.epoch, this.Setup.slotsInEpoch);
+            this.Setup.minimumHeight = await getMinBlockHeightBySlots(minSlot,maxSlot);
+            this.Setup.configuredMaximum = await getMaxBlockHeightBySlots(minSlot,maxSlot);
+        } else {
+            this.Setup.minimumHeight = await getMinBlockHeight(this.Setup.epoch)
+            this.Setup.configuredMaximum = await getMaxBlockHeight(this.Setup.epoch)
+        }
+        
+        console.log(`Epoch Minimum Height: ${this.Setup.minimumHeight} - Epoch Maximum Height: ${this.Setup.configuredMaximum}`);
+    }
+    private static async getMinMaxHeight(epoch: number, slotsInEpoch: number): Promise<[number, number]> {
+        const min = slotsInEpoch * epoch;
+        const max = slotsInEpoch * (epoch + 1) - 1;
+        return [min,max];
+    }
+
+    private static async validate() {
         if (Number.isNaN(this.Setup.defaultCommissionRate)) {
             console.log('ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file');
             throw new Error('.env COMMISSION_RATE not set');
@@ -42,15 +74,6 @@ export class ConfigurationManager {
             const msg = "ERROR: Minimum or maximum block height not provided.";
             console.log(msg);
             throw new Error(msg);
-        }
-
-        if (this.Setup.epoch) {
-            console.log(`Working for configured Epoch: ${this.Setup.epoch}`);
-            
-            this.Setup.minimumHeight = await getMinBlockHeight(this.Setup.epoch)
-            this.Setup.configuredMaximum = await getMaxBlockHeight(this.Setup.epoch)
-
-            console.log(`Epoch Minimum Height: ${this.Setup.minimumHeight} - Epoch Maximum Height: ${this.Setup.configuredMaximum}`);
         }
     }
 }

@@ -103,6 +103,26 @@ async function getNullParents(minHeight: number, maxHeight: number) {
     return heights.map((x) => x.height);
 }
 
+export async function getMinBlockHeightBySlots(minSlot: number, maxSlot: number) {
+    const result = await db.one<height>(`
+    select height from blocks where global_slot between $1 and $2
+    order by height asc
+    limit 1
+    `, [minSlot, maxSlot]);
+
+    return result.height;
+}
+
+export async function getMaxBlockHeightBySlots(minSlot: number, maxSlot: number) {
+    const result = await db.one<height>(`
+    select height from blocks where global_slot between $1 and $2
+    order by height desc
+    limit 1
+    `, [minSlot, maxSlot]);
+
+    return result.height;
+}
+
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
     let blocks: Blocks = await db.any(blockQuery, [key, minHeight, maxHeight]);
 
