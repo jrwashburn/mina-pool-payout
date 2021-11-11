@@ -100,7 +100,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
 
                     let blockTotal = 0;
 
-                    const commissionRate = commissionRates[staker.publicKey]?.commissionRate || defaultCommissionRate;
+                    const commissionRate = commissionRates[staker.publicKey] ? commissionRates[staker.publicKey].commissionRate : defaultCommissionRate;
 
                     if (staker.shareClass == 'Common') {
                         blockTotal =
