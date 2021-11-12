@@ -49,14 +49,18 @@ const getComissionRates = async (): Promise<KeyCommissionRate> => {
         const raw = fs.readFileSync(path, 'utf-8');
 
         const rows = raw.split(/\r?\n/);
+        
         let takeRate = 0.0;
         rows.forEach((x) => {
             const arr = x.split('|');
+
             takeRate = Number.parseFloat(arr[1]);
-            if (takeRate < 0.0 || takeRate > 0.5) {
-                console.log('ERROR: Negotieated Fees are outside of acceptable ranges 0.0-0.5');
+            
+            if (isNaN(takeRate) || takeRate < 0.0 || takeRate > 0.5) {
+                console.log('ERROR: Negotiated Fees are outside of acceptable ranges 0.0-0.5');
                 throw new Error('Key-specific .negotiatedFees are less than 0% or greater than 50% for ' + x);
             }
+
             commissionRates[arr[0]] = { commissionRate: takeRate };
         });
 
