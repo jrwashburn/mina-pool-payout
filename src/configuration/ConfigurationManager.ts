@@ -89,15 +89,20 @@ const getComissionRates = async (): Promise<KeyCommissionRate> => {
         const raw = fs.readFileSync(path, 'utf-8');
 
         const rows = raw.split(/\r?\n/);
-        let takeRate = 0.0;
-        rows.forEach((x) => {
-            const arr = x.split('|');
-            takeRate = Number.parseFloat(arr[1]);
-            if (takeRate < 0.0 || takeRate > 0.5) {
-                console.log('ERROR: Negotieated Fees are outside of acceptable ranges 0.0-0.5');
-                throw new Error('Key-specific .negotiatedFees are less than 0% or greater than 50% for ' + x);
+        
+        rows.forEach((x, index) => {
+            const [key, rate] = x.split('|');
+
+            const takeRate = Number.parseFloat(rate);
+            
+            const result = validateCommission(key, takeRate, index);
+            
+            if (!result.isValid) {
+                console.log(result.error);
+                throw new Error(result.error);
             }
-            commissionRates[arr[0]] = { commissionRate: takeRate };
+
+            commissionRates[key] = { commissionRate: takeRate };
         });
 
         return commissionRates;
@@ -105,3 +110,23 @@ const getComissionRates = async (): Promise<KeyCommissionRate> => {
 
     return {};
 };
+
+const validateCommission = (key : string, rate :number, index: number) => {
+    const line = index + 1;
+
+    let result = { error: "", isValid: false}
+
+    if (!key) {
+        return { ...result, error: `ERROR: Public Key is invalid at line ${line}. `}
+    }
+
+    if (isNaN(rate)) {
+        return { ...result, error: `ERROR: Negotiated Fee is not a number. Key: ${key} at line ${line}.`}
+    }
+
+    if (rate < 0.0 || rate > 0.5) {
+        return { ...result, error: `ERROR: Negotiated Fees is outside of acceptable ranges 0.0-0.5. Key: ${key} at line ${line}.`}
+    }
+
+    return { ...result, isValid: true}
+}
