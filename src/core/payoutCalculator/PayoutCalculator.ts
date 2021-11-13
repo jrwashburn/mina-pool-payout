@@ -83,7 +83,7 @@ export class PayoutCalculator implements IPayoutCalculator {
                     const effectiveCommonPoolWeighting =
                         effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes;
 
-                    const commissionRate = commissionRates[staker.publicKey].commissionRate || defaultCommissionRate;
+                        const commissionRate = commissionRates[staker.publicKey] ? commissionRates[staker.publicKey].commissionRate : defaultCommissionRate;
 
                     let blockTotal = 0;
                     if (staker.shareClass == 'Common') {
