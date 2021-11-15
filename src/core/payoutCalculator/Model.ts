@@ -44,12 +44,12 @@ export interface IPayoutCalculator {
         stakers: Stake[],
         totalStake: number,
         commisionRate: number,
-        comissionRates: KeyCommissionRate
+        comissionRates: KeyCommissionRate,
     ): Promise<
         [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]
     >;
 }
 
 export interface IFeeCalculatorFactory {
-    create():IFeeCalculator
+    create(): IFeeCalculator;
 }

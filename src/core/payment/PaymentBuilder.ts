@@ -33,7 +33,14 @@ export class PaymentBuilder implements IPaymentBuilder {
 
         const blockProvider = this.blockDataProviderFactory.build(config.blockDataSource);
 
-        const { configuredMaximum, minimumConfirmations, minimumHeight, stakingPoolPublicKey, defaultCommissionRate, commissionRatesByPublicKey } = config;
+        const {
+            configuredMaximum,
+            minimumConfirmations,
+            minimumHeight,
+            stakingPoolPublicKey,
+            defaultCommissionRate,
+            commissionRatesByPublicKey,
+        } = config;
 
         const latestHeight = await blockProvider.getLatestHeight();
 
@@ -65,7 +72,13 @@ export class PaymentBuilder implements IPaymentBuilder {
                 const ledgerBlocks = blocks.filter((x) => x.stakingledgerhash == ledgerHash);
 
                 const [ledgerPayouts, ledgerStorePayout, blocksIncluded, totalPayout] =
-                    await this.payoutCalculator.getPayouts(ledgerBlocks, stakers, totalStake, defaultCommissionRate, commissionRatesByPublicKey);
+                    await this.payoutCalculator.getPayouts(
+                        ledgerBlocks,
+                        stakers,
+                        totalStake,
+                        defaultCommissionRate,
+                        commissionRatesByPublicKey,
+                    );
 
                 payouts.push(...ledgerPayouts);
 

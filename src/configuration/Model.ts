@@ -2,10 +2,10 @@ import { keypair } from '@o1labs/client-sdk';
 
 export interface PaymentConfiguration {
     blockDataSource: string;
-    commissionRatesByPublicKey: KeyCommissionRate,
+    commissionRatesByPublicKey: KeyCommissionRate;
     configuredMaximum: number;
     defaultCommissionRate: number;
-    epoch: number,
+    epoch: number;
     minimumConfirmations: number;
     minimumHeight: number;
     payoutHash: string;
@@ -19,5 +19,5 @@ export interface PaymentConfiguration {
 }
 
 export interface KeyCommissionRate {
-    [publicKey: string] : {commissionRate: number}
+    [publicKey: string]: { commissionRate: number };
 }

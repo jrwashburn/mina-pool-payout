@@ -92,9 +92,9 @@ export async function getLatestHeight() {
     return data.blocks[0].blockHeight;
 }
 
-export async function getMinBlockHeight(epoch: number) {
-  const query = `query MinHeight {
-    blocks(
+export async function getMinMaxBlocksByEpoch(epoch: number) {
+    const query = `query MinMaxHeight{
+    minFromBlocks:blocks(
       query: {protocolState: {consensusState: {epoch: ${epoch}}}}
       sortBy: DATETIME_ASC
       limit: 1
@@ -104,17 +104,8 @@ export async function getMinBlockHeight(epoch: number) {
           blockHeight
         }
       }
-    }
-  }`;
-  
-  const { errors, data } = await fetchGraphQL(query, 'MinHeight', {}, graphqlEndpoint);
-  
-  return data.blocks[0].protocolState.consensusState.blockHeight;
-}
-
-export async function getMaxBlockHeight(epoch: number) {
-  const query = `query MaxHeight{
-    blocks(
+  },
+  maxFromBlocks: blocks(
       query: {protocolState: {consensusState: {epoch: ${epoch}}}}
       sortBy: DATETIME_DESC
       limit: 1
@@ -124,12 +115,15 @@ export async function getMaxBlockHeight(epoch: number) {
           blockHeight
         }
       }
-    }
+  }
   }`;
-  
-  const { errors, data } = await fetchGraphQL(query, 'MaxHeight', {}, graphqlEndpoint);
-  
-  return data.blocks[0].protocolState.consensusState.blockHeight;
+
+    const { errors, data } = await fetchGraphQL(query, 'MinMaxHeight', {}, graphqlEndpoint);
+
+    return {
+        min: data.minFromBlocks[0].protocolState.consensusState.blockHeight,
+        max: data.maxFromBlocks[0].protocolState.consensusState.blockHeight,
+    };
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {

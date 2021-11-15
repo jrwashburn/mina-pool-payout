@@ -103,24 +103,42 @@ async function getNullParents(minHeight: number, maxHeight: number) {
     return heights.map((x) => x.height);
 }
 
-export async function getMinBlockHeightBySlots(minSlot: number, maxSlot: number) {
-    const result = await db.one<height>(`
-    select height from blocks where global_slot between $1 and $2
-    order by height asc
-    limit 1
-    `, [minSlot, maxSlot]);
+async function getMinMaxSlotHeight(epoch: number): Promise<[number, number]> {
+    if (!process.env.NUM_SLOTS_IN_EPOCH) throw Error('ERROR: NUM_SLOTS_IN_EPOCH not present in .env file. ');
 
-    return result.height;
+    const slotsInEpoch = Number.parseInt(process.env.NUM_SLOTS_IN_EPOCH);
+
+    const min = slotsInEpoch * epoch;
+
+    const max = slotsInEpoch * (epoch + 1) - 1;
+
+    return [min, max];
 }
 
-export async function getMaxBlockHeightBySlots(minSlot: number, maxSlot: number) {
-    const result = await db.one<height>(`
-    select height from blocks where global_slot between $1 and $2
-    order by height desc
-    limit 1
-    `, [minSlot, maxSlot]);
+export async function getMinMaxBlocksByEpoch(epoch: number) {
+    const [min, max] = await getMinMaxSlotHeight(epoch);
 
-    return result.height;
+    const result = await db.one(`SELECT min(height) as minHeight, max(height) as maxHeight from blocks b
+    WHERE id IN
+    (
+    WITH RECURSIVE chain AS
+    (
+    SELECT id, parent_id FROM blocks b WHERE height = (select MAX(height) from blocks)
+    
+    UNION ALL
+    
+    SELECT b.id, b.parent_id FROM blocks b 
+    INNER JOIN chain
+    ON b.id = chain.parent_id
+    ) 
+    
+    SELECT distinct c.id
+    FROM chain c
+    )
+    and global_slot between ${min} and ${max}
+    `);
+
+    return { min: result.minheight, max: result.maxheight };
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {

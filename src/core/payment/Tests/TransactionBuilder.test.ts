@@ -40,6 +40,8 @@ describe('Transaction Builder Tests', () => {
                 verbose: false,
                 payoutHash: '',
                 payoutThreshold: 0,
+                epoch: 0,
+                slotsInEpoch: 0
             };
 
             const builder = new TransactionBuilder(mockAddressRemover);
