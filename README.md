@@ -128,6 +128,14 @@ please create a file named ".negotiatedFees" in the src/data directory. The file
 
 If no file is present, the process will use the default `COMMISSION_RATE` value.
 
+## Running payout for a full epoch
+
+You can run payout for full epoch by using the command `-e={EPOCH_NUMBER}`. This will ignore any min or max height if provided. Example:
+
+`npm run payout -- -e=14`
+
+The program will get min and max block height for the epoch from mina explorer, or calculate based on fixed slots in epoch for Archivedb. Note this is based on the .env file setting NUM_SLOTS_IN_EPOCH which is currently 7140 per mainnet consensus parameters.
+
 # Running the script
 
 -   Run `npm install` to install the project dependencies.

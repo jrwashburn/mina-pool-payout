@@ -15,7 +15,7 @@ export class PayoutCalculator implements IPayoutCalculator {
         stakers: Stake[],
         totalStake: number,
         defaultCommissionRate: number,
-        commissionRates: KeyCommissionRate
+        commissionRates: KeyCommissionRate,
     ): Promise<
         [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]
     > {
@@ -83,7 +83,9 @@ export class PayoutCalculator implements IPayoutCalculator {
                     const effectiveCommonPoolWeighting =
                         effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes;
 
-                        const commissionRate = commissionRates[staker.publicKey] ? commissionRates[staker.publicKey].commissionRate : defaultCommissionRate;
+                    const commissionRate = commissionRates[staker.publicKey]
+                        ? commissionRates[staker.publicKey].commissionRate
+                        : defaultCommissionRate;
 
                     let blockTotal = 0;
                     if (staker.shareClass == 'Common') {
@@ -140,7 +142,7 @@ export class PayoutCalculator implements IPayoutCalculator {
                     amount: amount,
                     fee: 0,
                     amountMina: 0,
-                    feeMina: 0
+                    feeMina: 0,
                 });
                 totalPayout += amount;
             }

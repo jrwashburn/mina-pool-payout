@@ -6,6 +6,9 @@ import { IBlockDataProvider } from './Models';
 @injectable()
 export class ArchiveBlockDataProvider implements IBlockDataProvider {
     //TODO: Refactor the core logic here
+    getMinMaxBlocksByEpoch(epoch: number): Promise<{ min: number; max: number }> {
+        return provider.getMinMaxBlocksByEpoch(epoch);
+    }
     async getLatestHeight(): Promise<number> {
         return await provider.getLatestHeight();
     }

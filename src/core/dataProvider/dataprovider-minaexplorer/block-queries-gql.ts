@@ -92,6 +92,40 @@ export async function getLatestHeight() {
     return data.blocks[0].blockHeight;
 }
 
+export async function getMinMaxBlocksByEpoch(epoch: number) {
+    const query = `query MinMaxHeight{
+    minFromBlocks:blocks(
+      query: {protocolState: {consensusState: {epoch: ${epoch}}}}
+      sortBy: DATETIME_ASC
+      limit: 1
+    ) {
+      protocolState {
+        consensusState {
+          blockHeight
+        }
+      }
+  },
+  maxFromBlocks: blocks(
+      query: {protocolState: {consensusState: {epoch: ${epoch}}}}
+      sortBy: DATETIME_DESC
+      limit: 1
+    ) {
+      protocolState {
+        consensusState {
+          blockHeight
+        }
+      }
+  }
+  }`;
+
+    const { errors, data } = await fetchGraphQL(query, 'MinMaxHeight', {}, graphqlEndpoint);
+
+    return {
+        min: data.minFromBlocks[0].protocolState.consensusState.blockHeight,
+        max: data.maxFromBlocks[0].protocolState.consensusState.blockHeight,
+    };
+}
+
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
     let flatBlocks: Blocks = [];
     const { errors, data } = await fetchGraphQL(

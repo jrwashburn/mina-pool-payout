@@ -7,6 +7,7 @@ export interface IDataProviderFactory<T> {
 export interface IBlockDataProvider {
     getLatestHeight(): Promise<number>;
     getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks>;
+    getMinMaxBlocksByEpoch(epoch: number): Promise<{ min: number; max: number }>;
 }
 
 export interface IStakeDataProvider {
