@@ -165,7 +165,7 @@ export async function getBlocks(key: string, minHeight: number, maxHeight: numbe
         });
     }
     // TODO move this up a layer to a helper / werapper - identical code in block-queries-sql.ts for archivedb.
-    const blockFile = `${__dirname}/../../data/.paidblocks`;
+    const blockFile = `${__dirname}/../../../data/.paidblocks`;
 
     const filterBlocks = () => {
         return new Promise((resolve, reject) => {
