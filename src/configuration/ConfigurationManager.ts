@@ -85,7 +85,7 @@ const getComissionRates = async (): Promise<KeyCommissionRate> => {
 
         const raw = fs.readFileSync(path, 'utf-8');
 
-        const rows = raw.split(/\r?\n/);
+        const rows = raw.split(/\r?\n/).filter(row => row);
 
         rows.forEach((x, index) => {
             const [key, rate] = x.split('|');
