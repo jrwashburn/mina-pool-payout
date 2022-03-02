@@ -53,9 +53,9 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
 -   Set `SEND_PRIVATE_KEY` to the sender private key
     The private key value can be retrieved from a pk file by running the mina advanced dump-keypair command, e.g.
 
-        ```
-        mina advanced dump-keypair --privkey-path keys/my-payout-wallet
-        ```
+    ```
+    mina advanced dump-keypair --privkey-path keys/my-payout-wallet
+    ```
 
 -   Set `SEND_PUBLIC_KEY` to the sender public key. It can also be blank if generating ephemeral keys.
 
@@ -109,10 +109,10 @@ The file is pipe-delimited and contains 2 columns - the first column is the publ
 
 In the example content below, the first row would cause any payouts to the first key to not be sent. This may be useful for the pool operator's keys. The second row would cause any payouts to the key ending in WCvh to be sent instead to the key ending in Ez3yB. This is useful for redirecting new tokens that would be paid to a locked account to go to an unlocked account instead.
 
-    ```
-    B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|EXCLUDE
-    B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|B62qoigHEtJCoZ5ekbGHWyr9hYfc6fkZ2A41h9vvVZuvty9amzEz3yB
-    ```
+```
+B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|EXCLUDE
+B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|B62qoigHEtJCoZ5ekbGHWyr9hYfc6fkZ2A41h9vvVZuvty9amzEz3yB
+```
 
 To enable these features, create a file src/data/.substitutePayTo and configure according to your situation.
 
@@ -121,10 +121,10 @@ To enable these features, create a file src/data/.substitutePayTo and configure 
 You can use payor specific commission rates. They will override the value of `COMMISSION_RATE` based on the public key specified. To use this feature,
 please create a file named ".negotiatedFees" in the src/data directory. The file should contain a list of "public key|commission rate" combination. Note that the fee should be expressed as a number (can be a decimal). Example:
 
-    ```
-    B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|0.012573
-    B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|0.012544
-    ```
+```
+B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|0.012573
+B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|0.012544
+```
 
 If no file is present, the process will use the default `COMMISSION_RATE` value.
 
