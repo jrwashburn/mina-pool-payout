@@ -1,36 +1,31 @@
-import { fetchGraphQL } from '../../../infrastructure/graphql';
+import { fetchGraphQL } from '../../../infrastructure/graphql-me';
 import { Stake, LedgerEntry } from '../dataprovider-types';
 import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util';
+import { gql } from '@apollo/client/core';
 
-const graphqlEndpoint = process.env.MINAEXPLORER_GRAPHQL_ENDPOINT || 'https://localhost:3085';
-
-const ledgerQuery = `
-query stakingLedger( $ledgerHash: String, $delegate: String) {
-  stakes(limit: 10000, query: {ledgerHash: $ledgerHash, delegate: $delegate}) {
-    pk
-    balance
-    delegate
-    timing {
-      cliff_amount
-      cliff_time
-      initial_minimum_balance
-      vesting_increment
-      vesting_period
+const LEDGERQUERY = gql`
+    query stakingLedger($ledgerHash: String, $delegate: String) {
+        stakes(limit: 10000, query: { ledgerHash: $ledgerHash, delegate: $delegate }) {
+            pk
+            balance
+            delegate
+            timing {
+                cliff_amount
+                cliff_time
+                initial_minimum_balance
+                vesting_increment
+                vesting_period
+            }
+        }
     }
-  }
-}`;
+`;
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards
 export async function getStakes(ledgerHash: string, key: string): Promise<[Stake[], number]> {
     let totalStakingBalance = 0;
     let stakers: Stake[] = [];
-    const { errors, data } = await fetchGraphQL(
-        ledgerQuery,
-        'stakingLedger',
-        { ledgerHash: ledgerHash, delegate: key },
-        graphqlEndpoint,
-    );
+    const { errors, data } = await fetchGraphQL(LEDGERQUERY, { ledgerHash: ledgerHash, delegate: key });
 
     if (errors) {
         console.log(errors);

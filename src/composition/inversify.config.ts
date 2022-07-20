@@ -1,6 +1,6 @@
 import { Container } from 'inversify';
-import TYPES from './Types';
 import 'reflect-metadata';
+import TYPES from './Types';
 
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../core/dataProvider/Models';
 import {
@@ -11,7 +11,7 @@ import {
     ISummarizer,
     PaymentProcess,
 } from '../core/payment/Model';
-import { IFeeCalculatorFactory, IPayoutCalculator } from '../core/payoutCalculator/Model';
+import { IPayoutCalculator } from '../core/payoutCalculator/Model';
 import { BlockProcessor } from '../core/payment/BlockProcessor';
 import { PaymentBuilder } from '../core/payment/PaymentBuilder';
 import { PaymentProcessor } from '../core/payment/PaymentProcessor';

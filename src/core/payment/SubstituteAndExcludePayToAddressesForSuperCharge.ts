@@ -1,7 +1,7 @@
 import { PayoutTransaction } from '../payoutCalculator/Model';
 import { ISubstituteAndExcludePayToAddresses } from './Model';
 import fs from 'fs';
-import parse from 'csv-parse';
+import { parse } from 'csv-parse';
 import { injectable } from 'inversify';
 import { ConfigurationManager } from '../../configuration/ConfigurationManager';
 

@@ -163,7 +163,7 @@ describe('Payout Calculator tests', () => {
                 200,
             ];
 
-            let commissionRates : KeyCommissionRate = {}
+            const commissionRates: KeyCommissionRate = {};
 
             return calculator.getPayouts(mockedBlocks, mockStakers, 11, 0.11, commissionRates).then((result) => {
                 expect(result).toStrictEqual(mockResult);
@@ -223,9 +223,8 @@ describe('Payout Calculator tests', () => {
                     untimedAfterSlot: 11,
                 },
             ];
-            const totalStake = 10;
 
-            let commissionRates : KeyCommissionRate = {}
+            const commissionRates: KeyCommissionRate = {};
 
             return calculator.getPayouts(mockedBlocks, mockStakers, 10, 100, commissionRates).then((result) => {
                 expect(result).toThrow();
