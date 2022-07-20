@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { signPayment, keypair, signed, payment } from '@o1labs/client-sdk';
 import fs from 'fs';
-import { sendPaymentGraphQL } from '../infrastructure/graphql-pay';
+import { sendPaymentGraphQL, fetchGraphQL } from '../infrastructure/graphql-pay';
 import { PayoutTransaction } from '../core/payoutCalculator/Model';
 import { gql } from '@apollo/client/core';
 
@@ -27,6 +27,7 @@ async function sendSignedPayment(payment: signed<payment>): Promise<any> {
         payment {
           amount
           fee
+          id
           kind
           memo
           nonce
@@ -61,7 +62,7 @@ export async function getNonce(publicKey: string): Promise<any> {
             }
         }
     `;
-    const { errors, data } = await sendPaymentGraphQL(operationsDoc, { publicKey: publicKey });
+    const { errors, data } = await fetchGraphQL(operationsDoc, { publicKey: publicKey });
     if (errors) {
         console.log(`not able to get the nonce`);
         console.log(errors);

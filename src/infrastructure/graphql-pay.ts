@@ -1,15 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import fetch from 'cross-fetch';
-import { ApolloClient, InMemoryCache, DocumentNode, ApolloQueryResult, HttpLink} from '@apollo/client/core';
+import { ApolloClient, ApolloQueryResult, DocumentNode, HttpLink, InMemoryCache } from '@apollo/client/core';
 
-const client = new ApolloClient({
+const mutationClient = new ApolloClient({
     link: new HttpLink({ uri: process.env.SEND_PAYMENT_GRAPHQL_ENDPOINT || 'https://localhost:3085', fetch }),
     cache: new InMemoryCache(),
 });
 
-export async function sendPaymentGraphQL(
+const queryClient = new ApolloClient({
+    link: new HttpLink({ uri: process.env.SEND_PAYMENT_GRAPHQL_ENDPOINT || 'https://localhost:3085', fetch }),
+    cache: new InMemoryCache(),
+});
+
+export async function sendPaymentGraphQL(mutation: DocumentNode, variables: Record<string, any>): Promise<any> {
+    return await mutationClient.mutate({ mutation: mutation, variables: variables });
+}
+
+export async function fetchGraphQL(
     query: DocumentNode,
     variables: Record<string, any>,
 ): Promise<ApolloQueryResult<any>> {
-    return await client.query({ query: query, variables: variables });
+    return await queryClient.query({ query: query, variables: variables });
 }
