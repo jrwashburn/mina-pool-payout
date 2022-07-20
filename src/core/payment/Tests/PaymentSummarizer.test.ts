@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { IFileWriter } from '../../../shared/Model';
 import { Block } from '../../dataProvider/dataprovider-types';
 import { PaymentProcess } from '../Model';
@@ -5,12 +6,12 @@ import { PaymentSummarizer } from '../PaymentSummarizer';
 
 describe('Payment Summarizer tests', () => {
     describe('should be succesful', () => {
-        it('when payment process is finished', () => {
-
+        it('when payment process is finished', async () => {
             const mockFileWriter: IFileWriter = {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 write: (filename, obj) => {
-                    return new Promise(() => {})
-                }
+                    return new Promise(() => {});
+                },
             };
 
             const summarizer = new PaymentSummarizer(mockFileWriter);
@@ -66,9 +67,8 @@ describe('Payment Summarizer tests', () => {
                 },
             };
 
-            return summarizer.calculateTotals(process).then((result) => {
-                expect(result).toStrictEqual(process);
-            });
+            const result = await summarizer.calculateTotals(process);
+            expect(result).toStrictEqual(process);
         });
     });
 });

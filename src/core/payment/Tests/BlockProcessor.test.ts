@@ -10,12 +10,11 @@ describe('BlockProcessor Tests', () => {
             });
         });
 
-        it('when finallityheight is higher', () => {
+        it('when finallityheight is higher', async () => {
             const blockProcessor = new BlockProcessor();
 
-            return blockProcessor.determineLastBlockHeightToProcess(5, 1, 12).then((result) => {
-                expect(5).toBe(result);
-            });
+            const result = await blockProcessor.determineLastBlockHeightToProcess(5, 1, 12);
+            expect(5).toBe(result);
         });
     });
 });

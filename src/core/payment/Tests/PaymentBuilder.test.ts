@@ -41,13 +41,14 @@ describe('Payment Builder Tests', () => {
     ];
 
     const mockBlockDataProvider: IBlockDataProvider = {
-        getBlocks: () => new Promise(() => {
-            return mockedBlocks;
-        }),
+        getBlocks: () =>
+            new Promise(() => {
+                return mockedBlocks;
+            }),
         getLatestHeight: () => new Promise(() => 11),
-        getMinMaxBlocksByEpoch: function (epoch: number): Promise<{ min: number; max: number; }> {
+        getMinMaxBlocksByEpoch: function (): Promise<{ min: number; max: number }> {
             throw new Error('Function not implemented.');
-        }
+        },
     };
 
     const mockStakeDataProvider: IStakeDataProvider = {
@@ -80,7 +81,7 @@ describe('Payment Builder Tests', () => {
                 mockedStakeDataFactory,
             );
 
-            builder.build().then((result) => {
+            builder.build().then(() => {
                 expect(mockedBlockProcessor).toHaveBeenCalledTimes(1);
                 expect(mockStakeDataProvider).toHaveBeenCalledTimes(1);
                 expect(mockedPayoutCalculator).toHaveBeenCalledTimes(1);

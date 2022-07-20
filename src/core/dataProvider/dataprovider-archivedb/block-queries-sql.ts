@@ -1,6 +1,6 @@
 import { db } from '../../../infrastructure/database';
 import fs from 'fs';
-import parse from 'csv-parse';
+import { parse } from 'csv-parse';
 import { Blocks } from '../dataprovider-types';
 
 const blockQuery = `
@@ -124,14 +124,14 @@ export async function getMinMaxBlocksByEpoch(epoch: number) {
     WITH RECURSIVE chain AS
     (
     SELECT id, parent_id FROM blocks b WHERE height = (select MAX(height) from blocks)
-    
+
     UNION ALL
-    
-    SELECT b.id, b.parent_id FROM blocks b 
+
+    SELECT b.id, b.parent_id FROM blocks b
     INNER JOIN chain
     ON b.id = chain.parent_id
-    ) 
-    
+    )
+
     SELECT distinct c.id
     FROM chain c
     )
