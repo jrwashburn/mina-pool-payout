@@ -13,7 +13,7 @@ export class TransactionSender implements ISender {
 
         const { blocks, payouts } = paymentProcess;
 
-        const calculatedHash = hash(paymentProcess.storePayout, { algorithm: 'sha256' });
+        const calculatedHash = hash(paymentProcess.storePayout, { algorithm: 'sha1' });
 
         if (payoutHash) {
             console.log(`### Processing signed payout for hash ${payoutHash}...`);

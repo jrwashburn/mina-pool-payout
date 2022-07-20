@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { signPayment, keypair, signed, payment } from '@o1labs/client-sdk';
 import fs from 'fs';
-import { fetchGraphQL } from '../infrastructure/graphql';
+import { sendPaymentGraphQL } from '../infrastructure/graphql-pay';
 import { PayoutTransaction } from '../core/payoutCalculator/Model';
+import { gql } from '@apollo/client/core';
 
-const graphqlEndpoint = process.env.SEND_PAYMENT_GRAPHQL_ENDPOINT || 'https://localhost:3085';
-
-async function sendSignedPayment(payment: signed<payment>) {
-    const operationsDoc = `
+async function sendSignedPayment(payment: signed<payment>): Promise<any> {
+    const operationsDoc = gql`
     mutation SendSignedPayment {
       __typename
       sendPayment(
@@ -42,10 +42,10 @@ async function sendSignedPayment(payment: signed<payment>) {
     }
   `;
 
-    fs.writeFileSync('./src/data/' + payment.payload.nonce + '.gql', operationsDoc);
+    fs.writeFileSync('./src/data/' + payment.payload.nonce + '.gql', String(operationsDoc));
 
     console.log(operationsDoc);
-    const { errors, data } = await fetchGraphQL(operationsDoc, 'SendSignedPayment', {}, graphqlEndpoint);
+    const { errors, data } = await sendPaymentGraphQL(operationsDoc, {});
     if (errors) {
         // handle those errors like a pro
         console.error(errors);
@@ -53,15 +53,15 @@ async function sendSignedPayment(payment: signed<payment>) {
     return data;
 }
 
-export async function getNonce(publicKey: string) {
-    const operationsDoc = `
-    query GetNonce($publicKey: PublicKey!) {
-      account(publicKey: $publicKey) {
-        inferredNonce
-      }
-    }
-  `;
-    const { errors, data } = await fetchGraphQL(operationsDoc, 'GetNonce', { publicKey: publicKey }, graphqlEndpoint);
+export async function getNonce(publicKey: string): Promise<any> {
+    const operationsDoc = gql`
+        query GetNonce($publicKey: PublicKey!) {
+            account(publicKey: $publicKey) {
+                inferredNonce
+            }
+        }
+    `;
+    const { errors, data } = await sendPaymentGraphQL(operationsDoc, { publicKey: publicKey });
     if (errors) {
         console.log(`not able to get the nonce`);
         console.log(errors);
@@ -69,7 +69,11 @@ export async function getNonce(publicKey: string) {
     return data.account.inferredNonce ?? 0;
 }
 
-export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair, memo: string) {
+export async function sendSignedTransactions(
+    payoutsToSign: PayoutTransaction[],
+    keys: keypair,
+    memo: string,
+): Promise<any> {
     let nonce = await getNonce(keys.publicKey);
     payoutsToSign.reduce(async (previousPromise, payout) => {
         await previousPromise;
