@@ -169,3 +169,11 @@ The process will also maintain a list of blocks for which it generated signed pa
 ```
 
 .paidblocks is used to filter future runs - so that you will not duplicate payouts by running repeatedly. This file may need to be manipulated if you sign but do not send transactions and want to reprocess a block. By removing a block (or several) from the paidblocks file, the process will calculate (and can payout) those blocks again.
+
+## Handling failed transmissions
+
+Sometimes a transaction be successfully sent to the node, but then fail to actually send in the network. That causes all subsequent payments to fail because the nonce is then incorrect.
+
+All attempted payouts are automatically logged in the src/data directory - and now those files can be used to automatically resend failures after a given nonce. There is a new command: `npm run resend -- -f=[nonce]` which will scan the src/data directory for files named .gql, and attempt to resent all files that have a nonce (based on the file name) *equal to* or greater than the supplied parameter.
+
+So `npm run resend -- -f=3102` will try to re-transmit any files it finds named 3102.gql or higher - e.g. 3102.gql, 3103.gql, 3014.gql will all be tretransmitted. There is no upper boundary since any failure should cause all subsequent transactions to fail, so all should be re-transmitted. This command uses the graphql endpoint specified in the .env file.
