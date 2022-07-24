@@ -4,13 +4,14 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "npm run payout -- -m=0",
         "build": "tsc -p .",
+        "lint": "eslint \"*/**/*.{js,ts,tsx}\" --quiet --fix",
         "payout": "ts-node -r dotenv/config src/index.ts",
-        "test": "jest",
-        "lint": "eslint \"*/**/*.{js,ts,tsx}\" --quiet --fix"
+        "resend": "ts-node -r dotenv/config src/resender.ts",
+        "start": "npm run payout -- -m=0",
+        "test": "jest"
     },
-    "keywords": [],
+    "keywords": [ ],
     "author": "",
     "license": "ISC",
     "devDependencies": {
