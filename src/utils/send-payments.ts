@@ -4,8 +4,9 @@ import fs from 'fs';
 import { sendPaymentGraphQL, fetchGraphQL } from '../infrastructure/graphql-pay';
 import { PayoutTransaction } from '../core/payoutCalculator/Model';
 import { gql } from '@apollo/client/core';
+import { print } from 'graphql';
 
-async function sendSignedPayment(payment: signed<payment>): Promise<any> {
+async function getPaymentMutation(payment: signed<payment>): Promise<any> {
     const operationsDoc = gql`
     mutation SendSignedPayment {
       __typename
@@ -42,16 +43,7 @@ async function sendSignedPayment(payment: signed<payment>): Promise<any> {
       }
     }
   `;
-
-    fs.writeFileSync('./src/data/' + payment.payload.nonce + '.gql', String(operationsDoc));
-
-    console.log(operationsDoc);
-    const { errors, data } = await sendPaymentGraphQL(operationsDoc, {});
-    if (errors) {
-        // handle those errors like a pro
-        console.error(errors);
-    }
-    return data;
+    return operationsDoc;
 }
 
 export async function getNonce(publicKey: string): Promise<any> {
@@ -76,6 +68,8 @@ export async function sendSignedTransactions(
     memo: string,
 ): Promise<any> {
     let nonce = await getNonce(keys.publicKey);
+    let continueSending = true;
+  let timeout = 5000;
     payoutsToSign.reduce(async (previousPromise, payout) => {
         await previousPromise;
         return new Promise<void>((resolve, reject) => {
@@ -90,17 +84,30 @@ export async function sendSignedTransactions(
                     memo: memo,
                 };
                 try {
+                    // 20221105 - changing to always write gql file, and always increment nonce
+                    // if any transmission errors encontered, now still generate and sign transactions, but do not send
+                    // this will allow resending transactions later via resend-payments command.
                     const signedPayment = signPayment(paymentTransaction, keys);
-                    const data = await sendSignedPayment(signedPayment);
-                    // Writes them to a file by nonce for broadcasting
-                    fs.writeFileSync('./src/data/' + nonce + '.json', JSON.stringify(data));
-                    nonce++;
+                    const opsDoc = await getPaymentMutation(signedPayment);
+                    //console.log(opsDoc);
+                    fs.writeFileSync('./src/data/' + nonce + '.gql', print(opsDoc));
+                    if (continueSending) {
+                        const { error, data } = await sendPaymentGraphQL(opsDoc, {});
+                        fs.writeFileSync('./src/data/' + nonce + '.json', JSON.stringify(data));
+                    } else {
+                        console.log(`Generated gql file for nonce ${nonce}; not attempting to send transaction`);
+                    }
                 } catch (Error) {
                     console.log(Error);
-                } finally {
+                    continueSending = false;
+                    //reset timeout to 0 - delay is not necessary since we won't send transactions now
+                    timeout = 0;
+                    console.log(`*** ERROR SENDING TRANSACTIONS - STOPPED SENDING AT NONCE ${nonce} *** `);
                 }
+                //increment nonce even on errror - now saving files to send later.
+                nonce++;
                 resolve();
-            }, 5000); //TODO: Move timeout to .env
+            }, timeout); //TODO: Move timeout to .env
         });
     }, Promise.resolve());
 }

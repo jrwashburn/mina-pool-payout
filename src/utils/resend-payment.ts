@@ -1,16 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { gql } from '@apollo/client/core';
 import fs from 'fs';
-import path, { resolve } from 'path';
+import path from 'path';
 import { sendPaymentGraphQL } from '../infrastructure/graphql-pay';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function resendSignedPaymentFromFile(args: any): Promise<void> {
     const dir = path.join(__dirname, '/../data/');
     const fromNonce = args.fromNonce;
+    const toNonce = args.toNonce;
     const fileList = fs.readdirSync(dir).filter((f) => {
         if (f.substring(f.indexOf('.')) === '.gql') {
-            if (Number(f.substring(0, f.indexOf('.'))) >= Number(fromNonce)) {
+            if (
+                Number(f.substring(0, f.indexOf('.'))) >= Number(fromNonce) &&
+                Number(f.substring(0, f.indexOf('.'))) <= Number(toNonce)
+            ) {
                 return true;
             } else {
                 return false;
