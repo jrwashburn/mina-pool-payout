@@ -172,8 +172,10 @@ The process will also maintain a list of blocks for which it generated signed pa
 
 ## Handling failed transmissions
 
-Sometimes a transaction be successfully sent to the node, but then fail to actually send in the network. That causes all subsequent payments to fail because the nonce is then incorrect.
+Sometimes a transaction be successfully sent to the node, but then fail to actually send in the network. As of 5/11/2022, the application will continue to generate, sign, and store .gql files for each transaction; however, it will no longer attempt to send transactions to the network after encountering a failure. Instead, the trasnactions not sent can be resent using the resend command.
 
-All attempted payouts are automatically logged in the src/data directory - and now those files can be used to automatically resend failures after a given nonce. There is a new command: `npm run resend -- -f=[nonce]` which will scan the src/data directory for files named .gql, and attempt to resent all files that have a nonce (based on the file name) *equal to* or greater than the supplied parameter.
+`npm run resend -- -fromNone=[nonce] -toNonce=[nonce]`
 
-So `npm run resend -- -f=3102` will try to re-transmit any files it finds named 3102.gql or higher - e.g. 3102.gql, 3103.gql, 3014.gql will all be tretransmitted. There is no upper boundary since any failure should cause all subsequent transactions to fail, so all should be re-transmitted. This command uses the graphql endpoint specified in the .env file.
+All attempted payouts are automatically logged in the src/data directory. The resend command will scan the src/data directory for files named .gql, and attempt to resend all files that have a nonce (based on the file name) *equal to* or between the supplied parameters. (The from/to parameters can be shortened: `-fromNonce` alias -f; `-toNonce` alias -t.)
+
+For example, `npm run resend -- -f=3102 -t=3104` will try to re-transmit any files it finds named 3102.gql up to 3104.gql. This command uses the graphql endpoint specified in the .env file.
