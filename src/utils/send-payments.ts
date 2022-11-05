@@ -69,7 +69,7 @@ export async function sendSignedTransactions(
 ): Promise<any> {
     let nonce = await getNonce(keys.publicKey);
     let continueSending = true;
-  let timeout = 5000;
+    let timeout = 5000;
     payoutsToSign.reduce(async (previousPromise, payout) => {
         await previousPromise;
         return new Promise<void>((resolve, reject) => {
