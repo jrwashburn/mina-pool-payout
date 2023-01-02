@@ -11,7 +11,7 @@
         "start": "npm run payout -- -m=0",
         "test": "jest"
     },
-    "keywords": [ ],
+    "keywords": [],
     "author": "",
     "license": "ISC",
     "devDependencies": {

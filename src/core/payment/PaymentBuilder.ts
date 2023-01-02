@@ -82,7 +82,9 @@ export class PaymentBuilder implements IPaymentBuilder {
 
                 payouts.push(...ledgerPayouts);
 
-                storePayout.push(...ledgerStorePayout);
+                for (let i = 0; i < ledgerStorePayout.length; i++) {
+                    storePayout.push(ledgerStorePayout[i]);
+                }
 
                 console.log(`We won these blocks: ${blocksIncluded}`);
 
