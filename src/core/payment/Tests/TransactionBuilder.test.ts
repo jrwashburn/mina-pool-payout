@@ -25,6 +25,8 @@ describe('Transaction Builder Tests', () => {
             //TODO: MOVE THIS TO ITS A SETUP FILE
             const configurationMock: PaymentConfiguration = {
                 defaultCommissionRate: 0.05,
+                mfCommissionRate: 0.08,
+                o1CommissionRate: 0.05,
                 commissionRatesByPublicKey: {},
                 stakingPoolPublicKey: '',
                 payoutMemo: '',

@@ -21,7 +21,7 @@ export type Stake = {
     total: number;
     stakingBalance: number;
     untimedAfterSlot: number;
-    shareClass: 'NPS' | 'Common';
+    shareClass: ShareClass;
 };
 
 //TODO: Add remaining field definitions as needed
@@ -37,3 +37,5 @@ export type LedgerEntry = {
         vesting_increment: number;
     };
 };
+
+export type ShareClass = { shareClass: 'NPS' | 'Common'; shareOwner: '' | 'MF' | 'O1' };

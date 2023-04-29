@@ -39,6 +39,8 @@ export class PaymentBuilder implements IPaymentBuilder {
             minimumHeight,
             stakingPoolPublicKey,
             defaultCommissionRate,
+            mfCommissionRate,
+            o1CommissionRate,
             commissionRatesByPublicKey,
         } = config;
 
@@ -77,6 +79,8 @@ export class PaymentBuilder implements IPaymentBuilder {
                         stakers,
                         totalStake,
                         defaultCommissionRate,
+                        mfCommissionRate,
+                        o1CommissionRate,
                         commissionRatesByPublicKey,
                     );
 

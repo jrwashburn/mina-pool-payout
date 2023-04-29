@@ -9,6 +9,8 @@ export class ConfigurationManager {
     public static async build(args: any) {
         this.Setup = {
             defaultCommissionRate: Number(process.env.COMMISSION_RATE),
+            mfCommissionRate: Number(process.env.MF_COMMISSION_RATE),
+            o1CommissionRate: Number(process.env.O1_COMMISSION_RATE),
             epoch: args.epoch ?? Number(args.epoch),
             slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
             commissionRatesByPublicKey: await getComissionRates(),
@@ -56,6 +58,14 @@ export class ConfigurationManager {
     private static async validate() {
         if (Number.isNaN(this.Setup.defaultCommissionRate)) {
             console.log('ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file');
+            throw new Error('.env COMMISSION_RATE not set');
+        }
+        if (Number.isNaN(this.Setup.o1CommissionRate)) {
+            console.log('ERROR: Comission Rate is not a number - please set O1_COMMISSION_RATE in .env file');
+            throw new Error('.env COMMISSION_RATE not set');
+        }
+        if (Number.isNaN(this.Setup.mfCommissionRate)) {
+            console.log('ERROR: Comission Rate is not a number - please set MF_COMMISSION_RATE in .env file');
             throw new Error('.env COMMISSION_RATE not set');
         }
         if (this.Setup.payorSendTransactionFee < 1000000) {

@@ -15,6 +15,8 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
         stakers: Stake[],
         totalStake: number,
         defaultCommissionRate: number,
+        mfCommissionRate: number,
+        o1CommissionRate: number,
         commissionRates: KeyCommissionRate,
     ): Promise<
         [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]
@@ -41,7 +43,6 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                     [key: string]: { npsStake: number; commonStake: number; superchargedStake: number };
                 } = {};
 
-                const transactionFees = block.usercommandtransactionfees || 0;
                 const totalRewards = block.coinbase + block.feetransfertoreceiver - block.feetransferfromcoinbase;
                 const totalNPSPoolRewards = stakeIsLocked(winner, block) ? block.coinbase : block.coinbase / 2;
                 const totalSuperchargedPoolRewards = stakeIsLocked(winner, block) ? 0 : block.coinbase / 2;
@@ -55,7 +56,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                     let effectiveSuperchargedStake = 0;
                     let effectiveCommonStake = 0;
                     // common stake stays at 0 for NPS shares - they do not participate with the common in fees or supercharged block coinbase
-                    if (staker.shareClass == 'Common') {
+                    if (staker.shareClass.shareClass == 'Common') {
                         effectiveCommonStake = staker.stakingBalance;
                         totalUnweightedCommonStake += staker.stakingBalance;
                         if (!stakeIsLocked(staker, block)) {
@@ -100,11 +101,12 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
 
                     let blockTotal = 0;
 
+                    //TODO APPLY NEW COMMISSION RATES Extract function
                     const commissionRate = commissionRates[staker.publicKey]
                         ? commissionRates[staker.publicKey].commissionRate
                         : defaultCommissionRate;
 
-                    if (staker.shareClass == 'Common') {
+                    if (staker.shareClass.shareClass == 'Common') {
                         blockTotal =
                             Math.floor((1 - commissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting) +
                             Math.floor((1 - commissionRate) * totalCommonPoolRewards * effectiveCommonPoolWeighting) +
@@ -113,11 +115,25 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                                     totalSuperchargedPoolRewards *
                                     effectiveSuperchargedPoolWeighting,
                             );
-                    } else if (staker.shareClass == 'NPS') {
-                        blockTotal = Math.floor(
-                            (1 - npsCommissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting,
+                    } else if (staker.shareClass.shareClass == 'NPS') {
+                        if (staker.shareClass.shareOwner == 'MF') {
+                            blockTotal = Math.floor(
+                                (1 - mfCommissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting,
+                            );
+                        } else if (staker.shareClass.shareOwner == 'O1') {
+                            blockTotal = Math.floor(
+                                (1 - o1CommissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting,
+                            );
+                        } else {
+                            throw new Error(
+                                'NPS shares should be owned by MF or O1. Found NPS Shares with other owner.',
+                            );
+                        }
+                    } else {
+                        throw new Error(
+                            'Shares should be common or non-participating. Found shares with other shareClass.',
                         );
-                    } else throw new Error('Staker share class is unknown');
+                    }
 
                     staker.total += blockTotal;
 

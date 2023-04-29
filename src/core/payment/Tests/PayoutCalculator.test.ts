@@ -1,5 +1,5 @@
 import { KeyCommissionRate } from '../../../configuration/Model';
-import { Block, Stake } from '../../dataProvider/dataprovider-types';
+import { Block, Stake, ShareClass } from '../../dataProvider/dataprovider-types';
 import { PayoutCalculator } from '../../payoutCalculator/PayoutCalculator';
 
 describe('Payout Calculator tests', () => {
@@ -43,14 +43,14 @@ describe('Payout Calculator tests', () => {
             const mockStakers: Stake[] = [
                 {
                     publicKey: '123645789',
-                    shareClass: 'Common',
+                    shareClass: { shareClass: 'Common', shareOwner: '' },
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
                 },
                 {
                     publicKey: '123645782',
-                    shareClass: 'Common',
+                    shareClass: { shareClass: 'Common', shareOwner: '' },
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
@@ -82,7 +82,7 @@ describe('Payout Calculator tests', () => {
                         payout: -50,
                         publicKey: '123645789',
                         publicKeyUntimedAfter: 11,
-                        shareClass: 'Common',
+                        shareClass: { shareClass: 'Common', shareOwner: '' },
                         stakingBalance: 100,
                         stateHash: '0062aca83e3d7027cd77cfe03e0fe7d9',
                         sumEffectiveCommonPoolStakes: 200,
@@ -104,7 +104,7 @@ describe('Payout Calculator tests', () => {
                         payout: -50,
                         publicKey: '123645782',
                         publicKeyUntimedAfter: 11,
-                        shareClass: 'Common',
+                        shareClass: { shareClass: 'Common', shareOwner: '' },
                         stakingBalance: 100,
                         stateHash: '0062aca83e3d7027cd77cfe03e0fe7d9',
                         sumEffectiveCommonPoolStakes: 200,
@@ -126,7 +126,7 @@ describe('Payout Calculator tests', () => {
                         payout: -50,
                         publicKey: '123645789',
                         publicKeyUntimedAfter: 11,
-                        shareClass: 'Common',
+                        shareClass: { shareClass: 'Common', shareOwner: '' },
                         stakingBalance: 100,
                         stateHash: '0062aca83e3d7027cd77cfe03e0fe7d9',
                         sumEffectiveCommonPoolStakes: 200,
@@ -148,7 +148,7 @@ describe('Payout Calculator tests', () => {
                         payout: -50,
                         publicKey: '123645782',
                         publicKeyUntimedAfter: 11,
-                        shareClass: 'Common',
+                        shareClass: { shareClass: 'Common', shareOwner: '' },
                         stakingBalance: 100,
                         stateHash: '0062aca83e3d7027cd77cfe03e0fe7d9',
                         sumEffectiveCommonPoolStakes: 200,
@@ -210,14 +210,14 @@ describe('Payout Calculator tests', () => {
             const mockStakers: Stake[] = [
                 {
                     publicKey: '123645789',
-                    shareClass: 'NPS',
+                    shareClass: { shareClass: 'NPS', shareOwner: 'MF' },
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
                 },
                 {
                     publicKey: '123645782',
-                    shareClass: 'NPS',
+                    shareClass: { shareClass: 'NPS', shareOwner: 'O1' },
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
@@ -226,7 +226,7 @@ describe('Payout Calculator tests', () => {
 
             const commissionRates: KeyCommissionRate = {};
 
-            return calculator.getPayouts(mockedBlocks, mockStakers, 10, 100, commissionRates).then((result) => {
+            return calculator.getPayouts(mockedBlocks, mockStakers, 10, 0.05, 0.08, 0.05, commissionRates).then((result) => {
                 expect(result).toThrow();
             });
         });
