@@ -1,22 +1,22 @@
 import fs from 'fs';
-import { Stake, LedgerEntry, Block } from '../core/dataProvider/dataprovider-types';
+import { Stake, LedgerEntry, Block, ShareClass } from '../core/dataProvider/dataprovider-types';
 
 export function stakeIsLocked(stake: Stake, block: Block) {
     return stake.untimedAfterSlot && stake.untimedAfterSlot > block.globalslotsincegenesis;
 }
 
-export function getPublicKeyShareClass(key: string) {
+export function getPublicKeyShareClass(key: string): ShareClass {
     const path = require('path');
     const foundationAddressesFile = path.join('src', 'data', 'nps-addresses', 'Mina_Foundation_Addresses.csv');
     const labsAddressesFile = path.join('src', 'data', 'nps-addresses', 'O1_Labs_addresses.csv');
     const foundationAddresses = fs.readFileSync(foundationAddressesFile);
     const o1labsAddresses = fs.readFileSync(labsAddressesFile);
 
-    if (foundationAddresses.includes(key) || o1labsAddresses.includes(key)) {
-        return 'NPS';
-    } else {
-        return 'Common';
-    }
+    if (foundationAddresses.includes(key)) {
+        return { shareClass: 'NPS', shareOwner: 'MF' };
+    } else if (o1labsAddresses.includes(key)) {
+        return { shareClass: 'NPS', shareOwner: 'O1' };
+    } else return { shareClass: 'Common', shareOwner: '' };
 }
 
 // Changed from original implementation to simply return the slot number at which account beomes untimed

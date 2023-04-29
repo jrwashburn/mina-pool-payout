@@ -5,6 +5,8 @@ export interface PaymentConfiguration {
     commissionRatesByPublicKey: KeyCommissionRate;
     configuredMaximum: number;
     defaultCommissionRate: number;
+    mfCommissionRate: number;
+    o1CommissionRate: number;
     epoch: number;
     minimumConfirmations: number;
     minimumHeight: number;

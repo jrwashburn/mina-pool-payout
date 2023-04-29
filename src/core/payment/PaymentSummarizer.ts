@@ -102,6 +102,8 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
         const data = {
             ...totals,
             defaultCommissionRate: config.defaultCommissionRate,
+            mfCommissionRate: config.mfCommissionRate,
+            o1CommissionRate: config.o1CommissionRate,
             stakingPoolPublicKey: config.stakingPoolPublicKey,
             payorComissionRates: config.commissionRatesByPublicKey,
         };

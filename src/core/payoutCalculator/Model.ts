@@ -1,5 +1,5 @@
 import { KeyCommissionRate } from '../../configuration/Model';
-import { Block, Stake } from '../dataProvider/dataprovider-types';
+import { Block, Stake, ShareClass } from '../dataProvider/dataprovider-types';
 import { IFeeCalculator } from '../transaction/Model';
 
 export type PayoutDetails = {
@@ -7,7 +7,7 @@ export type PayoutDetails = {
     blockHeight: number;
     globalSlot: number;
     publicKeyUntimedAfter: number;
-    shareClass: 'NPS' | 'Common';
+    shareClass: ShareClass;
     stateHash: string;
     effectiveNPSPoolWeighting: number;
     effectiveNPSPoolStakes: number;
@@ -44,6 +44,8 @@ export interface IPayoutCalculator {
         stakers: Stake[],
         totalStake: number,
         commisionRate: number,
+        mfCommissionRate: number,
+        o1CommissionRate: number,
         comissionRates: KeyCommissionRate,
     ): Promise<
         [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]

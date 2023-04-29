@@ -40,7 +40,11 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
     -   ARCHIVEDB will use the database connection string to get blocks and the current max height, and will expect [hash].json files for the ledgers being processed.
     -   MINAEXPLORER will use endpoint specified in MINAEXPLORER_GRAPHQL_ENDPOINT (expect: graphql.minaexplorer.com) to get blocks and the staking ledger
 
--   Set `COMMISSION_RATE` to the commission your pool charges. Default is assumed to be the Mina Foundation maximum rate of .05 if a value is not provided.
+-   Set `COMMISSION_RATE` to the commission your pool charges unknown delegators. (Mina Foundation and O1 delegations have separate configurations in the .env file, and you can set override rates for known delegators -- see "Using payor specific commission rates" below.)
+
+-   Set `MF_COMMISSION_RATE` to the commission your pool charges for Mina Foundation delegations, if any. Mina Foundation maximum rate was .05 from inception until delegation cycle 10, after which the maximum allowable is 0.08.
+
+-   Set `O1_COMMISSION_RATE` to the commission your pool charges for O(1) Labs delegations, if any.
 
 -   Set `POOL_PUBLIC_KEY` to the public key of the pool account being tracked for payouts. This should be the block producer public key.
 
@@ -116,7 +120,7 @@ B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|B62qoigHEtJCoZ5ekbGHWyr9
 
 To enable these features, create a file src/data/.substitutePayTo and configure according to your situation.
 
-## Using payor specific commission rates (New!)
+## Using payor specific commission rates
 
 You can use payor specific commission rates. They will override the value of `COMMISSION_RATE` based on the public key specified. To use this feature,
 please create a file named ".negotiatedFees" in the src/data directory. The file should contain a list of "public key|commission rate" combination. Note that the fee should be expressed as a number (can be a decimal). Example:
