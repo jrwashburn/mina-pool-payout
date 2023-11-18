@@ -19,10 +19,12 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
         //TODO: Find a different way to handle this without doing require in const
         const path = require('path');
 
+        const knownSubstitutePayToFile = path.join('src', 'data', 'knownSubstitutePayTo');
         const substitutePayToFile = path.join('src', 'data', '.substitutePayTo');
-        const filterPayouts = () => {
+
+        const filterPayouts = (filterFile: any) => {
             return new Promise((resolve, reject) => {
-                fs.createReadStream(substitutePayToFile)
+                fs.createReadStream(filterFile)
                     .pipe(parse({ delimiter: '|' }))
                     .on('data', (record) => {
                         transactions = transactions
@@ -40,9 +42,15 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
                     .on('error', reject);
             });
         };
-        if (fs.existsSync(substitutePayToFile)) {
-            await filterPayouts();
+        
+        if (fs.existsSync(knownSubstitutePayToFile)) {
+            await filterPayouts(knownSubstitutePayToFile);
         }
+
+        if (fs.existsSync(substitutePayToFile)) {
+            await filterPayouts(substitutePayToFile);
+        }
+        
         return transactions;
     }
 }

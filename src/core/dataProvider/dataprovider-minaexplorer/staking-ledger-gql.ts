@@ -37,6 +37,7 @@ export async function getStakes(ledgerHash: string, key: string): Promise<[Stake
             return {
                 publicKey: stake.pk,
                 total: 0,
+                totalToBurn: 0,
                 stakingBalance: balance,
                 untimedAfterSlot: calculateUntimedSlot(stake),
                 shareClass: getPublicKeyShareClass(stake.pk),

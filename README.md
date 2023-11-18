@@ -6,6 +6,37 @@ This started out as a port from the original, but has morphed a fair amount. As 
 -   mina-payout-script spreads an unlocked key's weighted supercharged award across the entire epoch if it will unlock at any point during the epoch. mina-pool-payout will only supercharge an account after it is unlocked.
 -   mina-pool-payout will (as of PR 59) reserve supercharged rewards entirely for unlocked keys versus spreading the supercharged award across normal coinbase blocks as well. This will result in more variability in unlocked payout versus mina-payout-script.
 
+# Mina Foundation Delegation Program requirements
+
+-   All the rewards should be sent back to the delegator. Only the commision rate should be kept by the Block Producer.
+-   The supercharged rewards of the blocks won by Mina Foundation should be sent to the burn address: `B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X`
+-   The supercharged rewards of the blocks won by the delegators who requested to burn their supercharged rewards should be sent to the burn address: `B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X`
+-   The memo field of the payback and burn transaction should contain the md5 value of the block producer's public key that received the delegation.
+
+# How are the rewards calculated ?
+
+Please check here:
+
+```
+https://github.com/jrwashburn/mina-pool-payout/blob/main/src/core/payoutCalculator/PayoutCalculatorIsolateSuperCharge.ts
+```
+
+# How to compute the md5 hash of the block producer's public key ?
+
+Please check here:
+
+```
+https://github.com/jrwashburn/mina-pool-payout/blob/main/src/configuration/ConfigurationManager.ts
+```
+
+# How are the supercharged rewards burned ?
+
+Please check here:
+
+```
+https://github.com/jrwashburn/mina-pool-payout/blob/main/src/utils/send-payments.ts
+```
+
 # Dependencies
 
 -   This code uses language features of Typescript v3.7 and Node 14.
@@ -15,12 +46,15 @@ This started out as a port from the original, but has morphed a fair amount. As 
 # Operational Overview
 
 This application will calculate, and may sign and transmit, the required payouts for accounts delegating to a given account.
+It also may send the supercharged rewards to a burn address .
+The burn of the supercharged rewards is related to blocks won by Mina Foundation or delegators who want to burn their supercharged rewards.
+_The burn address is: B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X_ . It's a public address without a private key. The tokens held by this address are locked forever.
 
 The recommended run process is:
 
 -   copy any updated ledger files to the machine that will run the payout process
     (See Providing the Staking Ledgers below)
--   run payout process read only for a given block range (you can provie a min height and max height on the command line)
+-   run payout process read only for a given block range (you can provide a min height and max height on the command line)
     This will process the blocks in the range (inclusive) and calculate and display the calculations per delegator per block, and the summary payout plan and a hash of the projected payouts.
 -   review the payout plan, confirm, and then transmit funds to the wallet that is configured to make the payments.
     This is assumed to be an offline process and is intentionally not automated.
@@ -37,8 +71,8 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
 
 -   Set `BLOCK_DATA_SOURCE` to either ARCHIVEDB or MINAEXPLORER.
 
-    -   ARCHIVEDB will use the database connection string to get blocks and the current max height, and will expect [hash].json files for the ledgers being processed.
-    -   MINAEXPLORER will use endpoint specified in MINAEXPLORER_GRAPHQL_ENDPOINT (expect: graphql.minaexplorer.com) to get blocks and the staking ledger
+-   ARCHIVEDB will use the database connection string to get blocks and the current max height, and will expect [hash].json files for the ledgers being processed.
+-   MINAEXPLORER will use endpoint specified in MINAEXPLORER_GRAPHQL_ENDPOINT (expect: graphql.minaexplorer.com) to get blocks and the staking ledger
 
 -   Set `COMMISSION_RATE` to the commission your pool charges unknown delegators. (Mina Foundation and O1 delegations have separate configurations in the .env file, and you can set override rates for known delegators -- see "Using payor specific commission rates" below.)
 
@@ -48,8 +82,6 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
 
 -   Set `POOL_PUBLIC_KEY` to the public key of the pool account being tracked for payouts. This should be the block producer public key.
 
--   Set `POOL_MEMO` to the DiscordID or other message to be sent in the payout memo field
-
 -   Set `SEND_TRANSACTION_FEE` to the transaction fee for payout transactions. It is specified in the .env file in MINA, but will be translated to NANOMINA for the actual payment transactions. Double check that this is in Mina!
 
 -   Set `SEND_PAYOUT_THRESHOLD` to a minimum threshold which payout amounts must exceed to be sent. Default is 0, and payout transaction amount must _exceed_ this number to be sent. Also specified in Mina!
@@ -57,51 +89,52 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
 -   Set `SEND_PRIVATE_KEY` to the sender private key
     The private key value can be retrieved from a pk file by running the mina advanced dump-keypair command, e.g.
 
-    ```
-    mina advanced dump-keypair --privkey-path keys/my-payout-wallet
-    ```
+```
+mina advanced dump-keypair --privkey-path keys/my-payout-wallet
+```
 
 -   Set `SEND_PUBLIC_KEY` to the sender public key. It can also be blank if generating ephemeral keys.
 
 -   Set `MIN_CONFIRMATIONS` to whatever number of confirmed blocks you require before paying out. Default to 290 or "k" to use the assumed network finality.
 
-    The process will include blocks at a height up to the **lower of** `MAX_HEIGHT` and the current tip minus `MIN_CONFIRMATIONS`.
+The process will include blocks at a height up to the **lower of** `MAX_HEIGHT` and the current tip minus `MIN_CONFIRMATIONS`.
 
-    To clarify - `MAX_HEIGHT` only applies _below_ the minimum confirmation window. (i.e. Given a current block height of 1,500; `MAX_HEIGHT` of 5,000; and `MIN_CONFIRMATIONS` of 290, the process will consider blocks up to height 1210 (1500-290). If `MAX_HEIGHT` were set to 1,000, then the process would consider blocks up to height 1000.)
+To clarify - `MAX_HEIGHT` only applies _below_ the minimum confirmation window. (i.e. Given a current block height of 1,500; `MAX_HEIGHT` of 5,000; and `MIN_CONFIRMATIONS` of 290, the process will consider blocks up to height 1210 (1500-290). If `MAX_HEIGHT` were set to 1,000, then the process would consider blocks up to height 1000.)
 
 -   Populate `DATABASE_URL` with the connection string for your archive node Postgresql instance. This will typically look something like:
 
-    ```
-    DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
-    ```
+```
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
+```
 
 -   Set `SEND_PAYMENT_GRAPHQL_ENDPOINT` to the url of a graphql server that can send transactions. (e.g. http://127.0.0.1:3085/graphql ) This is required to transmit payout transactions; payouts will be broadcast via this endpoint.
 
-    -   Note @vanphandinh / beaconchain#8571 has provided a graphql proxy https://github.com/vanphandinh/mina-graphql-proxy which can be used to transmit payments
-    -   beaconchain is providing a public endpoint here: https://minagraph.com/graphql (provided with permission, and _do your own research_)
+-   Note @vanphandinh / beaconchain#8571 has provided a graphql proxy https://github.com/vanphandinh/mina-graphql-proxy which can be used to transmit payments
 
--   Set `MINAEXPLORER_GRAPHQL_ENDPOINT` to the url of the mina explorer graphql api if block data source is set to minaexplorer.
+-   minaexplorer provides a graphql endpoint that will shutdown at Hard Fork of mainnet: https://proxy.minaexplorer.com/graphql
+
+-   Set `MINAEXPLORER_GRAPHQL_ENDPOINT` to the url of the mina explorer graphql api if the block data source is set to minaexplorer.
 
 ## Providing the Staking Ledgers
 
--   Export the staking ledger and place in src/data/ledger directory. You can export the current staking ledger with:
+-   Export the staking ledger and place it in src/data/ledger directory. You can export the current staking ledger with:
 
-    ```
-    mina ledger export staking-epoch-ledger > staking-epoch-ledger.json
-    ```
+```
+mina ledger export staking-epoch-ledger > staking-epoch-ledger.json
+```
 
 -   and the next epoch's ledger is available via:
 
-    ```
-    mina ledger export next-epoch-ledger > next-epoch-ledger.json
-    ```
+```
+mina ledger export next-epoch-ledger > next-epoch-ledger.json
+```
 
 -   The files can then be hashed and renamed with:
 
-    ```
-    mina ledger hash --ledger-file staking-epoch-ledger.json | xargs -I % cp staking-epoch-ledger.json %.json
-    mina ledger hash --ledger-file next-epoch-ledger.json | xargs -I % cp next-epoch-ledger.json %.json
-    ```
+```
+mina ledger hash --ledger-file staking-epoch-ledger.json | xargs -I % cp staking-epoch-ledger.json %.json
+mina ledger hash --ledger-file next-epoch-ledger.json | xargs -I % cp next-epoch-ledger.json %.json
+```
 
 ## Handling special accounts - suppressing or redirecting payouts
 
@@ -118,19 +151,21 @@ B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|EXCLUDE
 B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|B62qoigHEtJCoZ5ekbGHWyr9hYfc6fkZ2A41h9vvVZuvty9amzEz3yB
 ```
 
-To enable these features, create a file src/data/.substitutePayTo and configure according to your situation.
+To enable these features, create a file src/data/.substitutePayTo and configure it according to your situation.
 
-## Using payor specific commission rates
+## Using payor specific commission rates and specifying to burn supercharged rewards or not
 
 You can use payor specific commission rates. They will override the value of `COMMISSION_RATE` based on the public key specified. To use this feature,
-please create a file named ".negotiatedFees" in the src/data directory. The file should contain a list of "public key|commission rate" combination. Note that the fee should be expressed as a number (can be a decimal). Example:
+please create a file named ".negotiatedFees" in the src/data directory. The file should contain a list of "public key|commission rate|burn supercharged" combination. Note that the fee should be expressed as a number (can be a decimal).
+The 3rd column indicated if the supercharged rewards should be burned or not.
+Example:
 
 ```
-B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|0.012573
-B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|0.012544
+B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|0.012573|1
+B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|0.012544|0
 ```
 
-If no file is present, the process will use the default `COMMISSION_RATE` value.
+If no file is present, the process will use the default `COMMISSION_RATE` value and will not burn the supercharged rewards (except the ones of Mina Foundation).
 
 ## Running payout for a full epoch
 
@@ -150,7 +185,7 @@ For example, this will process blocks 0-1000, output a summary table, write deta
 
 `npm run payout -- -m=0 -x=1000`
 
-After verifying the results and confirming you are ready to payout, but adding the -h parameter with the hash provided by the output above, as long as the caluclations are the same, the payments will be signed and sent.
+After verifying the results and confirming you are ready to payout, but adding the -h parameter with the hash provided by the output above, as long as the calculations are the same, the payments will be signed and sent.
 
 `npm run payout -- -m=0 -x=1000 -h=84cd21b7b566dc1c84cf06039462e013851df483ad61c229d1830285934dcae2`
 
@@ -158,7 +193,7 @@ NOTE: Prior versions also output the entire calculation list for every block. Th
 
 ## Seeing Results
 
-The process will output summary informaiton to the console, and will generate several files under the src/data directory. Files will include:
+The process will output summary information to the console, and will generate several files under the src/data directory. Files will include:
 
 ```
 ./src/data/payout_details_[datetime_minblock_maxblock].json - contains the detailed calculations for each delegator key at each block.
@@ -176,10 +211,10 @@ The process will also maintain a list of blocks for which it generated signed pa
 
 ## Handling failed transmissions
 
-Sometimes a transaction be successfully sent to the node, but then fail to actually send in the network. As of 5/11/2022, the application will continue to generate, sign, and store .gql files for each transaction; however, it will no longer attempt to send transactions to the network after encountering a failure. Instead, the trasnactions not sent can be resent using the resend command.
+Sometimes a transaction is successfully sent to the node, but then fails to actually send in the network. As of 5/11/2022, the application will continue to generate, sign, and store .gql files for each transaction; however, it will no longer attempt to send transactions to the network after encountering a failure. Instead, the transactions not sent can be resent using the resend command.
 
 `npm run resend -- -fromNone=[nonce] -toNonce=[nonce]`
 
-All attempted payouts are automatically logged in the src/data directory. The resend command will scan the src/data directory for files named .gql, and attempt to resend all files that have a nonce (based on the file name) *equal to* or between the supplied parameters. (The from/to parameters can be shortened: `-fromNonce` alias -f; `-toNonce` alias -t.)
+All attempted payouts are automatically logged in the src/data directory. The resend command will scan the src/data directory for files named .gql, and attempt to resend all files that have a nonce (based on the file name) _equal to_ or between the supplied parameters. (The from/to parameters can be shortened: `-fromNonce` alias -f; `-toNonce` alias -t.)
 
 For example, `npm run resend -- -f=3102 -t=3104` will try to re-transmit any files it finds named 3102.gql up to 3104.gql. This command uses the graphql endpoint specified in the .env file.

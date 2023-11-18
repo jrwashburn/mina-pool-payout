@@ -28,14 +28,21 @@ export type PayoutDetails = {
     totalRewardsSuperchargedPool: number;
     payout: number;
     isEffectiveSuperCharge: boolean;
+    toBurn: number;
 };
 
 export type PayoutTransaction = {
+    numberOfBlocks: number;
+    sumCoinbase: number;
+    sumCoinbaseNoSuperchargedRewards: number;
     publicKey: string;
     amount: number;
     fee: number;
     amountMina: number;
     feeMina: number;
+    amountToBurn: number;
+    amountToBurnMina: number;
+    owner: '' | 'MF' | 'O1' | 'INVEST';
 };
 
 export interface IPayoutCalculator {
@@ -46,9 +53,10 @@ export interface IPayoutCalculator {
         commisionRate: number,
         mfCommissionRate: number,
         o1CommissionRate: number,
+        investorsCommissionRate: number,
         comissionRates: KeyCommissionRate,
     ): Promise<
-        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]
+        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number, totalToBurn: number]
     >;
 }
 

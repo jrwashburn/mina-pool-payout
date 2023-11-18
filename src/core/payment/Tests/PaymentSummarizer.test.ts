@@ -64,7 +64,10 @@ describe('Payment Summarizer tests', () => {
                     payoutAmountsSum: 686,
                     payoutFeesSum: 0.08,
                     userCommandTransactionFeeSum: 36,
+                    burnSum: 0,
                 },
+                totalPayouts: 0,
+                totalBurn: 0,
             };
 
             const result = await summarizer.calculateTotals(process);

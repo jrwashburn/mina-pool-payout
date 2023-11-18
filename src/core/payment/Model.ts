@@ -13,6 +13,8 @@ export interface PaymentProcess {
     maximumHeight: number;
     blocks: Block[];
     totalPayoutFundsNeeded: number;
+    totalPayouts: number;
+    totalBurn: number;
     totals?: PaymentTotals;
 }
 
@@ -24,6 +26,7 @@ export interface PaymentTotals {
     payoutAmountsSum: number;
     payoutFeesSum: number;
     netMinaToPoolOperator: number;
+    burnSum: number;
 }
 
 export interface IPaymentBuilder {

@@ -41,6 +41,7 @@ export class PaymentBuilder implements IPaymentBuilder {
             defaultCommissionRate,
             mfCommissionRate,
             o1CommissionRate,
+            investorsCommissionRate,
             commissionRatesByPublicKey,
         } = config;
 
@@ -61,6 +62,9 @@ export class PaymentBuilder implements IPaymentBuilder {
 
         const storePayout: PayoutDetails[] = [];
 
+        let globalTotalPayout: number = 0;
+        let globalTotalToBurn: number = 0;
+
         const ledgerHashes = [...new Set(blocks.map((block) => block.stakingledgerhash))];
 
         return Promise.all(
@@ -73,7 +77,7 @@ export class PaymentBuilder implements IPaymentBuilder {
 
                 const ledgerBlocks = blocks.filter((x) => x.stakingledgerhash == ledgerHash);
 
-                const [ledgerPayouts, ledgerStorePayout, blocksIncluded, totalPayout] =
+                const [ledgerPayouts, ledgerStorePayout, blocksIncluded, totalPayout, totalToBurn] =
                     await this.payoutCalculator.getPayouts(
                         ledgerBlocks,
                         stakers,
@@ -81,10 +85,14 @@ export class PaymentBuilder implements IPaymentBuilder {
                         defaultCommissionRate,
                         mfCommissionRate,
                         o1CommissionRate,
-                        commissionRatesByPublicKey,
+                        investorsCommissionRate,
+                        commissionRatesByPublicKey
                     );
 
                 payouts.push(...ledgerPayouts);
+
+                globalTotalPayout = totalPayout;
+                globalTotalToBurn = totalToBurn;
 
                 for (let i = 0; i < ledgerStorePayout.length; i++) {
                     storePayout.push(ledgerStorePayout[i]);
@@ -93,6 +101,8 @@ export class PaymentBuilder implements IPaymentBuilder {
                 console.log(`We won these blocks: ${blocksIncluded}`);
 
                 console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`);
+
+                console.log(`The Total amount to burn is: ${totalToBurn} nm or ${totalToBurn / 1000000000} mina`);
             }),
         ).then(async () => {
             // added a sort because these payout details are hashed and need to be in a reliable order
@@ -113,6 +123,8 @@ export class PaymentBuilder implements IPaymentBuilder {
                 blocks,
                 totalPayoutFundsNeeded: 0,
                 payoutsBeforeExclusions: [],
+                totalPayouts: globalTotalPayout,
+                totalBurn: globalTotalToBurn
             };
 
             return paymentProcess;

@@ -48,6 +48,16 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
             return feesum;
         };
 
+        const getTotalToBurnSum = (transactions: PayoutTransaction[]) => {
+            let toburnsum = 0;
+
+            transactions.forEach((transaction) => {
+                toburnsum += transaction.amountToBurn ?? 0;
+            });
+
+            return toburnsum;
+        };
+
         const { coinbasesum, feetransferfromcoinbasesum, usercommandtransactionfeessum } = getTotalsFromBlocks(
             base.blocks,
         );
@@ -58,6 +68,8 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
 
         const feesum = getTotalFeeSum(base.payouts);
 
+        const toburnsum = getTotalToBurnSum(base.payouts);
+
         base.totals = {
             coinBaseSum: coinbasesum / 1000000000,
             feeTransferFromCoinBaseSum: feetransferfromcoinbasesum / 1000000000,
@@ -67,6 +79,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
             payoutAmountsSum: amountsum / 1000000000,
             payoutFeesSum: feesum / 1000000000,
             netMinaToPoolOperator: (netcoinbasereceived - amountsum - feesum) / 1000000000,
+            burnSum: toburnsum / 1000000000,
         };
     }
 

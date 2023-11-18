@@ -22,6 +22,7 @@ export function getStakes(ledgerHash: string, key: string): [Stake[], number] {
             return {
                 publicKey: stake.pk,
                 total: 0,
+                totalToBurn: 0,
                 stakingBalance: balance,
                 untimedAfterSlot: calculateUntimedSlot(stake),
                 shareClass: getPublicKeyShareClass(stake.pk),

@@ -16,13 +16,16 @@ export class PayoutCalculator implements IPayoutCalculator {
         defaultCommissionRate: number,
         mfCommissionRate: number,
         o1CommissionRate: number,
+        investorsCommissionRate: number,
         commissionRates: KeyCommissionRate,
     ): Promise<
-        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]
+        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number, totalToBurn: number]
     > {
         // Initialize some stuff
         const blocksIncluded: number[] = [];
         const storePayout: PayoutDetails[] = [];
+        let sumCoinbase = 0;
+        let sumCoinbaseNoSuperchargedRewards = 0;
 
         // for each block, calculate the effective stake of each staker
         blocks.forEach((block: Block) => {
@@ -33,7 +36,7 @@ export class PayoutCalculator implements IPayoutCalculator {
                 // no coinbase, don't need to do anything
             } else {
                 const winner = this.getWinner(stakers, block);
-
+                sumCoinbase += block.coinbase;
                 let sumEffectiveCommonPoolStakes = 0;
                 let sumEffectiveNPSPoolStakes = 0;
                 const effectivePoolStakes: {
@@ -45,11 +48,13 @@ export class PayoutCalculator implements IPayoutCalculator {
                 const totalNPSPoolRewards = stakeIsLocked(winner, block) ? block.coinbase : block.coinbase / 2;
                 const totalCommonPoolRewards = totalRewards - totalNPSPoolRewards;
 
+
                 // Determine the supercharged discount for the block
                 //  unlocked accounts will get a double share less this discount based on the ratio of fees : coinbase
                 //  unlocaked accounts generate extra coinbase, but if fees are significant, that coinbase would have a lower relative weight
                 const superchargedWeightingDiscount = transactionFees / block.coinbase;
 
+                sumCoinbaseNoSuperchargedRewards += totalNPSPoolRewards;
                 let totalUnweightedCommonStake = 0;
                 // Determine the non-participating and common pool weighting for each staker
                 stakers.forEach((staker: Stake) => {
@@ -143,6 +148,7 @@ export class PayoutCalculator implements IPayoutCalculator {
                         effectiveSuperchargedPoolStakes: 0,
                         sumEffectiveSuperchargedPoolStakes: 0,
                         totalRewardsSuperchargedPool: 0,
+                        toBurn: 0,
                     });
                 });
             }
@@ -150,20 +156,28 @@ export class PayoutCalculator implements IPayoutCalculator {
 
         const payoutJson: PayoutTransaction[] = [];
         let totalPayout = 0;
+        let totalToBurn = 0;
         stakers.forEach((staker: Stake) => {
             const amount = staker.total;
             if (amount > 0) {
                 payoutJson.push({
                     publicKey: staker.publicKey,
+                    owner: staker.shareClass.shareOwner,
+                    numberOfBlocks: blocksIncluded.length,
+                    sumCoinbase: sumCoinbase / 1000000000,
+                    sumCoinbaseNoSuperchargedRewards: sumCoinbaseNoSuperchargedRewards / 1000000000,
                     amount: amount,
                     fee: 0,
                     amountMina: 0,
                     feeMina: 0,
+                    amountToBurn: 0,
+                    amountToBurnMina: 0,
                 });
                 totalPayout += amount;
+                totalToBurn += staker.totalToBurn;
             }
         });
-        return [payoutJson, storePayout, blocksIncluded, totalPayout];
+        return [payoutJson, storePayout, blocksIncluded, totalPayout, totalToBurn];
     }
 
     private getWinner(stakers: Stake[], block: Block): Stake {

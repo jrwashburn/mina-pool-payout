@@ -5,4 +5,6 @@ node_modules
 .env
 /src/data/*
 !/src/data/nps-addresses/
+!/src/data/knownNegotiatedFees
+!/src/data/knownSubstitutePayTo
 package-lock.json

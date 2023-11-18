@@ -47,6 +47,7 @@ describe('Payout Calculator tests', () => {
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
+                    totalToBurn:0,
                 },
                 {
                     publicKey: '123645782',
@@ -54,6 +55,7 @@ describe('Payout Calculator tests', () => {
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
+                    totalToBurn: 0,
                 },
             ];
             const mockResult = [
@@ -165,7 +167,7 @@ describe('Payout Calculator tests', () => {
 
             const commissionRates: KeyCommissionRate = {};
 
-            return calculator.getPayouts(mockedBlocks, mockStakers, 11, 0.11, commissionRates).then((result) => {
+            return calculator.getPayouts(mockedBlocks, mockStakers, 11, 0.11, 0.08, 0.05, 0.08, commissionRates).then((result) => {
                 expect(result).toStrictEqual(mockResult);
             });
         });
@@ -214,6 +216,7 @@ describe('Payout Calculator tests', () => {
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
+                    totalToBurn:0,
                 },
                 {
                     publicKey: '123645782',
@@ -221,12 +224,13 @@ describe('Payout Calculator tests', () => {
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
+                    totalToBurn:0,
                 },
             ];
 
             const commissionRates: KeyCommissionRate = {};
 
-            return calculator.getPayouts(mockedBlocks, mockStakers, 10, 0.05, 0.08, 0.05, commissionRates).then((result) => {
+            return calculator.getPayouts(mockedBlocks, mockStakers, 10, 0.05, 0.08, 0.05, 0.08, commissionRates).then((result) => {
                 expect(result).toThrow();
             });
         });

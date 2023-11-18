@@ -24,6 +24,7 @@ export class TransactionBuilder implements ITransactionBuilder {
                         r.get(o.publicKey) ||
                         Object.assign({}, o, {
                             amount: 0,
+                            amountToBurn: 0,
                             fee: 0,
                             amountMina: 0,
                             feeMina: 0,
@@ -33,6 +34,8 @@ export class TransactionBuilder implements ITransactionBuilder {
                     item.fee = config.payorSendTransactionFee;
                     item.amountMina = item.amount / 1000000000;
                     item.feeMina = item.fee / 1000000000;
+                    item.amountToBurn = o.amountToBurn;
+                    item.amountToBurnMina = item.amountToBurn / 1000000000;
                     return r.set(o.publicKey, item);
                 }, new Map())
                 .values(),
