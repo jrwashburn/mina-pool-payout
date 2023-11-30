@@ -84,7 +84,7 @@ Copy `sample.env` to `.env` and make the following changes within the `.env`:
 
 -   Set `POOL_PUBLIC_KEY` to the public key of the pool account being tracked for payouts. This should be the block producer public key.
 
--   Set `POOL_MEMO` to the DiscordID or other message to be sent in the payout memo field. Note that in case of Mina Foundation is the winner, the memo will be forced to the nd5 hash value of the BP Key.
+-   Set `POOL_MEMO` to the DiscordID or other message to be sent in the payout memo field. Note that in case of Mina Foundation is the winner, the memo will be forced to the md5 hash value of the BP Key.
 
 -   Set `SEND_TRANSACTION_FEE` to the transaction fee for payout transactions. It is specified in the .env file in MINA, but will be translated to NANOMINA for the actual payment transactions. Double check that this is in Mina!
 
