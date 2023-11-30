@@ -160,13 +160,12 @@ To enable these features, create a file src/data/.substitutePayTo and configure 
 ## Using payor specific commission rates and specifying to burn supercharged rewards or not
 
 You can use payor specific commission rates. They will override the value of `COMMISSION_RATE` based on the public key specified. To use this feature,
-please create a file named ".negotiatedFees" in the src/data directory. The file should contain a list of "public key|commission rate|burn supercharged" combination. Note that the fee should be expressed as a number (can be a decimal).
-The 3rd column indicated if the supercharged rewards should be burned or not.
+please create a file named ".negotiatedFees" in the src/data directory. The file should contain a list of "public key|commission rate|" combination. Note that the fee should be expressed as a number (can be a decimal).
 Example:
 
 ```
-B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|0.012573|1
-B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|0.012544|0
+B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|0.012573
+B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|0.012544
 ```
 
 If no file is present, the process will use the default `COMMISSION_RATE` value and will not burn the supercharged rewards (except the ones of Mina Foundation).

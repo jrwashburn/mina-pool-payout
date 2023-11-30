@@ -17,7 +17,7 @@ export class ConfigurationManager {
             slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
             commissionRatesByPublicKey: await getComissionRates(),
             stakingPoolPublicKey: process.env.POOL_PUBLIC_KEY || '',
-            payoutMemo: process.env.POOL_MEMO || 'mina-pool-payouts',
+            payoutMemo: process.env.POOL_MEMO || 'mina-pool-payout',
             bpKeyMd5Hash: getMemoMd5Hash(process.env.POOL_PUBLIC_KEY || ''),
             senderKeys: {
                 privateKey: process.env.SEND_PRIVATE_KEY || '',
