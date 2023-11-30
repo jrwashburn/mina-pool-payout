@@ -19,7 +19,7 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
         //TODO: Find a different way to handle this without doing require in const
         const path = require('path');
 
-        const knownSubstitutePayToFile = path.join('src', 'data', 'knownSubstitutePayTo');
+        const knownSubstitutePayToFile = path.join('src', 'data', 'mfSubstitutePayTo');
         const substitutePayToFile = path.join('src', 'data', '.substitutePayTo');
 
         const filterPayouts = (filterFile: any) => {
