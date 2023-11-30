@@ -92,13 +92,36 @@ export class ConfigurationManager {
 }
 
 const getComissionRates = async (): Promise<KeyCommissionRate> => {
+    const path = `${__dirname}/../data/.negotiatedFees`;
 
-    const commissionRates: KeyCommissionRate = {};
+    if (fs.existsSync(path)) {
+        const commissionRates: KeyCommissionRate = {};
 
-    getComissionRatesFromFile('knownNegotiatedFees', commissionRates);
-    getComissionRatesFromFile('.negotiatedFees', commissionRates);
-    
-    return commissionRates;
+        console.log('Found .negotiatedFees file. Using Payor Specific Commission Rates.');
+
+        const raw = fs.readFileSync(path, 'utf-8');
+
+        const rows = raw.split(/\r?\n/).filter(row => row);
+
+        rows.forEach((x, index) => {
+            const [key, rate] = x.split('|');
+
+            const takeRate = Number.parseFloat(rate);
+
+            const result = validateCommission(key, takeRate, index);
+
+            if (!result.isValid) {
+                console.log(result.error);
+                throw new Error(result.error);
+            }
+
+            commissionRates[key] = { commissionRate: takeRate };
+        });
+
+        return commissionRates;
+    }
+
+    return {};
 };
 
 const validateCommission = (key: string, rate: number, index: number) => {
@@ -122,36 +145,6 @@ const validateCommission = (key: string, rate: number, index: number) => {
     }
 
     return { ...result, isValid: true };
-};
-
-const getComissionRatesFromFile = (fileName: string, commissionRates: KeyCommissionRate) => {
-    const path = `${__dirname}/../data/${fileName}`;
-
-    if (fs.existsSync(path)) {
-
-        console.log('Found .negotiatedFees file. Using Payor Specific Commission Rates.');
-
-        const raw = fs.readFileSync(path, 'utf-8');
-
-        const rows = raw.split(/\r?\n/).filter(row => row);
-
-        rows.forEach((x, index) => {
-            const [key, rate, burnscr] = x.split('|');
-
-            const takeRate = Number.parseFloat(rate);
-
-            const burnscrewards = (burnscr === '1') ? true: false;
-
-            const result = validateCommission(key, takeRate, index);
-
-            if (!result.isValid) {
-                console.log(result.error);
-                throw new Error(result.error);
-            }
-
-            commissionRates[key] = { commissionRate: takeRate, burnSuperchargedRewards: burnscrewards };
-        });
-    }
 };
 
 const getMemoMd5Hash = (memo: string) => {

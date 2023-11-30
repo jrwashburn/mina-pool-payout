@@ -24,5 +24,5 @@ export interface PaymentConfiguration {
 }
 
 export interface KeyCommissionRate {
-    [publicKey: string]: { commissionRate: number , burnSuperchargedRewards: boolean};
+    [publicKey: string]: { commissionRate: number};
 }
