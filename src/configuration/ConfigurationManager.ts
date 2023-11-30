@@ -10,9 +10,9 @@ export class ConfigurationManager {
     public static async build(args: any) {
         this.Setup = {
             defaultCommissionRate: Number(process.env.COMMISSION_RATE),
-            mfCommissionRate: Number(process.env.MF_COMMISSION_RATE),
-            o1CommissionRate: Number(process.env.O1_COMMISSION_RATE),
-            investorsCommissionRate: Number(process.env.INVESTORS_COMMISSION_RATE),
+            mfCommissionRate: Number(process.env.MF_COMMISSION_RATE || 0.08),
+            o1CommissionRate: Number(process.env.O1_COMMISSION_RATE || 0.05),
+            investorsCommissionRate: Number(process.env.INVESTORS_COMMISSION_RATE || 0.08),
             epoch: args.epoch ?? Number(args.epoch),
             slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
             commissionRatesByPublicKey: await getComissionRates(),
