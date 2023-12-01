@@ -108,9 +108,13 @@ export class PayoutCalculator implements IPayoutCalculator {
                             blockTotal = Math.floor(
                                 (1 - o1CommissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting,
                             );
+                       } else if (staker.shareClass.shareOwner == 'INVEST') {
+                            blockTotal = Math.floor(
+                                (1 - investorsCommissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting,
+                            );
                         } else {
                             throw new Error(
-                                'NPS shares should be owned by MF or O1. Found NPS Shares with other owner.',
+                                'NPS shares should be MF or O1 or INVEST. Found NPS Shares with other owner.',
                             );
                         }
                     } else {
