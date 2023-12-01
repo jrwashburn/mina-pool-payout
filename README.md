@@ -2,12 +2,12 @@
 
 Before to send any payout please make sure:
 
--   Execute the payout script in a dry run mode first. (DO NOT set -h as parameter).
--   Verfify / check all the outputs of the script as highlighted in the image below.
+-   Execute the payout script in a dry run mode first. (DO NOT set -h as a parameter).
+-   Verify / check all the outputs of the script as highlighted in the image below.
 -   Make sure the total payout amount is valid and aligned with the details displayed during the execution of the script.
 -   Make sure the total amount to BURN is valid and aligned with the details displayed during the execution of the script.
 -   Make sure the total coinbase amount is valid and aligned with the details displayed during the execution of the script.
--   You can see more details by enabling the debug mode. This can achieved by addin --verbose=true to the command line.
+-   You can see more details by enabling the debug mode. This can be achieved by adding --verbose=true to the command line.
 
 ![Verification steps](https://github.com/jrwashburn/mina-pool-payout/tree/main/src/img/verification.png?raw=true)
 
