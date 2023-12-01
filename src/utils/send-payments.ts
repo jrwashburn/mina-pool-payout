@@ -5,6 +5,8 @@ import { sendPaymentGraphQL, fetchGraphQL } from '../infrastructure/graphql-pay'
 import { PayoutTransaction } from '../core/payoutCalculator/Model';
 import { gql } from '@apollo/client/core';
 import { print } from 'graphql';
+import { PaymentProcess } from '../core/payment/Model';
+import { PaymentConfiguration } from '../configuration/Model';
 
 async function getPaymentMutation(payment: signed<payment>): Promise<any> {
     const operationsDoc = gql`
@@ -143,4 +145,18 @@ export async function sendSignedBurnTransactions(burnTransaction: payment, keys:
       console.log(`*** ERROR BURNING TRANSACTIONS - NONCE ${burnTransaction.nonce} *** `);
       return Promise.resolve(false);
   }
+}
+
+export function paymentSanityCheckPassed(paymentProcess: PaymentProcess, payouts: PayoutTransaction[], config: PaymentConfiguration): boolean {
+    //total value to burn can't exceed half of the coinBaseSum
+    if (paymentProcess.totals && (paymentProcess.totalBurn > paymentProcess.totals?.coinBaseSum/2)) {
+        return false;
+    }
+
+    // in case of burn, the burn amount should be > 0, the burn address should be provided and its value should be checked
+    if (paymentProcess.totalBurn > 0 && (!config.burnAddress || config.burnAddress != 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X')) {
+            return false;
+    }
+
+    return true;
 }

@@ -1,7 +1,6 @@
-import { getNonce, sendSignedBurnTransactions, sendSignedTransactions } from '../../utils/send-payments';
-import { signPayment, keypair, signed, payment } from '@o1labs/client-sdk';
+import { sendSignedTransactions, paymentSanityCheckPassed } from '../../utils/send-payments';
 import fs from 'fs';
-import hash, { MD5 } from 'object-hash';
+import hash from 'object-hash';
 import { PaymentConfiguration } from '../../configuration/Model';
 import { injectable } from 'inversify';
 import { ISender } from './Model';
@@ -19,14 +18,16 @@ export class TransactionSender implements ISender {
         if (payoutHash) {
             console.log(`### Processing signed payout for hash ${payoutHash}...`);
             if (payoutHash == calculatedHash) {
-                
-                sendSignedTransactions(payouts, senderKeys, payoutMemo, bpKeyMd5Hash, paymentProcess.totalBurn, burnAddress, payorSendTransactionFee);
-                const paidblockStream = fs.createWriteStream(`${__dirname}/../../data/.paidblocks`, { flags: 'a' });
-                blocks.forEach((block) => {
-                    paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
-                });
-                paidblockStream.end();
-
+                if (paymentSanityCheckPassed(paymentProcess, payouts, config)) {
+                    sendSignedTransactions(payouts, senderKeys, payoutMemo, bpKeyMd5Hash, paymentProcess.totalBurn, burnAddress, payorSendTransactionFee);
+                    const paidblockStream = fs.createWriteStream(`${__dirname}/../../data/.paidblocks`, { flags: 'a' });
+                    blocks.forEach((block) => {
+                        paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
+                    });
+                    paidblockStream.end();
+                } else {
+                    console.log(`Payment sanity checks didn't pass !!`);
+                }
             } else {
                 console.error("HASHES DON'T MATCH");
             }

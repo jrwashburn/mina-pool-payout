@@ -4,10 +4,6 @@ import { stakeIsLocked } from '../../utils/staking-ledger-util';
 import { Block, Stake } from '../dataProvider/dataprovider-types';
 import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
 
-// per foundation and o1 rules, the maximum fee is 5%, excluding fees and supercharged coinbase
-// see https://minaprotocol.com/docs/advanced/foundation-delegation-program
-const npsCommissionRate = 0.05;
-
 @injectable()
 export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
     async getPayouts(
@@ -28,6 +24,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
         const storePayout: PayoutDetails[] = [];
         let sumCoinbase = 0;
         let sumCoinbaseNoSuperchargedRewards = 0;
+        let sumToBurnForSanityCheck = 0;
 
         // for each block, calculate the effective stake of each staker
         blocks.forEach((block: Block) => {
@@ -64,6 +61,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                     totalSuperchargedPoolRewards = coinbase / 2;
                     totalCommonPoolRewards = totalRewards - totalNPSPoolRewards - totalSuperchargedPoolRewards;
                     blockRewardsToBurn = coinbase / 2;
+                    sumToBurnForSanityCheck += blockRewardsToBurn;
                 }
 
                 sumCoinbaseNoSuperchargedRewards += totalNPSPoolRewards;
@@ -125,6 +123,11 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                         ? commissionRates[staker.publicKey].commissionRate
                         : defaultCommissionRate;
                     
+                    //!!!!!!! IMPORTANT !!!!!!! : Increment the  totalToBurn only if the following conditions have been met:
+                    // Only if the WINNER IS MF or INVEST and coinbase = 1440
+                    // But Also and only in case the winner == the staker. This will avoid burning the same amount several times
+                    // if We increment this for each staker, the total to burn will be huge if the number of stakers is high !!
+                    // this is another way to make sure we burn only 1 time per supercharged block won by MF or INVET
                     if (winner.publicKey == staker.publicKey && burnSuperChargedRewards) { 
                         staker.totalToBurn += blockRewardsToBurn;
                     }
@@ -220,6 +223,13 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                 totalToBurn += staker.totalToBurn;
             }
         });
+
+        if (sumToBurnForSanityCheck !== totalToBurn) {
+            throw new Error('sumToBurnForSanityCheck !== totalToBurn !! this should never happen',);
+        } else if (sumToBurnForSanityCheck > sumCoinbase / 2) { 
+            throw new Error('sumToBurnForSanityCheck is too high. It s more than 1/2 of the sum of coinbases!! this should never happen',);
+        }
+
         return [payoutJson, storePayout, blocksIncluded, totalPayout, totalToBurn];
     }
 

@@ -54,6 +54,7 @@ export class TransactionBuilder implements ITransactionBuilder {
                 'totalRewardsNPSPool',
                 'totalRewardsCommonPool',
                 'payout',
+                'toBurn',
             ]);
         }
 
