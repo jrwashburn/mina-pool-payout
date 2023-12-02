@@ -165,7 +165,7 @@ export class PayoutCalculator implements IPayoutCalculator {
                         totalRewardsSuperchargedPool: 0,
                     });
                 });
-                if (totalToBurn > 0) {
+                if (burnAmount > 0) {
                     storePayout.push({
                         publicKey: burnAddress,
                         owner: 'BURN',

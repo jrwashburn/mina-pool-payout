@@ -181,7 +181,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                         isEffectiveSuperCharge: true,
                     });
                 });
-                if (totalToBurn > 0) {
+                if (burnAmount > 0) {
                     storePayout.push({
                         publicKey: burnAddress,
                         owner: 'BURN',
