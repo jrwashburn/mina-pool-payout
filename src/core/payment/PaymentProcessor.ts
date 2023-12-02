@@ -61,12 +61,6 @@ export class PaymentProcessor implements IPaymentProcessor {
             totalPayoutFundsNeeded += t.amount + t.fee;
         });
 
-        if (paymentProcess.totalBurn > 0) { 
-            totalPayoutFundsNeeded = totalPayoutFundsNeeded + paymentProcess.totalBurn + configuration.payorSendTransactionFee;
-        }
-
-        paymentProcess.totalPayoutFundsNeeded = totalPayoutFundsNeeded;
-
         console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
     }
 

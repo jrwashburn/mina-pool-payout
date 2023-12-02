@@ -26,7 +26,6 @@ export interface PaymentTotals {
     payoutAmountsSum: number;
     payoutFeesSum: number;
     netMinaToPoolOperator: number;
-    burnSum: number;
 }
 
 export interface IPaymentBuilder {

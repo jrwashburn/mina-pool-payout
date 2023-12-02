@@ -86,7 +86,10 @@ export class PaymentBuilder implements IPaymentBuilder {
                         mfCommissionRate,
                         o1CommissionRate,
                         investorsCommissionRate,
-                        commissionRatesByPublicKey
+                        commissionRatesByPublicKey,
+                        config.burnAddress,
+                        config.bpKeyMd5Hash,
+                        config.payoutMemo,
                     );
 
                 payouts.push(...ledgerPayouts);

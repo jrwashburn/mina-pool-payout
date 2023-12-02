@@ -9,7 +9,7 @@ import { PaymentProcess } from '../payment/Model';
 @injectable()
 export class TransactionSender implements ISender {
     async send(config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void> {
-        const { payoutHash, senderKeys, burnAddress, payorSendTransactionFee, payoutMemo, bpKeyMd5Hash} = config;
+        const { payoutHash, senderKeys } = config;
 
         const { blocks, payouts } = paymentProcess;
 
@@ -19,7 +19,7 @@ export class TransactionSender implements ISender {
             console.log(`### Processing signed payout for hash ${payoutHash}...`);
             if (payoutHash == calculatedHash) {
                 if (paymentSanityCheckPassed(paymentProcess, payouts, config)) {
-                    sendSignedTransactions(payouts, senderKeys, payoutMemo, bpKeyMd5Hash, paymentProcess.totalBurn, burnAddress, payorSendTransactionFee);
+                    sendSignedTransactions(payouts, senderKeys);
                     const paidblockStream = fs.createWriteStream(`${__dirname}/../../data/.paidblocks`, { flags: 'a' });
                     blocks.forEach((block) => {
                         paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);

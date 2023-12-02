@@ -39,4 +39,4 @@ export type LedgerEntry = {
     };
 };
 
-export type ShareClass = { shareClass: 'NPS' | 'Common'; shareOwner: '' | 'MF' | 'O1' | 'INVEST' };
+export type ShareClass = { shareClass: 'NPS' | 'Common' | 'BURN'; shareOwner: '' | 'MF' | 'O1' | 'INVEST' | 'BURN' };
