@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { BlockProcessor } from '../BlockProcessor';
 
 describe('BlockProcessor Tests', () => {

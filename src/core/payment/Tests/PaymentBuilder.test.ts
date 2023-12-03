@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Block } from '../../dataProvider/dataprovider-types';
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../../dataProvider/Models';
 import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from '../../payoutCalculator/Model';
@@ -54,7 +55,25 @@ describe('Payment Builder Tests', () => {
     const mockStakeDataProvider: IStakeDataProvider = {
         getStakes: () =>
             new Promise(() => {
-                1;
+                [
+                    {
+                        pk: 'B62qiy32p8kAKnny8ZFwoMhYpBppM1DWVCqAPBYNcXnsAHhnfAAuXgg',
+                        balance: '0.000001',
+                        delegate: 'B62qiy32p8kAKnny8ZFwoMhYpBppM1DWVCqAPBYNcXnsAHhnfAAuXgg',
+                    },
+                    {
+                        pk: 'B62qmqMrgPshhHKLJ7DqWn1KeizEgga5MuGmWb2bXajUnyivfeMW6JE',
+                        balance: '372093',
+                        delegate: 'B62qrecVjpoZ4Re3a5arN6gXZ6orhmj1enUtA887XdG5mtZfdUbBUh4',
+                        timing: {
+                            initial_minimum_balance: '372093',
+                            cliff_time: '86400',
+                            cliff_amount: '372093',
+                            vesting_period: '1',
+                            vesting_increment: '0',
+                        },
+                    },
+                ];
             }),
     };
 
@@ -99,30 +118,20 @@ describe('Payment Builder Tests', () => {
 
             const expectedPayoutTransaction: PayoutTransaction[] = [
                 {
-                    numberOfBlocks: 1,
-                    sumCoinbase: 1,
-                    sumCoinbaseNoSuperchargedRewards: 1,
                     amount: 100,
                     fee: 10,
                     publicKey: '123645789',
                     amountMina: 0,
                     feeMina: 0,
-                    amountToBurn: 0,
-                    amountToBurnMina: 0,
-                    owner: 'MF'
+                    memo: '',
                 },
                 {
-                    numberOfBlocks: 1,
-                    sumCoinbase: 1,
-                    sumCoinbaseNoSuperchargedRewards: 1,
                     amount: 100,
                     fee: 10,
                     publicKey: '223645789',
                     amountMina: 0,
                     feeMina: 0,
-                    amountToBurn: 0,
-                    amountToBurnMina: 0,
-                    owner: 'MF'
+                    memo: '',
                 },
             ];
 
@@ -153,7 +162,9 @@ describe('Payment Builder Tests', () => {
                     effectiveSuperchargedPoolWeighting: 0,
                     sumEffectiveSuperchargedPoolStakes: 0,
                     totalRewardsSuperchargedPool: 0,
-                    toBurn: 0,
+                    owner: 'MF',
+                    winnerShareOwner: 'MF',
+                    totalRewardsToBurn: 0,
                 },
                 {
                     blockHeight: 11,
@@ -181,7 +192,9 @@ describe('Payment Builder Tests', () => {
                     effectiveSuperchargedPoolWeighting: 0,
                     sumEffectiveSuperchargedPoolStakes: 0,
                     totalRewardsSuperchargedPool: 0,
-                    toBurn: 0,
+                    owner: 'O1',
+                    winnerShareOwner: 'MF',
+                    totalRewardsToBurn: 0,
                 },
             ];
 
@@ -200,10 +213,9 @@ describe('Payment Builder Tests', () => {
                     payoutAmountsSum: 12,
                     payoutFeesSum: 13,
                     userCommandTransactionFeeSum: 12,
-                    burnSum: 0,
                 },
                 totalPayouts: 0,
-                totalBurn:0
+                totalBurn: 0,
             };
 
             builder.build().then((result) => {
@@ -221,30 +233,20 @@ describe('Payment Builder Tests', () => {
 
             const expectedPayoutTransaction: PayoutTransaction[] = [
                 {
-                    numberOfBlocks: 1,
-                    sumCoinbase: 1,
-                    sumCoinbaseNoSuperchargedRewards: 1,
                     amount: 100,
                     fee: 10,
                     publicKey: '123645789',
                     amountMina: 0,
                     feeMina: 0,
-                    amountToBurn: 0,
-                    amountToBurnMina: 0,
-                    owner: 'MF'
+                    memo: '',
                 },
                 {
-                    numberOfBlocks: 1,
-                    sumCoinbase: 1,
-                    sumCoinbaseNoSuperchargedRewards: 1,
                     amount: 100,
                     fee: 10,
                     publicKey: '223645789',
                     amountMina: 0,
                     feeMina: 0,
-                    amountToBurn: 0,
-                    amountToBurnMina: 0,
-                    owner: 'MF'
+                    memo: '',
                 },
             ];
 
@@ -275,7 +277,9 @@ describe('Payment Builder Tests', () => {
                     effectiveSuperchargedPoolWeighting: 0,
                     sumEffectiveSuperchargedPoolStakes: 0,
                     totalRewardsSuperchargedPool: 0,
-                    toBurn:0,
+                    owner: 'MF',
+                    winnerShareOwner: 'MF',
+                    totalRewardsToBurn: 0,
                 },
                 {
                     blockHeight: 11,
@@ -303,7 +307,9 @@ describe('Payment Builder Tests', () => {
                     effectiveSuperchargedPoolWeighting: 0,
                     sumEffectiveSuperchargedPoolStakes: 0,
                     totalRewardsSuperchargedPool: 0,
-                    toBurn:0,
+                    owner: 'MF',
+                    winnerShareOwner: 'MF',
+                    totalRewardsToBurn: 0,
                 },
             ];
 
@@ -322,11 +328,9 @@ describe('Payment Builder Tests', () => {
                     payoutAmountsSum: 11,
                     payoutFeesSum: 11,
                     userCommandTransactionFeeSum: 11,
-                    burnSum: 0,
                 },
                 totalPayouts: 0,
                 totalBurn: 0,
-
             };
 
             builder.build().then((result) => {
