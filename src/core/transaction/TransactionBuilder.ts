@@ -27,19 +27,22 @@ export class TransactionBuilder implements ITransactionBuilder {
                             fee: 0,
                             amountMina: 0,
                             feeMina: 0,
+                            memo: '',
                         });
 
                     item.amount += o.amount;
                     item.fee = config.payorSendTransactionFee;
                     item.amountMina = item.amount / 1000000000;
                     item.feeMina = item.fee / 1000000000;
+                    item.memo = o.memo;
                     return r.set(o.publicKey, item);
                 }, new Map())
                 .values(),
         ];
 
         if (config.verbose) {
-            console.table(storePayout, [
+            console.table(storePayout);
+                /*, [
                 'publicKey',
                 'blockHeight',
                 'shareClass',
@@ -51,7 +54,8 @@ export class TransactionBuilder implements ITransactionBuilder {
                 'totalRewardsNPSPool',
                 'totalRewardsCommonPool',
                 'payout',
-            ]);
+                'toBurn',
+            ]);*/
         }
 
         console.log(`before substitutions and exclusions`);

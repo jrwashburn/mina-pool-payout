@@ -4,9 +4,11 @@ import { IFeeCalculator } from '../transaction/Model';
 
 export type PayoutDetails = {
     publicKey: string;
+    owner: string;
     blockHeight: number;
     globalSlot: number;
     publicKeyUntimedAfter: number;
+    winnerShareOwner: string;
     shareClass: ShareClass;
     stateHash: string;
     effectiveNPSPoolWeighting: number;
@@ -23,6 +25,7 @@ export type PayoutDetails = {
     dateTime: number;
     coinbase: number;
     totalRewards: number;
+    totalRewardsToBurn: number;
     totalRewardsNPSPool: number;
     totalRewardsCommonPool: number;
     totalRewardsSuperchargedPool: number;
@@ -36,6 +39,7 @@ export type PayoutTransaction = {
     fee: number;
     amountMina: number;
     feeMina: number;
+    memo: string;
 };
 
 export interface IPayoutCalculator {
@@ -46,9 +50,13 @@ export interface IPayoutCalculator {
         commisionRate: number,
         mfCommissionRate: number,
         o1CommissionRate: number,
+        investorsCommissionRate: number,
         comissionRates: KeyCommissionRate,
+        burnAddress: string,
+        bpKeyMd5Hash: string,
+        configuredMemo: string,
     ): Promise<
-        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number]
+        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number, totalToBurn: number]
     >;
 }
 

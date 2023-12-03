@@ -8,14 +8,18 @@ export function stakeIsLocked(stake: Stake, block: Block) {
 export function getPublicKeyShareClass(key: string): ShareClass {
     const path = require('path');
     const foundationAddressesFile = path.join('src', 'data', 'nps-addresses', 'Mina_Foundation_Addresses.csv');
-    const labsAddressesFile = path.join('src', 'data', 'nps-addresses', 'O1_Labs_addresses.csv');
+    const labsAddressesFile = path.join('src', 'data', 'nps-addresses', 'O1_Labs_Addresses.csv');
+    const investorsAddressesFile = path.join('src', 'data', 'nps-addresses', 'Investors_Addresses.csv');
     const foundationAddresses = fs.readFileSync(foundationAddressesFile);
     const o1labsAddresses = fs.readFileSync(labsAddressesFile);
+    const investorsAddresses = fs.readFileSync(investorsAddressesFile);
 
     if (foundationAddresses.includes(key)) {
         return { shareClass: 'NPS', shareOwner: 'MF' };
     } else if (o1labsAddresses.includes(key)) {
         return { shareClass: 'NPS', shareOwner: 'O1' };
+    } else if (investorsAddresses.includes(key)) {
+        return { shareClass: 'NPS', shareOwner: 'INVEST' };
     } else return { shareClass: 'Common', shareOwner: '' };
 }
 

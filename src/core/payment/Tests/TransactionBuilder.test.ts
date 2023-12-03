@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { TransactionBuilder } from '../../transaction/TransactionBuilder';
 import { ISubstituteAndExcludePayToAddresses, PaymentProcess } from '../Model';
 import { PaymentConfiguration } from '../../../configuration/Model';
@@ -21,15 +22,19 @@ describe('Transaction Builder Tests', () => {
                 storePayout: [],
                 totalPayoutFundsNeeded: 11,
                 payoutsBeforeExclusions: [],
+                totalPayouts: 0,
+                totalBurn: 0,
             };
             //TODO: MOVE THIS TO ITS A SETUP FILE
             const configurationMock: PaymentConfiguration = {
                 defaultCommissionRate: 0.05,
                 mfCommissionRate: 0.08,
                 o1CommissionRate: 0.05,
+                investorsCommissionRate: 0.08,
                 commissionRatesByPublicKey: {},
                 stakingPoolPublicKey: '',
                 payoutMemo: '',
+                bpKeyMd5Hash: '',
                 senderKeys: {
                     privateKey: '',
                     publicKey: '',
@@ -44,6 +49,7 @@ describe('Transaction Builder Tests', () => {
                 payoutThreshold: 0,
                 epoch: 0,
                 slotsInEpoch: 0,
+                burnAddress: '',
             };
 
             const builder = new TransactionBuilder(mockAddressRemover);

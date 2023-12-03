@@ -13,6 +13,8 @@ export interface PaymentProcess {
     maximumHeight: number;
     blocks: Block[];
     totalPayoutFundsNeeded: number;
+    totalPayouts: number;
+    totalBurn: number;
     totals?: PaymentTotals;
 }
 

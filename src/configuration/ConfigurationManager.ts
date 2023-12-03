@@ -3,19 +3,22 @@ import fs from 'fs';
 import Container from '../composition/inversify.config';
 import { IBlockDataProvider, IDataProviderFactory } from '../core/dataProvider/Models';
 import TYPES from '../composition/Types';
+import { createHash } from 'node:crypto'
 
 export class ConfigurationManager {
     public static Setup: PaymentConfiguration;
     public static async build(args: any) {
         this.Setup = {
             defaultCommissionRate: Number(process.env.COMMISSION_RATE),
-            mfCommissionRate: Number(process.env.MF_COMMISSION_RATE),
-            o1CommissionRate: Number(process.env.O1_COMMISSION_RATE),
+            mfCommissionRate: Number(process.env.MF_COMMISSION_RATE || 0.08),
+            o1CommissionRate: Number(process.env.O1_COMMISSION_RATE || 0.05),
+            investorsCommissionRate: Number(process.env.INVESTORS_COMMISSION_RATE || 0.08),
             epoch: args.epoch ?? Number(args.epoch),
             slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
             commissionRatesByPublicKey: await getComissionRates(),
             stakingPoolPublicKey: process.env.POOL_PUBLIC_KEY || '',
             payoutMemo: process.env.POOL_MEMO || 'mina-pool-payout',
+            bpKeyMd5Hash: getMemoMd5Hash(process.env.POOL_PUBLIC_KEY || ''),
             senderKeys: {
                 privateKey: process.env.SEND_PRIVATE_KEY || '',
                 publicKey: process.env.SEND_PUBLIC_KEY || '',
@@ -28,6 +31,7 @@ export class ConfigurationManager {
             verbose: args.verbose,
             payoutHash: args.payouthash,
             payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0,
+            burnAddress: 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X',
         };
 
         await this.validate();
@@ -54,6 +58,8 @@ export class ConfigurationManager {
             `Epoch Minimum Height: ${this.Setup.minimumHeight} - Epoch Maximum Height: ${this.Setup.configuredMaximum}`,
         );
     }
+
+    
 
     private static async validate() {
         if (Number.isNaN(this.Setup.defaultCommissionRate)) {
@@ -140,3 +146,11 @@ const validateCommission = (key: string, rate: number, index: number) => {
 
     return { ...result, isValid: true };
 };
+
+const getMemoMd5Hash = (memo: string) => {
+    if (typeof memo !== 'string' || memo.length === 0) {
+        return createHash('md5').update('default-memo-value').digest('hex');
+    } else { 
+        return createHash('md5').update(memo).digest('hex');
+    }
+}

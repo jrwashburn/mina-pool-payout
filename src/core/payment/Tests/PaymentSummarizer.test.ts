@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import 'reflect-metadata';
 import { IFileWriter } from '../../../shared/Model';
 import { Block } from '../../dataProvider/dataprovider-types';
 import { PaymentProcess } from '../Model';
@@ -20,31 +21,31 @@ describe('Payment Summarizer tests', () => {
                 {
                     blockdatetime: 213456789,
                     blockheight: 10,
-                    coinbase: 10,
+                    coinbase: 720000000000,
                     creatorpublickey: '123645789',
-                    feetransferfromcoinbase: 10,
-                    feetransfertoreceiver: 1,
+                    feetransferfromcoinbase: 10000000000,
+                    feetransfertoreceiver: 1000000000,
                     globalslotsincegenesis: 1,
                     receiverpublickey: '123445676',
                     slot: 1,
                     stakingledgerhash: 'da622bbdea9ab2c632385a78791b202a',
                     statehash: '0062aca83e3d7027cd77cfe03e0fe7d9',
-                    usercommandtransactionfees: 10,
+                    usercommandtransactionfees: 10000000000,
                     winnerpublickey: '123645789',
                 },
                 {
                     blockdatetime: 213456781,
                     blockheight: 11,
-                    coinbase: 10,
+                    coinbase: 720000000000,
                     creatorpublickey: '123645782',
-                    feetransferfromcoinbase: 10,
-                    feetransfertoreceiver: 1,
+                    feetransferfromcoinbase: 10000000000,
+                    feetransfertoreceiver: 1000000000,
                     globalslotsincegenesis: 1,
                     receiverpublickey: '123445672',
                     slot: 1,
                     stakingledgerhash: 'da622bbdea9ab2c632385a78791b202a',
                     statehash: '0062aca83e3d7027cd77cfe03e0fe7d9',
-                    usercommandtransactionfees: 10,
+                    usercommandtransactionfees: 10000000000,
                     winnerpublickey: '123645789',
                 },
             ];
@@ -56,19 +57,22 @@ describe('Payment Summarizer tests', () => {
                 payoutsBeforeExclusions: [],
                 storePayout: [],
                 totalPayoutFundsNeeded: 0,
-                totals: {
-                    coinBaseSum: 720,
-                    feeTransferFromCoinBaseSum: 2.823,
-                    netCoinBaseReceived: 0,
-                    netMinaToPoolOperator: 722,
-                    payoutAmountsSum: 686,
-                    payoutFeesSum: 0.08,
-                    userCommandTransactionFeeSum: 36,
-                },
+                totalPayouts: 0,
+                totalBurn: 0,
             };
 
-            const result = await summarizer.calculateTotals(process);
-            expect(result).toStrictEqual(process);
+            const totals = {
+                coinBaseSum: 1440,
+                feeTransferFromCoinBaseSum: 20,
+                userCommandTransactionFeeSum: 20,
+                netCoinBaseReceived: 1440,
+                payoutAmountsSum: 0,
+                payoutFeesSum: 0,
+                netMinaToPoolOperator: 1440,
+            };
+
+            await summarizer.calculateTotals(process);
+            expect(process.totals).toStrictEqual(totals);
         });
     });
 });

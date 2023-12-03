@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Block } from '../../dataProvider/dataprovider-types';
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../../dataProvider/Models';
 import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from '../../payoutCalculator/Model';
@@ -54,7 +55,25 @@ describe('Payment Builder Tests', () => {
     const mockStakeDataProvider: IStakeDataProvider = {
         getStakes: () =>
             new Promise(() => {
-                1;
+                [
+                    {
+                        pk: 'B62qiy32p8kAKnny8ZFwoMhYpBppM1DWVCqAPBYNcXnsAHhnfAAuXgg',
+                        balance: '0.000001',
+                        delegate: 'B62qiy32p8kAKnny8ZFwoMhYpBppM1DWVCqAPBYNcXnsAHhnfAAuXgg',
+                    },
+                    {
+                        pk: 'B62qmqMrgPshhHKLJ7DqWn1KeizEgga5MuGmWb2bXajUnyivfeMW6JE',
+                        balance: '372093',
+                        delegate: 'B62qrecVjpoZ4Re3a5arN6gXZ6orhmj1enUtA887XdG5mtZfdUbBUh4',
+                        timing: {
+                            initial_minimum_balance: '372093',
+                            cliff_time: '86400',
+                            cliff_amount: '372093',
+                            vesting_period: '1',
+                            vesting_increment: '0',
+                        },
+                    },
+                ];
             }),
     };
 
@@ -104,6 +123,7 @@ describe('Payment Builder Tests', () => {
                     publicKey: '123645789',
                     amountMina: 0,
                     feeMina: 0,
+                    memo: '',
                 },
                 {
                     amount: 100,
@@ -111,6 +131,7 @@ describe('Payment Builder Tests', () => {
                     publicKey: '223645789',
                     amountMina: 0,
                     feeMina: 0,
+                    memo: '',
                 },
             ];
 
@@ -141,6 +162,9 @@ describe('Payment Builder Tests', () => {
                     effectiveSuperchargedPoolWeighting: 0,
                     sumEffectiveSuperchargedPoolStakes: 0,
                     totalRewardsSuperchargedPool: 0,
+                    owner: 'MF',
+                    winnerShareOwner: 'MF',
+                    totalRewardsToBurn: 0,
                 },
                 {
                     blockHeight: 11,
@@ -168,6 +192,9 @@ describe('Payment Builder Tests', () => {
                     effectiveSuperchargedPoolWeighting: 0,
                     sumEffectiveSuperchargedPoolStakes: 0,
                     totalRewardsSuperchargedPool: 0,
+                    owner: 'O1',
+                    winnerShareOwner: 'MF',
+                    totalRewardsToBurn: 0,
                 },
             ];
 
@@ -187,6 +214,8 @@ describe('Payment Builder Tests', () => {
                     payoutFeesSum: 13,
                     userCommandTransactionFeeSum: 12,
                 },
+                totalPayouts: 0,
+                totalBurn: 0,
             };
 
             builder.build().then((result) => {
@@ -209,6 +238,7 @@ describe('Payment Builder Tests', () => {
                     publicKey: '123645789',
                     amountMina: 0,
                     feeMina: 0,
+                    memo: '',
                 },
                 {
                     amount: 100,
@@ -216,6 +246,7 @@ describe('Payment Builder Tests', () => {
                     publicKey: '223645789',
                     amountMina: 0,
                     feeMina: 0,
+                    memo: '',
                 },
             ];
 
@@ -246,6 +277,9 @@ describe('Payment Builder Tests', () => {
                     effectiveSuperchargedPoolWeighting: 0,
                     sumEffectiveSuperchargedPoolStakes: 0,
                     totalRewardsSuperchargedPool: 0,
+                    owner: 'MF',
+                    winnerShareOwner: 'MF',
+                    totalRewardsToBurn: 0,
                 },
                 {
                     blockHeight: 11,
@@ -273,6 +307,9 @@ describe('Payment Builder Tests', () => {
                     effectiveSuperchargedPoolWeighting: 0,
                     sumEffectiveSuperchargedPoolStakes: 0,
                     totalRewardsSuperchargedPool: 0,
+                    owner: 'MF',
+                    winnerShareOwner: 'MF',
+                    totalRewardsToBurn: 0,
                 },
             ];
 
@@ -292,6 +329,8 @@ describe('Payment Builder Tests', () => {
                     payoutFeesSum: 11,
                     userCommandTransactionFeeSum: 11,
                 },
+                totalPayouts: 0,
+                totalBurn: 0,
             };
 
             builder.build().then((result) => {

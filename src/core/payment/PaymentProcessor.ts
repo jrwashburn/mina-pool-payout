@@ -37,7 +37,7 @@ export class PaymentProcessor implements IPaymentProcessor {
 
             await this.transactionBuilder.build(paymentProcess, configuration);
 
-            await this.calculateTotalPayoutFundsNeeded(paymentProcess);
+            await this.calculateTotalPayoutFundsNeeded(paymentProcess, configuration);
 
             await this.transactionProcessor.write(configuration, paymentProcess);
 
@@ -54,14 +54,12 @@ export class PaymentProcessor implements IPaymentProcessor {
         }
     }
 
-    private async calculateTotalPayoutFundsNeeded(paymentProcess: PaymentProcess) {
+    private async calculateTotalPayoutFundsNeeded(paymentProcess: PaymentProcess, configuration: PaymentConfiguration) {
         let totalPayoutFundsNeeded = 0;
 
         paymentProcess.payouts.map((t) => {
             totalPayoutFundsNeeded += t.amount + t.fee;
         });
-
-        paymentProcess.totalPayoutFundsNeeded = totalPayoutFundsNeeded;
 
         console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
     }
