@@ -21,7 +21,7 @@ import { StakeDataProviderFactory } from '../core/dataProvider/StakeDataProvider
 import { IFileWriter } from '../shared/Model';
 import { FileWriter } from '../shared/FileWriter';
 import { ISender, ITransactionBuilder, ITransactionProcessor } from '../core/transaction/Model';
-import { TransactionSender } from '../core/transaction/TrasactionSender';
+import { TransactionSender } from '../core/transaction/TransactionSender';
 import { TransactionProcessor } from '../core/transaction/TransactionProcessor';
 import { PayoutCalculatorIsolateSuperCharge } from '../core/payoutCalculator/PayoutCalculatorIsolateSuperCharge';
 import { SubstituteAndExcludePayToAddressesForSuperCharge } from '../core/payment/SubstituteAndExcludePayToAddressesForSuperCharge';
