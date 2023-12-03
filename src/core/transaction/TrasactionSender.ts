@@ -1,4 +1,4 @@
-import { sendSignedTransactions, paymentSanityCheckPassed } from '../../utils/send-payments';
+import { sendSignedTransactions } from '../../utils/send-payments';
 import fs from 'fs';
 import hash from 'object-hash';
 import { PaymentConfiguration } from '../../configuration/Model';
@@ -18,16 +18,12 @@ export class TransactionSender implements ISender {
         if (payoutHash) {
             console.log(`### Processing signed payout for hash ${payoutHash}...`);
             if (payoutHash == calculatedHash) {
-                if (paymentSanityCheckPassed(paymentProcess, payouts, config)) {
-                    sendSignedTransactions(payouts, senderKeys);
-                    const paidblockStream = fs.createWriteStream(`${__dirname}/../../data/.paidblocks`, { flags: 'a' });
-                    blocks.forEach((block) => {
-                        paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
-                    });
-                    paidblockStream.end();
-                } else {
-                    console.log(`Payment sanity checks didn't pass !!`);
-                }
+                sendSignedTransactions(payouts, senderKeys);
+                const paidblockStream = fs.createWriteStream(`${__dirname}/../../data/.paidblocks`, { flags: 'a' });
+                blocks.forEach((block) => {
+                    paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
+                });
+                paidblockStream.end();
             } else {
                 console.error("HASHES DON'T MATCH");
             }

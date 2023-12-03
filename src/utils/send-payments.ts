@@ -115,17 +115,3 @@ export async function sendSignedTransactions(
     });
   }, Promise.resolve());
 }
-
-export function paymentSanityCheckPassed(paymentProcess: PaymentProcess, payouts: PayoutTransaction[], config: PaymentConfiguration): boolean {
-    //total value to burn can't exceed half of the coinBaseSum
-    if (paymentProcess.totals && (paymentProcess.totalBurn > paymentProcess.totals?.coinBaseSum/2)) {
-        return false;
-    }
-
-    // in case of burn, the burn amount should be > 0, the burn address should be provided and its value should be checked
-    if (paymentProcess.totalBurn > 0 && (!config.burnAddress || config.burnAddress != 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X')) {
-            return false;
-    }
-
-    return true;
-}

@@ -74,7 +74,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
         console.log('------------------- Summary & Totals ------------------');
         console.log('Calculations based on entire pool');
         console.log(`\x1b[42m%s\x1b[0m`,`Net Coinbase Received: ${base.totals?.netCoinBaseReceived}`);
-        console.log(`\x1b[42m%s\x1b[0m`,`Total Amounts Due To Stakers: ${base.totals?.payoutAmountsSum}`);
+        console.log(`\x1b[42m%s\x1b[0m`,`Total Amounts Due To Stakers / To Burn: ${base.totals?.payoutAmountsSum}`);
         console.log(`\x1b[42m%s\x1b[0m`,`Net MINA to Pool Operator (after send transaction fees): ${base.totals?.netMinaToPoolOperator}`);
         console.log(`Total Coin Base Generated: ${base.totals?.coinBaseSum}`);
         console.log(
