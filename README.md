@@ -9,7 +9,11 @@ Before to send any payout please make sure:
 -   Make sure the total coinbase amount is valid and aligned with the details displayed during the execution of the script.
 -   You can see more details by enabling the debug mode. This can be achieved by adding --verbose=true to the command line.
 
-![Verification steps](https://github.com/jrwashburn/mina-pool-payout/tree/main/src/img/verification.png?raw=true)
+## Example 1: 
+![Alt Verification steps](./src/img/dry-run-supercharged.png?raw=true)
+
+## Example 2:  
+![Alt Verification steps](./src/img/dry-run-no-supercharged.png?raw=true)
 
 # mina-pool-payout
 
