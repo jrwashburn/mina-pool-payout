@@ -54,7 +54,7 @@ export class PaymentProcessor implements IPaymentProcessor {
         }
     }
 
-    private async calculateTotalPayoutFundsNeeded(paymentProcess: PaymentProcess, config: PaymentConfiguration) {
+    private async calculateTotalPayoutFundsNeeded(paymentProcess: PaymentProcess, configuration: PaymentConfiguration) {
         let totalPayoutFundsNeeded = 0;
 
         paymentProcess.payouts.map((t) => {
@@ -68,7 +68,7 @@ export class PaymentProcessor implements IPaymentProcessor {
         );
         console.log(
             `Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${
-                config.senderKeys.publicKey
+                configuration.senderKeys.publicKey
             } ${totalPayoutFundsNeeded / 1000000000}`,
         );
     }
