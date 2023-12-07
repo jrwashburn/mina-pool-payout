@@ -36,12 +36,6 @@ export class TransactionProcessor implements ITransactionProcessor {
         );
 
         this.fileWriter.write(payoutDetailsFileName, JSON.stringify(storePayout));
-
-        console.log(
-            `Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${
-                config.senderKeys.publicKey
-            } ${totalPayoutFundsNeeded / 1000000000}`,
-        );
     }
 
     private generateOutputFileName(
