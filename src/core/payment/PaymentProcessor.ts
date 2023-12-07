@@ -61,7 +61,16 @@ export class PaymentProcessor implements IPaymentProcessor {
             totalPayoutFundsNeeded += t.amount + t.fee;
         });
 
-        console.log(`Total Funds Required for Payout = ${totalPayoutFundsNeeded}`);
+        console.log(
+            `Total Funds Required for Payout = ${totalPayoutFundsNeeded} nanoMINA or ${
+                totalPayoutFundsNeeded / 1000000000
+            } MINA`,
+        );
+        console.log(
+            `Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${
+                configuration.senderKeys.publicKey
+            } ${totalPayoutFundsNeeded / 1000000000}`,
+        );
     }
 
     private async isValid(config: PaymentConfiguration): Promise<boolean> {
