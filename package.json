@@ -40,6 +40,7 @@
         "@o1labs/client-sdk": "^1.0.0",
         "cross-fetch": "^3.1.5",
         "csv": "^6.2.0",
+        "csv-parse": "^5.5.3",
         "graphql": "^16.5.0",
         "help": "^3.0.2",
         "inversify": "^6.0.1",

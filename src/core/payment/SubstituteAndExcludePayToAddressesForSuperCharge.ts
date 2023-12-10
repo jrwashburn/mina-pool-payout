@@ -34,9 +34,33 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
                                     !(transaction.amount <= payoutThreshold),
                             )
                             .map((t) => {
-                                if (t.publicKey == record[0]) t.publicKey = record[1];
+				if (t.publicKey == record[0] && record[1] != 'SPLIT') t.publicKey = record[1];
                                 return t;
                             });
+			transactions = transactions.flatMap((t) => {
+                            if (t.publicKey == record[0] && record[1] == 'SPLIT') {
+                                const otherKey = record[2];
+                                const splitPercent = parseFloat(record[3]);
+                                const publicKeyAmount = Math.ceil(splitPercent * t.amount);
+                                const publicKeyAmountMina = publicKeyAmount / 1000000000;
+                                const otherKeyAmount = t.amount - publicKeyAmount;
+                                const otherKeyAmountMina = otherKeyAmount / 1000000000;
+                                t.amount = publicKeyAmount;
+                                t.amountMina = publicKeyAmountMina;
+                                const otherKeyTransaction: PayoutTransaction = {
+                                    publicKey: otherKey,
+                                    amount: otherKeyAmount,
+                                    fee: t.fee,
+                                    amountMina: otherKeyAmountMina,
+                                    feeMina: t.feeMina,
+                                    memo: t.memo,
+                                };
+
+                                return [t, otherKeyTransaction];
+                            } else {
+                                return [t];
+                            }
+                        });
                     })
                     .on('end', resolve)
                     .on('error', reject);
