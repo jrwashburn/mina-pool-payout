@@ -25,7 +25,7 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
         const filterPayouts = (filterFile: any) => {
             return new Promise((resolve, reject) => {
                 fs.createReadStream(filterFile)
-                    .pipe(parse({ delimiter: '|' }))
+                    .pipe(parse({ delimiter: '|', relax_column_count: true }))
                     .on('data', (record) => {
                         transactions = transactions
                             .filter(
