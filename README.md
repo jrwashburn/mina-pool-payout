@@ -164,12 +164,14 @@ The file is pipe-delimited and contains 2 columns - the first column is the publ
 
 -   Public Key|EXCLUDE
 -   Public Key|Redirected To Public Key
+-   Public Key|SPLIT|Second public key|Fraction
 
-In the example content below, the first row would cause any payouts to the first key to not be sent. This may be useful for the pool operator's keys. The second row would cause any payouts to the key ending in WCvh to be sent instead to the key ending in Ez3yB. This is useful for redirecting new tokens that would be paid to a locked account to go to an unlocked account instead.
+In the example content below, the first row would cause any payouts to the first key to not be sent. This may be useful for the pool operator's keys. The second row would cause any payouts to the key ending in WCvh to be sent instead to the key ending in Ez3yB. This is useful for redirecting new tokens that would be paid to a locked account to go to an unlocked account instead. The third row would split the payout such that 0.4\*payout (40 percent of the payout) goes to the key ending in WCvh and the rest to the key ending in Ez3yB.
 
 ```
 B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|EXCLUDE
 B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|B62qoigHEtJCoZ5ekbGHWyr9hYfc6fkZ2A41h9vvVZuvty9amzEz3yB
+B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|SPLIT|B62qoigHEtJCoZ5ekbGHWyr9hYfc6fkZ2A41h9vvVZuvty9amzEz3yB|0.4
 ```
 
 To enable these features, create a file src/data/.substitutePayTo and configure it according to your situation.
