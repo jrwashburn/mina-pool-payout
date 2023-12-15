@@ -10,9 +10,14 @@ export function getPublicKeyShareClass(key: string): ShareClass {
     const foundationAddressesFile = path.join('src', 'data', 'nps-addresses', 'Mina_Foundation_Addresses.csv');
     const labsAddressesFile = path.join('src', 'data', 'nps-addresses', 'O1_Labs_Addresses.csv');
     const investorsAddressesFile = path.join('src', 'data', 'nps-addresses', 'Investors_Addresses.csv');
+    const burnAddressesFile = path.join('src', 'data', '.burnSupercharged');
     const foundationAddresses = fs.readFileSync(foundationAddressesFile);
     const o1labsAddresses = fs.readFileSync(labsAddressesFile);
     const investorsAddresses = fs.readFileSync(investorsAddressesFile);
+    let burnAddresses: Buffer = Buffer.from('');
+    if (fs.existsSync(burnAddressesFile)) {
+        burnAddresses = fs.readFileSync(burnAddressesFile);
+    }
 
     if (foundationAddresses.includes(key)) {
         return { shareClass: 'NPS', shareOwner: 'MF' };
@@ -20,6 +25,8 @@ export function getPublicKeyShareClass(key: string): ShareClass {
         return { shareClass: 'NPS', shareOwner: 'O1' };
     } else if (investorsAddresses.includes(key)) {
         return { shareClass: 'NPS', shareOwner: 'INVEST' };
+    } else if (burnAddresses.includes(key)) {
+        return { shareClass: 'NPS', shareOwner: 'BURN' };
     } else return { shareClass: 'Common', shareOwner: '' };
 }
 

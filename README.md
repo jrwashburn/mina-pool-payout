@@ -9,10 +9,10 @@ Before to send any payout please make sure:
 -   Make sure the total coinbase amount is valid and aligned with the details displayed during the execution of the script.
 -   You can see more details by enabling the debug mode. This can be achieved by adding --verbose=true to the command line.
 
-## Example 1: 
+## Example 1:
 ![Alt Verification steps](./src/img/dry-run-supercharged.png?raw=true)
 
-## Example 2:  
+## Example 2:
 ![Alt Verification steps](./src/img/dry-run-no-supercharged.png?raw=true)
 
 # mina-pool-payout
@@ -188,6 +188,10 @@ B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|0.012544
 ```
 
 If no file is present, the process will use the default `COMMISSION_RATE` value
+
+## Adding accounts as Non-Paticipating and burning their supercharged coinbase
+
+You can add accounts as non-participating and burn their supercharged coinbase. This is configured with a file named ".burnSupercharged" which should be placed in the src/data directory. Simply place the public key address in the .burnSupercharged file and the process will treat that key similar to Investor and MF keys and will burn any supercharged coinbase they create, and will put the account in the non-participating payout pool (they will never earn a part of supercharged coinbases.) If you use the standard payout (not isolate supercharged) then they may still be weighted if unlocked, but by default will not receive any supercharged coinbase unless you have changed the code to run the original payout calculator.
 
 ## Running payout for a full epoch
 
