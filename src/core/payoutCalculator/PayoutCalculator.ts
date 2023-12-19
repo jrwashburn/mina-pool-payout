@@ -40,7 +40,9 @@ export class PayoutCalculator implements IPayoutCalculator {
                 const winnerStakeIsLocked = stakeIsLocked(winner, block);
                 const burnSuperChargedRewards =
                     block.coinbase == SUPERCHARGEDCOINBASE &&
-                    (winner.shareClass.shareOwner == 'MF' || winner.shareClass.shareOwner == 'INVEST');
+                    (winner.shareClass.shareOwner == 'MF' ||
+                        winner.shareClass.shareOwner == 'INVEST' ||
+                        winner.shareClass.shareOwner == 'BURN');
                 let sumEffectiveCommonPoolStakes = 0;
                 let sumEffectiveNPSPoolStakes = 0;
                 const effectivePoolStakes: {
@@ -120,9 +122,13 @@ export class PayoutCalculator implements IPayoutCalculator {
                             blockTotal = Math.floor(
                                 (1 - investorsCommissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting,
                             );
+                        } else if (staker.shareClass.shareOwner == 'BURN') {
+                            blockTotal = Math.floor(
+                                (1 - commissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting,
+                            );
                         } else {
                             throw new Error(
-                                'NPS shares should be MF or O1 or INVEST. Found NPS Shares with other owner.',
+                                'NPS shares should be MF or O1 or INVEST or BURN. Found NPS Shares with other owner.',
                             );
                         }
                     } else {
