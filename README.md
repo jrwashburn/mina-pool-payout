@@ -1,30 +1,30 @@
 # TLDR; Step by Step:
 Thanks Naamah https://discord.com/channels/484437221055922177/808895957978447882/1186797525160710204
 
-Pre-requisites
+Pre-requisites  
 Install nodejs/typescript/npm
 
 Get the script
 `git clone https://github.com/jrwashburn/mina-pool-payout.git`
 
-Go into the directory
+Go into the directory  
 `cd mina-pool-payout`
 
-Install the script and dependencies
+Install the script and dependencies  
 `npm install`
 
 Copy sample.env into .env
 `cp sample.env .env`
 
-Edit .env file
-Set POOL_PUBLIC_KEY to your node public key
-Set COMMISSION_RATE to your commission rate
-Set POOL_MEMO to a value that will be used for the memo of your payouts (except mina foundation payout)
-Set SEND_PRIVATE_KEY to your sender private key (export using mina advanced dump-keypair --privkey-path keys/my-payout-wallet if needed)
-Set SEND_PAYMENT_GRAPHQL to your local node graphql end point : SEND_PAYMENT_GRAPHQL_ENDPOINT=http://127.0.0.1:3085/graphql
+Edit .env file  
+Set POOL_PUBLIC_KEY to your node public key   
+Set COMMISSION_RATE to your commission rate  
+Set POOL_MEMO to a value that will be used for the memo of your payouts (except mina foundation payout)  
+Set SEND_PRIVATE_KEY to your sender private key (export using mina advanced dump-keypair --privkey-path keys/my-payout-wallet if needed)  
+Set SEND_PAYMENT_GRAPHQL to your local node graphql end point : SEND_PAYMENT_GRAPHQL_ENDPOINT=http://127.0.0.1:3085/graphql  
 
-Go back to script root directory
-Run the script in dry run mode for the full epoch (or from block to block if needed)
+Go back to script root directory  
+Run the script in dry run mode for the full epoch (or from block to block if needed)  
 `npm run payout -- -e=67`
 
 Check the results
