@@ -17,11 +17,12 @@ Copy sample.env into .env
 `cp sample.env .env`
 
 Edit .env file  
-Set POOL_PUBLIC_KEY to your node public key   
-Set COMMISSION_RATE to your commission rate  
-Set POOL_MEMO to a value that will be used for the memo of your payouts (except mina foundation payout)  
-Set SEND_PRIVATE_KEY to your sender private key (export using `mina advanced dump-keypair --privkey-path keys/my-payout-wallet` if needed)  
-Set SEND_PAYMENT_GRAPHQL to your local node graphql end point : SEND_PAYMENT_GRAPHQL_ENDPOINT=http://127.0.0.1:3085/graphql  
+Set `POOL_PUBLIC_KEY` to your node public key   
+Set `COMMISSION_RATE` to your commission rate  
+Set `POOL_MEMO` to a value that will be used for the memo of your payouts (except mina foundation payout)  
+Set `SEND_PRIVATE_KEY` to your sender private key 
+(export using `mina advanced dump-keypair --privkey-path keys/my-payout-wallet` if needed - suggest using isolated keys for this)  
+Set `SEND_PAYMENT_GRAPHQL` to your local node e.g. `SEND_PAYMENT_GRAPHQL_ENDPOINT=http://127.0.0.1:3085/graphql`  
 
 Go back to script root directory  
 Run the script in dry run mode for the full epoch (or from block to block if needed)  
@@ -29,8 +30,8 @@ Run the script in dry run mode for the full epoch (or from block to block if nee
 
 Check the results
 
-Send payout if results are ok
-Run the script with the hash provided in the previous dry run
+Send payout if results are ok  
+Run the script with the hash provided in the previous dry run  
 `npm run payout -- -e=67 -h=<hash_value_provided_during_dry_run>`
 
 # Important
