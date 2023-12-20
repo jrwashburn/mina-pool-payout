@@ -5,38 +5,33 @@ Pre-requisites
 Install nodejs/typescript/npm
 
 Get the script
-git clone https://github.com/jrwashburn/mina-pool-payout.git
+`git clone https://github.com/jrwashburn/mina-pool-payout.git`
 
 Go into the directory
-cd mina-pool-payout/
+`cd mina-pool-payout`
 
 Install the script and dependencies
-npm install
+`npm install`
 
 Copy sample.env into .env
-cp sample.env .env
+`cp sample.env .env`
 
 Edit .env file
 Set POOL_PUBLIC_KEY to your node public key
+Set COMMISSION_RATE to your commission rate
 Set POOL_MEMO to a value that will be used for the memo of your payouts (except mina foundation payout)
-Set SEND_PRIVATE_KEY to your wallet node private key (export using mina advanced dump-keypair --privkey-path keys/my-payout-wallet if needed)
-Set SEND_PAYMENT_GRAPHQLto your local node graphql end point : SEND_PAYMENT_GRAPHQL_ENDPOINT=http://127.0.0.1:3085/graphql
-
-Export staking ledger
-Go to src/data/ledger
-cd src/data/ledger
-Export the staking ledger (have to do this at the beginning of each epoch)
-mina ledger export staking-epoch-ledger > ./staking-epoch-ledger.json
+Set SEND_PRIVATE_KEY to your sender private key (export using mina advanced dump-keypair --privkey-path keys/my-payout-wallet if needed)
+Set SEND_PAYMENT_GRAPHQL to your local node graphql end point : SEND_PAYMENT_GRAPHQL_ENDPOINT=http://127.0.0.1:3085/graphql
 
 Go back to script root directory
 Run the script in dry run mode for the full epoch (or from block to block if needed)
-npm run payout -- -e=67
+`npm run payout -- -e=67`
 
 Check the results
 
 Send payout if results are ok
 Run the script with the hash provided in the previous dry run
-npm run payout -- -e=67 -h=<hash_value_provided_during_dry_run>
+`npm run payout -- -e=67 -h=<hash_value_provided_during_dry_run>`
 
 # Important
 
