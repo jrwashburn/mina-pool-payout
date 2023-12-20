@@ -20,7 +20,7 @@ Edit .env file
 Set `POOL_PUBLIC_KEY` to your node public key   
 Set `COMMISSION_RATE` to your commission rate  
 Set `POOL_MEMO` to a value that will be used for the memo of your payouts (except mina foundation payout)  
-Set `SEND_PRIVATE_KEY` to your sender private key 
+Set `SEND_PRIVATE_KEY` to your sender private key  
 (export using `mina advanced dump-keypair --privkey-path keys/my-payout-wallet` if needed - suggest using isolated keys for this)  
 Set `SEND_PAYMENT_GRAPHQL` to your local node e.g. `SEND_PAYMENT_GRAPHQL_ENDPOINT=http://127.0.0.1:3085/graphql`  
 
