@@ -225,6 +225,14 @@ B62qinpqDF7ongjhpvJLz7QBsExP1BkpceED6GuThYYbSVSbk1nWCvh|0.012544
 
 If no file is present, the process will use the default `COMMISSION_RATE` value
 
+## Burning a fraction of rewards
+
+Some delegates may request that a pool burn a portion of their rewards. The payout will burn a specific percentage of the rewards that would have been paid out ot a delegate if specified. To use this feature, create a file named .negotiatedBurn in the src/data directory. The file should contain rows in the format: "puyblic key|burn percentage". The burn percentage shoudl be expressed as a number. For example, the following configuration would would burn 5.05% of the payout to the specific key.
+
+```
+B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|0.0505
+```
+
 ## Adding accounts as Non-Paticipating and burning their supercharged coinbase
 
 You can add accounts as non-participating and burn their supercharged coinbase. This is configured with a file named ".burnSupercharged" which should be placed in the src/data directory. Simply place the public key address in the .burnSupercharged file and the process will treat that key similar to Investor and MF keys and will burn any supercharged coinbase they create, and will put the account in the non-participating payout pool (they will never earn a part of supercharged coinbases.) If you use the standard payout (not isolate supercharged) then they may still be weighted if unlocked, but by default will not receive any supercharged coinbase unless you have changed the code to run the original payout calculator.

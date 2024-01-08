@@ -43,6 +43,7 @@ export class PaymentBuilder implements IPaymentBuilder {
             o1CommissionRate,
             investorsCommissionRate,
             commissionRatesByPublicKey,
+            burnRatesByPublicKey,
         } = config;
 
         const latestHeight = await blockProvider.getLatestHeight();
@@ -62,8 +63,8 @@ export class PaymentBuilder implements IPaymentBuilder {
 
         const storePayout: PayoutDetails[] = [];
 
-        let globalTotalPayout: number = 0;
-        let globalTotalToBurn: number = 0;
+        let globalTotalPayout = 0;
+        let globalTotalToBurn = 0;
 
         const ledgerHashes = [...new Set(blocks.map((block) => block.stakingledgerhash))];
 
@@ -87,6 +88,7 @@ export class PaymentBuilder implements IPaymentBuilder {
                         o1CommissionRate,
                         investorsCommissionRate,
                         commissionRatesByPublicKey,
+                        burnRatesByPublicKey,
                         config.burnAddress,
                         config.bpKeyMd5Hash,
                         config.payoutMemo,
