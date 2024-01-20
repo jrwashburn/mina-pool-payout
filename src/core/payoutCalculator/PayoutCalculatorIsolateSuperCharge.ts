@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { KeyCommissionRate } from '../../configuration/Model';
+import { KeyedRate } from '../../configuration/Model';
 import { stakeIsLocked } from '../../utils/staking-ledger-util';
 import { Block, Stake } from '../dataProvider/dataprovider-types';
 import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
@@ -14,7 +14,8 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
         mfCommissionRate: number,
         o1CommissionRate: number,
         investorsCommissionRate: number,
-        commissionRates: KeyCommissionRate,
+        commissionRates: KeyedRate,
+        burnRates: KeyedRate,
         burnAddress: string,
         bpKeyMd5Hash: string,
         configuredMemo: string,
@@ -112,7 +113,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
 
                     //TODO APPLY NEW COMMISSION RATES Extract function
                     const commissionRate = commissionRates[staker.publicKey]
-                        ? commissionRates[staker.publicKey].commissionRate
+                        ? commissionRates[staker.publicKey].rate
                         : defaultCommissionRate;
 
                     let blockTotal = 0;
@@ -151,6 +152,18 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                         throw new Error(
                             'Shares should be common or non-participating. Found shares with other shareClass.',
                         );
+                    }
+
+                    // After calculating the block award, if the delegate has a fractional burn, move some of the blocktotal to the burn address
+                    const burnRate = burnRates[staker.publicKey] ? burnRates[staker.publicKey].rate : 0;
+                    if (burnAmount != 0 && burnRate > 0) {
+                        throw new Error(
+                            'Attempting to burn due to supercharged AND burning due to negotiated burn rate for the same key. Review configuration in .negotiatedBurn. Key should not be part of supercharged burn configuration and variable rate burn configuration at the same time.',
+                        );
+                    } else if (burnRate > 0) {
+                        const burnAmount = Math.floor(blockTotal * burnRate);
+                        blockTotal -= burnAmount;
+                        totalToBurn += burnAmount;
                     }
 
                     staker.total += blockTotal;
