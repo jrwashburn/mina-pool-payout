@@ -40,6 +40,7 @@ export type PayoutTransaction = {
     amountMina: number;
     feeMina: number;
     memo: string;
+    summaryGroup: number;
 };
 
 export interface IPayoutCalculator {
@@ -57,7 +58,14 @@ export interface IPayoutCalculator {
         bpKeyMd5Hash: string,
         configuredMemo: string,
     ): Promise<
-        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number, totalToBurn: number]
+        [
+            payoutJson: PayoutTransaction[],
+            storePayout: PayoutDetails[],
+            blocksIncluded: number[],
+            totalPayout: number,
+            totalSuperchargedToBurn: number,
+            totalNegotiatedBurn: number,
+        ]
     >;
 }
 
