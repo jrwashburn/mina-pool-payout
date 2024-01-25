@@ -63,7 +63,7 @@ export class PayoutCalculator implements IPayoutCalculator {
                 const totalNPSPoolRewards = winnerStakeIsLocked ? block.coinbase : REGULARCOINBASE;
                 // 20231201 implement new MF rules to burn supercharged rewards
                 const burnSuperchargedAmount = burnSuperChargedRewards ? REGULARCOINBASE : 0;
-                const totalCommonPoolRewards = totalRewards - totalNPSPoolRewards - burnAmount;
+                const totalCommonPoolRewards = totalRewards - totalNPSPoolRewards - burnSuperchargedAmount;
                 totalSuperchargedToBurn += burnSuperchargedAmount;
 
                 // Determine the supercharged discount for the block
