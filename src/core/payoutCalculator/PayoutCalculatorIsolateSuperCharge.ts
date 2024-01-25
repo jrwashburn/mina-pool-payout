@@ -284,6 +284,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                         staker.shareClass.shareOwner === 'MF' || staker.shareClass.shareOwner === 'INVEST'
                             ? bpKeyMd5Hash
                             : configuredMemo,
+                    summaryGroup: 0,
                 });
                 totalPayout += amount;
             }
@@ -296,6 +297,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                 amountMina: 0,
                 feeMina: 0,
                 memo: bpKeyMd5Hash,
+                summaryGroup: 1,
             });
         }
         if (totalNegotiatedBurn > 0) {
@@ -306,6 +308,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                 amountMina: 0,
                 feeMina: 0,
                 memo: configuredMemo,
+                summaryGroup: 2,
             });
         }
         return [payoutJson, storePayout, blocksIncluded, totalPayout, totalSuperchargedToBurn, totalNegotiatedBurn];

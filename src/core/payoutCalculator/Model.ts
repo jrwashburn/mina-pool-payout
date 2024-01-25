@@ -40,6 +40,7 @@ export type PayoutTransaction = {
     amountMina: number;
     feeMina: number;
     memo: string;
+    summaryGroup: number;
 };
 
 export interface IPayoutCalculator {

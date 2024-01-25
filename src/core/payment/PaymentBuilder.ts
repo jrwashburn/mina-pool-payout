@@ -114,7 +114,9 @@ export class PaymentBuilder implements IPaymentBuilder {
 
                 console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`);
 
-                console.log(`The Total amount to burn is: ${globalTotalToBurn} nm or ${globalTotalToBurn / 1000000000} mina`);
+                console.log(
+                    `The Total amount to burn is: ${globalTotalToBurn} nm or ${globalTotalToBurn / 1000000000} mina`,
+                );
             }),
         ).then(async () => {
             // added a sort because these payout details are hashed and need to be in a reliable order
@@ -136,7 +138,7 @@ export class PaymentBuilder implements IPaymentBuilder {
                 totalPayoutFundsNeeded: 0,
                 payoutsBeforeExclusions: [],
                 totalPayouts: globalTotalPayout,
-                totalBurn: globalTotalToBurn
+                totalBurn: globalTotalToBurn,
             };
 
             return paymentProcess;
