@@ -6,26 +6,28 @@ import { parse } from 'csv-parse';
 const baseUrl = process.env.PAYOUT_API_ENDPOINT;
 
 export async function getLatestHeight(): Promise<number> {
-    const result: string = await fetch(`${baseUrl}/latest-height`)
+    const result = await fetch(`${baseUrl}/consensus`)
                     .then(x => x.json());
 
-    return parseInt(result,10);
+    let consensus = result as Consensus;
+
+    return consensus.blockHeight;
 }
 
 export async function getMinMaxBlocksByEpoch(epoch: number) {
     const result = await fetch(`${baseUrl}/epoch/${epoch}`)
     .then(x => x.json());
 
-    var minMax = result as MinMax
+    var minMax = result as MinMax;
 
     return { min: minMax.minHeight, max: minMax.maxHeight };
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
-    const result: string = await fetch(`${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight}`)
+    const result = await fetch(`${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight}`)
                             .then(x => x.json());
     
-    let blocks: Blocks = result as unknown as Blocks;
+    let blocks = result as Blocks;
 
     const blockFile = `${__dirname}/../../../data/.paidblocks`;
 
@@ -51,4 +53,8 @@ export async function getBlocks(key: string, minHeight: number, maxHeight: numbe
 interface MinMax {
     minHeight: number;
     maxHeight: number;
+}
+
+interface Consensus{
+    blockHeight: number;
 }

@@ -1,5 +1,6 @@
 import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util';
 import { LedgerEntry, Stake } from '../dataprovider-types';
+import fs from 'fs';
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards
@@ -11,22 +12,29 @@ export function getStakes(ledgerHash: string, key: string): [Stake[], number] {
     const ledgerFile = `${ledgerDirectory}/${ledgerHash}.json`;
     // if (!fs.existsSync(ledgerFile)){ throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`)}
 
-    //TODO: Find a different way to handle this without doing require in const
-    const ledger = require(ledgerFile);
+    fs.readFile(ledgerFile, 'utf-8', (error, data) => {
+        if (error) {          
+          throw error;
+        }
 
-    const stakers: Stake[] = ledger
-        .filter((entry: LedgerEntry) => entry.delegate == key)
-        .map((stake: LedgerEntry) => {
-            const balance = Number(stake.balance);
-            totalStakingBalance += balance;
-            return {
-                publicKey: stake.pk,
-                total: 0,
-                totalToBurn: 0,
-                stakingBalance: balance,
-                untimedAfterSlot: calculateUntimedSlot(stake),
-                shareClass: getPublicKeyShareClass(stake.pk),
-            };
-        });
-    return [stakers, totalStakingBalance];
+        const ledger = JSON.parse(data);
+
+        const stakers: Stake[] = ledger
+            .filter((entry: LedgerEntry) => entry.delegate == key)
+            .map((stake: LedgerEntry) => {
+                const balance = Number(stake.balance);
+                totalStakingBalance += balance;
+                return {
+                    publicKey: stake.pk,
+                    total: 0,
+                    totalToBurn: 0,
+                    stakingBalance: balance,
+                    untimedAfterSlot: calculateUntimedSlot(stake),
+                    shareClass: getPublicKeyShareClass(stake.pk),
+                };
+            });
+        return [stakers, totalStakingBalance];
+    });    
+
+    throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`);
 }
