@@ -20,7 +20,7 @@ export async function getMinMaxBlocksByEpoch(epoch: number) {
 
     var minMax = result as MinMax;
 
-    return { min: minMax.minHeight, max: minMax.maxHeight };
+    return { min: minMax.minBlockHeight, max: minMax.maxBlockHeight };
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
@@ -51,8 +51,8 @@ export async function getBlocks(key: string, minHeight: number, maxHeight: numbe
 }
 
 interface MinMax {
-    minHeight: number;
-    maxHeight: number;
+    minBlockHeight: number;
+    maxBlockHeight: number;
 }
 
 interface Consensus{

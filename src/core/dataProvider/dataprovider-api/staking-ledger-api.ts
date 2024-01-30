@@ -6,13 +6,6 @@ export async function getStakes(ledgerHash: string, key: string): Promise<[Stake
     const result = await fetch(`${baseUrl}/staking-ledger/${ledgerHash}?key=${key}`)
                     .then(x => x.json());
 
-    let stakingLedgers = result as StakingLedgerResponse;
-
-    return [stakingLedgers.stakes, stakingLedgers.totalbalance];
-}
-
-
-interface StakingLedgerResponse{
-    stakes: Stake[];
-    totalbalance: number;
+    let stakingLedgers: [Stake[], number] = [result[0] as Stake[], result[1] as number];
+    return stakingLedgers;
 }
