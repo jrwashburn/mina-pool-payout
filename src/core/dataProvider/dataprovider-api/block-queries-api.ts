@@ -6,26 +6,42 @@ import { parse } from 'csv-parse';
 const baseUrl = process.env.PAYOUT_API_ENDPOINT;
 
 export async function getLatestHeight(): Promise<number> {
-    const result = await fetch(`${baseUrl}/consensus`)
+    const responseData = await fetch(`${baseUrl}/consensus`)
                     .then(x => x.json());
 
+    const { result, error, telemetry, messages } = responseData;
+
+    if(error){
+        throw new Error(`Error Code: ${error.code}, Message: ${error.message}`)
+    }
     let consensus = result as Consensus;
 
     return consensus.blockHeight;
 }
 
 export async function getMinMaxBlocksByEpoch(epoch: number) {
-    const result = await fetch(`${baseUrl}/epoch/${epoch}`)
+    const responseData = await fetch(`${baseUrl}/epoch/${epoch}`)
     .then(x => x.json());
 
+    const { result, error, telemetry, messages } = responseData;
+
+    if(error){
+        throw new Error(`Error Code: ${error.code}, Message: ${error.message}`)
+    }
     var minMax = result as MinMax;
 
     return { min: minMax.minBlockHeight, max: minMax.maxBlockHeight };
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
-    const result = await fetch(`${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight}`)
+    const responseData = await fetch(`${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight}`)
                             .then(x => x.json());
+
+    const { result, error, telemetry, messages } = responseData;
+
+    if(error){
+        throw new Error(`Error Code: ${error.code}, Message: ${error.message}`)
+    }            
     
     let blocks = result as Blocks;
 
