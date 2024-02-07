@@ -7,3 +7,4 @@ node_modules
 !/src/data/nps-addresses/
 !/src/data/mfSubstitutePayTo
 package-lock.json
+*.code-workspace
