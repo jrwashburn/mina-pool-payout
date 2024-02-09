@@ -9,8 +9,7 @@ export class BlockDataProviderFactory implements IDataProviderFactory<IBlockData
     build(dataSource: string): IBlockDataProvider {
         if (dataSource === 'ARCHIVEDB') {
             return new ArchiveBlockDataProvider();
-        }
-        else if(dataSource === 'API'){
+        } else if (dataSource === 'API') {
             return new ApiBlockDataProvider();
         }
         return new MinaExplorerBlockDataProvider();

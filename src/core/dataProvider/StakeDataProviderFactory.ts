@@ -9,8 +9,7 @@ export class StakeDataProviderFactory implements IDataProviderFactory<IStakeData
     build(dataSource: string): IStakeDataProvider {
         if (dataSource === 'ARCHIVEDB') {
             return new ArchiveStakeDataProvider();
-        }
-        else if(dataSource === 'API'){
+        } else if (dataSource === 'API') {
             return new ApiStakeDataProvider();
         }
         return new MinaExplorerStakeDataProvider();

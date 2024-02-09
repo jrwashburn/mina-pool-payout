@@ -131,7 +131,7 @@ describe('Payout Calculator tests', () => {
                         sumEffectiveCommonPoolStakes: 200,
                         sumEffectiveNPSPoolStakes: 200,
                         sumEffectiveSuperchargedPoolStakes: 0,
-                        superchargedWeightingDiscount: .000000000013888888888888888,
+                        superchargedWeightingDiscount: 0.000000000013888888888888888,
                         totalRewards: 719999999991,
                         totalRewardsCommonPool: -9,
                         totalRewardsNPSPool: 720000000000,
@@ -270,7 +270,7 @@ describe('Payout Calculator tests', () => {
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
-                    totalToBurn:0,
+                    totalToBurn: 0,
                 },
                 {
                     publicKey: '123645782',
@@ -278,7 +278,7 @@ describe('Payout Calculator tests', () => {
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
-                    totalToBurn:0,
+                    totalToBurn: 0,
                 },
             ];
 
@@ -299,8 +299,8 @@ describe('Payout Calculator tests', () => {
                     'memo',
                 )
                 .then((result) => {
-                expect(result).toThrow();
-            });
+                    expect(result).toThrow();
+                });
         });
     });
 });

@@ -1,10 +1,10 @@
 import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util';
-import { LedgerEntry, Stake } from '../dataprovider-types';
+import { Ledger, LedgerEntry, Stake } from '../dataprovider-types';
 import fs from 'fs';
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards
-export function getStakes(ledgerHash: string, key: string): [Stake[], number] {
+export function getStakes(ledgerHash: string, key: string): Ledger {
     let totalStakingBalance = 0;
     // get the stakes from staking ledger json
     // TODO: this might need to be reworked for large files
@@ -13,8 +13,8 @@ export function getStakes(ledgerHash: string, key: string): [Stake[], number] {
     // if (!fs.existsSync(ledgerFile)){ throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`)}
 
     fs.readFile(ledgerFile, 'utf-8', (error, data) => {
-        if (error) {          
-          throw error;
+        if (error) {
+            throw error;
         }
 
         const ledger = JSON.parse(data);
@@ -33,8 +33,8 @@ export function getStakes(ledgerHash: string, key: string): [Stake[], number] {
                     shareClass: getPublicKeyShareClass(stake.pk),
                 };
             });
-        return [stakers, totalStakingBalance];
-    });    
+        return { stakes: stakers, totalStakingBalance: totalStakingBalance };
+    });
 
     throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`);
 }

@@ -24,5 +24,5 @@ export interface PaymentConfiguration {
 }
 
 export interface KeyCommissionRate {
-    [publicKey: string]: { commissionRate: number};
+    [publicKey: string]: { commissionRate: number };
 }

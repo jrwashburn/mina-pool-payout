@@ -74,7 +74,11 @@ export class PaymentProcessor implements IPaymentProcessor {
     }
 
     private async isValid(config: PaymentConfiguration): Promise<boolean> {
-        if (config.blockDataSource != 'ARCHIVEDB' && config.blockDataSource != 'MINAEXPLORER' && config.blockDataSource != 'API') {
+        if (
+            config.blockDataSource != 'ARCHIVEDB' &&
+            config.blockDataSource != 'MINAEXPLORER' &&
+            config.blockDataSource != 'API'
+        ) {
             return false;
         }
 

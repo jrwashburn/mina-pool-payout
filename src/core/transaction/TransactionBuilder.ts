@@ -42,7 +42,7 @@ export class TransactionBuilder implements ITransactionBuilder {
 
         if (config.verbose) {
             console.table(storePayout);
-                /*, [
+            /*, [
                 'publicKey',
                 'blockHeight',
                 'shareClass',
@@ -62,7 +62,7 @@ export class TransactionBuilder implements ITransactionBuilder {
 
         console.table(transactions);
 
-	paymentProcess.payoutsBeforeExclusions = JSON.parse(JSON.stringify(transactions));
+        paymentProcess.payoutsBeforeExclusions = JSON.parse(JSON.stringify(transactions));
 
         transactions = await this.substituteAndExcludePayToAddresses.run(transactions);
 

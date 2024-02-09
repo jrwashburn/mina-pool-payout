@@ -62,8 +62,8 @@ export class PaymentBuilder implements IPaymentBuilder {
 
         const storePayout: PayoutDetails[] = [];
 
-        let globalTotalPayout: number = 0;
-        let globalTotalToBurn: number = 0;
+        let globalTotalPayout = 0;
+        let globalTotalToBurn = 0;
 
         const ledgerHashes = [...new Set(blocks.map((block) => block.stakingledgerhash))];
 
@@ -71,17 +71,17 @@ export class PaymentBuilder implements IPaymentBuilder {
             ledgerHashes.map(async (ledgerHash) => {
                 console.log(`### Calculating payouts for ledger ${ledgerHash}`);
 
-                const [stakers, totalStake] = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey);
+                const ledger = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey);
 
-                console.log(`The pool total staking balance is ${totalStake}`);
+                console.log(`The pool total staking balance is ${ledger.totalStakingBalance}`);
 
                 const ledgerBlocks = blocks.filter((x) => x.stakingledgerhash == ledgerHash);
 
                 const [ledgerPayouts, ledgerStorePayout, blocksIncluded, totalPayout, totalToBurn] =
                     await this.payoutCalculator.getPayouts(
                         ledgerBlocks,
-                        stakers,
-                        totalStake,
+                        ledger.stakes,
+                        ledger.totalStakingBalance,
                         defaultCommissionRate,
                         mfCommissionRate,
                         o1CommissionRate,
@@ -127,7 +127,7 @@ export class PaymentBuilder implements IPaymentBuilder {
                 totalPayoutFundsNeeded: 0,
                 payoutsBeforeExclusions: [],
                 totalPayouts: globalTotalPayout,
-                totalBurn: globalTotalToBurn
+                totalBurn: globalTotalToBurn,
             };
 
             return paymentProcess;

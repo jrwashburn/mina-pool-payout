@@ -19,7 +19,13 @@ export class PayoutCalculator implements IPayoutCalculator {
         bpKeyMd5Hash: string,
         configuredMemo: string,
     ): Promise<
-        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number, totalToBurn: number]
+        [
+            payoutJson: PayoutTransaction[],
+            storePayout: PayoutDetails[],
+            blocksIncluded: number[],
+            totalPayout: number,
+            totalToBurn: number,
+        ]
     > {
         // Initialize some stuff
         const SUPERCHARGEDCOINBASE = 1440000000000;

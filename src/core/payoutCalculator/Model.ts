@@ -56,7 +56,13 @@ export interface IPayoutCalculator {
         bpKeyMd5Hash: string,
         configuredMemo: string,
     ): Promise<
-        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number, totalToBurn: number]
+        [
+            payoutJson: PayoutTransaction[],
+            storePayout: PayoutDetails[],
+            blocksIncluded: number[],
+            totalPayout: number,
+            totalToBurn: number,
+        ]
     >;
 }
 

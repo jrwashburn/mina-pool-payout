@@ -1,49 +1,27 @@
-import fetch from "node-fetch";
+import fetch from 'node-fetch';
 import fs from 'fs';
 import { Blocks } from '../dataprovider-types';
 import { parse } from 'csv-parse';
 
-const baseUrl = process.env.PAYOUT_API_ENDPOINT;
-
+const baseUrl = process.env.PAYOUT_DATA_PROVIDER_API_ENDPOINT;
+if (!baseUrl) {
+    throw new Error('The PAYOUT_API_ENDPOINT environment variable is not set.');
+}
 export async function getLatestHeight(): Promise<number> {
-    const responseData = await fetch(`${baseUrl}/consensus`)
-                    .then(x => x.json());
-
-    const { result, error, telemetry, messages } = responseData;
-
-    if(error){
-        throw new Error(`Error Code: ${error.code}, Message: ${error.message}`)
-    }
-    let consensus = result as Consensus;
-
-    return consensus.blockHeight;
+    const responseData = await fetch(`${baseUrl}/consensus`).then((x) => x.json());
+    return Number(responseData.blockHeight);
 }
 
-export async function getMinMaxBlocksByEpoch(epoch: number) {
-    const responseData = await fetch(`${baseUrl}/epoch/${epoch}`)
-    .then(x => x.json());
-
-    const { result, error, telemetry, messages } = responseData;
-
-    if(error){
-        throw new Error(`Error Code: ${error.code}, Message: ${error.message}`)
-    }
-    var minMax = result as MinMax;
-
-    return { min: minMax.minBlockHeight, max: minMax.maxBlockHeight };
+export async function getMinMaxBlocksByEpoch(epoch: number): Promise<{ min: number; max: number }> {
+    const responseData = await fetch(`${baseUrl}/epoch/${epoch}`).then((x) => x.json());
+    return { min: Number(responseData.minBlockHeight), max: Number(responseData.maxBlockHeight) };
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
-    const responseData = await fetch(`${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight}`)
-                            .then(x => x.json());
-
-    const { result, error, telemetry, messages } = responseData;
-
-    if(error){
-        throw new Error(`Error Code: ${error.code}, Message: ${error.message}`)
-    }            
-    
-    let blocks = result as Blocks;
+    const responseData = await fetch(`${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight}`).then(
+        (x) => x.json(),
+    );
+    let blocks = responseData.blocks as Blocks;
 
     const blockFile = `${__dirname}/../../../data/.paidblocks`;
 
@@ -64,13 +42,4 @@ export async function getBlocks(key: string, minHeight: number, maxHeight: numbe
         await filterBlocks();
     }
     return blocks;
-}
-
-interface MinMax {
-    minBlockHeight: number;
-    maxBlockHeight: number;
-}
-
-interface Consensus{
-    blockHeight: number;
 }

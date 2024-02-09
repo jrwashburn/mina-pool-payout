@@ -3,7 +3,7 @@ import fs from 'fs';
 import Container from '../composition/inversify.config';
 import { IBlockDataProvider, IDataProviderFactory } from '../core/dataProvider/Models';
 import TYPES from '../composition/Types';
-import { createHash } from 'node:crypto'
+import { createHash } from 'node:crypto';
 
 export class ConfigurationManager {
     public static Setup: PaymentConfiguration;
@@ -59,8 +59,6 @@ export class ConfigurationManager {
         );
     }
 
-    
-
     private static async validate() {
         if (Number.isNaN(this.Setup.defaultCommissionRate)) {
             console.log('ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file');
@@ -101,7 +99,7 @@ const getComissionRates = async (): Promise<KeyCommissionRate> => {
 
         const raw = fs.readFileSync(path, 'utf-8');
 
-        const rows = raw.split(/\r?\n/).filter(row => row);
+        const rows = raw.split(/\r?\n/).filter((row) => row);
 
         rows.forEach((x, index) => {
             const [key, rate] = x.split('|');
@@ -150,7 +148,7 @@ const validateCommission = (key: string, rate: number, index: number) => {
 const getMemoMd5Hash = (memo: string) => {
     if (typeof memo !== 'string' || memo.length === 0) {
         return createHash('md5').update('default-memo-value').digest('hex');
-    } else { 
+    } else {
         return createHash('md5').update(memo).digest('hex');
     }
-}
+};

@@ -34,10 +34,10 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
                                     !(transaction.amount <= payoutThreshold),
                             )
                             .map((t) => {
-				if (t.publicKey == record[0] && record[1] != 'SPLIT') t.publicKey = record[1];
+                                if (t.publicKey == record[0] && record[1] != 'SPLIT') t.publicKey = record[1];
                                 return t;
                             });
-			transactions = transactions.flatMap((t) => {
+                        transactions = transactions.flatMap((t) => {
                             if (t.publicKey == record[0] && record[1] == 'SPLIT') {
                                 const otherKey = record[2];
                                 const splitPercent = parseFloat(record[3]);
@@ -66,7 +66,7 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
                     .on('error', reject);
             });
         };
-        
+
         if (fs.existsSync(mfSubstitutePayToFile)) {
             await filterPayouts(mfSubstitutePayToFile);
         }
@@ -74,7 +74,7 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
         if (fs.existsSync(substitutePayToFile)) {
             await filterPayouts(substitutePayToFile);
         }
-        
+
         return transactions;
     }
 }

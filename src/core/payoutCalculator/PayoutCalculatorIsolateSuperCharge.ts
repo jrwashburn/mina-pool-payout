@@ -19,7 +19,13 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
         bpKeyMd5Hash: string,
         configuredMemo: string,
     ): Promise<
-        [payoutJson: PayoutTransaction[], storePayout: PayoutDetails[], blocksIncluded: number[], totalPayout: number, totalToBurn: number]
+        [
+            payoutJson: PayoutTransaction[],
+            storePayout: PayoutDetails[],
+            blocksIncluded: number[],
+            totalPayout: number,
+            totalToBurn: number,
+        ]
     > {
         //TODO: JC - Shared Logic must be moved into its own class, then isolate change in behaviors
         // Initialize some stuff
