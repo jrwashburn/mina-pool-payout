@@ -99,11 +99,11 @@ export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[],
                         console.log(`Generated gql file for nonce ${nonce}; not attempting to send transaction`);
                     }
                 } catch (Error) {
-                    console.log(Error);
+                    console.error(Error);
                     continueSending = false;
                     //reset timeout to 0 - delay is not necessary since we won't send transactions now
                     timeout = 0;
-                    console.log(`*** ERROR SENDING TRANSACTIONS - STOPPED SENDING AT NONCE ${nonce} *** `);
+                    console.error(`*** ERROR SENDING TRANSACTIONS - STOPPED SENDING AT NONCE ${nonce} *** `);
                 }
                 //increment nonce even on errror - now saving files to send later.
                 nonce++;

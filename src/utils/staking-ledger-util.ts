@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import { Stake, LedgerEntry, Block, ShareClass } from '../core/dataProvider/dataprovider-types';
 
 export function stakeIsLocked(stake: Stake, block: Block) {
@@ -6,7 +7,6 @@ export function stakeIsLocked(stake: Stake, block: Block) {
 }
 
 export function getPublicKeyShareClass(key: string): ShareClass {
-    const path = require('path');
     const foundationAddressesFile = path.join('src', 'data', 'nps-addresses', 'Mina_Foundation_Addresses.csv');
     const labsAddressesFile = path.join('src', 'data', 'nps-addresses', 'O1_Labs_Addresses.csv');
     const investorsAddressesFile = path.join('src', 'data', 'nps-addresses', 'Investors_Addresses.csv');

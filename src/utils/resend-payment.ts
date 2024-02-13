@@ -38,7 +38,7 @@ async function sendSignedPaymentFromFile(filename: string): Promise<void> {
         await sendPaymentGraphQL(paymentDoc, {});
         console.log(`Sent payments for nonce: ${filename} again.`);
     } catch (error) {
-        console.log(`Failed to send payments for nonce ${filename}`);
+        console.error(`Failed to send payments for nonce ${filename}`);
         throw error;
     }
 }
