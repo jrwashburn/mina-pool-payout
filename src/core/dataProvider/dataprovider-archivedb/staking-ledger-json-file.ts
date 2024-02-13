@@ -1,24 +1,16 @@
 import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util';
 import { Ledger, LedgerEntry, Stake } from '../dataprovider-types';
 import fs from 'fs';
+import path from 'path';
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards
 export function getStakes(ledgerHash: string, key: string): Ledger {
     let totalStakingBalance = 0;
-    // get the stakes from staking ledger json
-    // TODO: this might need to be reworked for large files
-    const ledgerDirectory = '../../../data/ledger'; // TODO: Move this back to .env
-    const ledgerFile = `${ledgerDirectory}/${ledgerHash}.json`;
-    // if (!fs.existsSync(ledgerFile)){ throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`)}
-
-    fs.readFile(ledgerFile, 'utf-8', (error, data) => {
-        if (error) {
-            throw error;
-        }
-
+    const ledgerFile = path.join(__dirname, '..', '..', '..', 'data', 'ledger', `${ledgerHash}.json`);
+    try {
+        const data = fs.readFileSync(ledgerFile, 'utf-8');
         const ledger = JSON.parse(data);
-
         const stakers: Stake[] = ledger
             .filter((entry: LedgerEntry) => entry.delegate == key)
             .map((stake: LedgerEntry) => {
@@ -34,7 +26,7 @@ export function getStakes(ledgerHash: string, key: string): Ledger {
                 };
             });
         return { stakes: stakers, totalStakingBalance: totalStakingBalance };
-    });
-
-    throw new Error(`Couldn't locate ledger for hash ${ledgerHash}`);
+    } catch (error) {
+        throw new Error(`Could not load ledger file ${ledgerFile} for hash ${ledgerHash}`);
+    }
 }
