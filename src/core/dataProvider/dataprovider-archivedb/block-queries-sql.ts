@@ -196,8 +196,8 @@ async function getMinMaxBlocksInSlotRange(min: number, max: number): Promise<[nu
       AND b.global_slot_since_genesis >= CAST($1 AS INTEGER)
       AND b.global_slot_since_genesis <= CAST($2 AS INTEGER)`;
     const result = await db.one(query, [min, max]);
-    const epochminblockheight = result.rows[0].epochminblockheight;
-    const epochmaxblockheight = result.rows[0].epochmaxblockheight;
+    const epochminblockheight = result.epochminblockheight;
+    const epochmaxblockheight = result.epochmaxblockheight;
     return [epochminblockheight, epochmaxblockheight];
 }
 
