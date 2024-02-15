@@ -46,6 +46,7 @@ export class SubstituteAndExcludePayToAddresses implements ISubstituteAndExclude
                                     amountMina: otherKeyAmountMina,
                                     feeMina: t.feeMina,
                                     memo: t.memo,
+                                    summaryGroup: 0,
                                 };
 
                                 return [t, otherKeyTransaction];

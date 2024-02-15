@@ -11,7 +11,7 @@ describe('Payment Summarizer tests', () => {
             const mockFileWriter: IFileWriter = {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 write: (filename, obj) => {
-                    return new Promise(() => {});
+                    return new Promise(() => { });
                 },
             };
 
@@ -69,6 +69,8 @@ describe('Payment Summarizer tests', () => {
                 payoutAmountsSum: 0,
                 payoutFeesSum: 0,
                 netMinaToPoolOperator: 1440,
+                payoutBurnSum: 0,
+                payoutStakersSum: 0,
             };
 
             await summarizer.calculateTotals(process);
