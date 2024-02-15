@@ -118,25 +118,8 @@ async function getMinMaxSlotHeight(epoch: number): Promise<[number, number]> {
 export async function getMinMaxBlocksByEpoch(epoch: number) {
     const [min, max] = await getMinMaxSlotHeight(epoch);
 
-    const result = await db.one(`SELECT min(height) as minHeight, max(height) as maxHeight from blocks b
-    WHERE id IN
-    (
-    WITH RECURSIVE chain AS
-    (
-    SELECT id, parent_id FROM blocks b WHERE height = (select MAX(height) from blocks)
-
-    UNION ALL
-
-    SELECT b.id, b.parent_id FROM blocks b
-    INNER JOIN chain
-    ON b.id = chain.parent_id
-    )
-
-    SELECT distinct c.id
-    FROM chain c
-    )
-    and global_slot between ${min} and ${max}
-    `);
+    const result = await db.one(`SELECT min(height) as minHeight, max(height) as maxheight
+    FROM blocks WHERE global_slot between ${min} and ${max}`);
 
     return { min: result.minheight, max: result.maxheight };
 }

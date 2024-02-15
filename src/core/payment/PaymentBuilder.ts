@@ -43,6 +43,7 @@ export class PaymentBuilder implements IPaymentBuilder {
             o1CommissionRate,
             investorsCommissionRate,
             commissionRatesByPublicKey,
+            burnRatesByPublicKey,
         } = config;
 
         const latestHeight = await blockProvider.getLatestHeight();
@@ -77,25 +78,32 @@ export class PaymentBuilder implements IPaymentBuilder {
 
                 const ledgerBlocks = blocks.filter((x) => x.stakingledgerhash == ledgerHash);
 
-                const [ledgerPayouts, ledgerStorePayout, blocksIncluded, totalPayout, totalToBurn] =
-                    await this.payoutCalculator.getPayouts(
-                        ledgerBlocks,
-                        ledger.stakes,
-                        ledger.totalStakingBalance,
-                        defaultCommissionRate,
-                        mfCommissionRate,
-                        o1CommissionRate,
-                        investorsCommissionRate,
-                        commissionRatesByPublicKey,
-                        config.burnAddress,
-                        config.bpKeyMd5Hash,
-                        config.payoutMemo,
-                    );
-
+                const [
+                    ledgerPayouts,
+                    ledgerStorePayout,
+                    blocksIncluded,
+                    totalPayout,
+                    totalSuperchargedToBurn,
+                    totalNegotiatedBurn,
+                ] = await this.payoutCalculator.getPayouts(
+                    ledgerBlocks,
+                    ledger.stakes,
+                    ledger.totalStakingBalance,
+                    defaultCommissionRate,
+                    mfCommissionRate,
+                    o1CommissionRate,
+                    investorsCommissionRate,
+                    commissionRatesByPublicKey,
+                    burnRatesByPublicKey,
+                    config.burnAddress,
+                    config.bpKeyMd5Hash,
+                    config.payoutMemo,
+                );
                 payouts.push(...ledgerPayouts);
 
                 globalTotalPayout = totalPayout;
-                globalTotalToBurn = totalToBurn;
+                globalTotalToBurn = totalSuperchargedToBurn + totalNegotiatedBurn;
+                //ADD TOTAL TO NEGOTIATED BURN
 
                 for (let i = 0; i < ledgerStorePayout.length; i++) {
                     storePayout.push(ledgerStorePayout[i]);
@@ -105,7 +113,9 @@ export class PaymentBuilder implements IPaymentBuilder {
 
                 console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`);
 
-                console.log(`The Total amount to burn is: ${totalToBurn} nm or ${totalToBurn / 1000000000} mina`);
+                console.log(
+                    `The Total amount to burn is: ${globalTotalToBurn} nm or ${globalTotalToBurn / 1000000000} mina`,
+                );
             }),
         ).then(async () => {
             // added a sort because these payout details are hashed and need to be in a reliable order

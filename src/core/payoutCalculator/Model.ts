@@ -1,4 +1,4 @@
-import { KeyCommissionRate } from '../../configuration/Model';
+import { KeyedRate } from '../../configuration/Model';
 import { Block, Stake, ShareClass } from '../dataProvider/dataprovider-types';
 import { IFeeCalculator } from '../transaction/Model';
 
@@ -40,6 +40,7 @@ export type PayoutTransaction = {
     amountMina: number;
     feeMina: number;
     memo: string;
+    summaryGroup: number;
 };
 
 export interface IPayoutCalculator {
@@ -51,7 +52,8 @@ export interface IPayoutCalculator {
         mfCommissionRate: number,
         o1CommissionRate: number,
         investorsCommissionRate: number,
-        comissionRates: KeyCommissionRate,
+        comissionRates: KeyedRate,
+        burnRates: KeyedRate,
         burnAddress: string,
         bpKeyMd5Hash: string,
         configuredMemo: string,
@@ -61,7 +63,8 @@ export interface IPayoutCalculator {
             storePayout: PayoutDetails[],
             blocksIncluded: number[],
             totalPayout: number,
-            totalToBurn: number,
+            totalSuperchargedToBurn: number,
+            totalNegotiatedBurn: number,
         ]
     >;
 }

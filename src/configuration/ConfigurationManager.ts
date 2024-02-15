@@ -1,4 +1,4 @@
-import { PaymentConfiguration, KeyCommissionRate } from './Model';
+import { PaymentConfiguration, KeyedRate } from './Model';
 import fs from 'fs';
 import Container from '../composition/inversify.config';
 import { IBlockDataProvider, IDataProviderFactory } from '../core/dataProvider/Models';
@@ -16,6 +16,7 @@ export class ConfigurationManager {
             epoch: args.epoch ?? Number(args.epoch),
             slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
             commissionRatesByPublicKey: await getComissionRates(),
+            burnRatesByPublicKey: await getBurnRates(),
             stakingPoolPublicKey: process.env.POOL_PUBLIC_KEY || '',
             payoutMemo: process.env.POOL_MEMO || 'mina-pool-payout',
             bpKeyMd5Hash: getMemoMd5Hash(process.env.POOL_PUBLIC_KEY || ''),
@@ -89,40 +90,46 @@ export class ConfigurationManager {
     }
 }
 
-const getComissionRates = async (): Promise<KeyCommissionRate> => {
+const getComissionRates = async (): Promise<KeyedRate> => {
     const path = `${__dirname}/../data/.negotiatedFees`;
+    const arbitraryMaxRate = 0.5;
+    return getKeyedRates(path, arbitraryMaxRate);
+};
 
-    if (fs.existsSync(path)) {
-        const commissionRates: KeyCommissionRate = {};
+const getBurnRates = async (): Promise<KeyedRate> => {
+    const path = `${__dirname}/../data/.negotiatedBurn`;
+    const arbitraryMaxRate = 1.0;
+    return getKeyedRates(path, arbitraryMaxRate);
+};
 
-        console.log('Found .negotiatedFees file. Using Payor Specific Commission Rates.');
+const getKeyedRates = async (configurationPath: string, maxRate: number): Promise<KeyedRate> => {
+    const keyedList: KeyedRate = {};
+    if (fs.existsSync(configurationPath)) {
+        console.log(`Found ${configurationPath} file. Using Specific Rates.`);
 
-        const raw = fs.readFileSync(path, 'utf-8');
+        const raw = fs.readFileSync(configurationPath, 'utf-8');
 
         const rows = raw.split(/\r?\n/).filter((row) => row);
 
         rows.forEach((x, index) => {
             const [key, rate] = x.split('|');
 
-            const takeRate = Number.parseFloat(rate);
+            const parsedRate = Number.parseFloat(rate);
 
-            const result = validateCommission(key, takeRate, index);
+            const result = validateRate(key, parsedRate, index, maxRate);
 
             if (!result.isValid) {
                 console.log(result.error);
                 throw new Error(result.error);
             }
 
-            commissionRates[key] = { commissionRate: takeRate };
+            keyedList[key] = { rate: parsedRate };
         });
-
-        return commissionRates;
     }
-
-    return {};
+    return keyedList;
 };
 
-const validateCommission = (key: string, rate: number, index: number) => {
+const validateRate = (key: string, rate: number, index: number, maxRate: number) => {
     const line = index + 1;
 
     const result = { error: '', isValid: false };
@@ -132,13 +139,13 @@ const validateCommission = (key: string, rate: number, index: number) => {
     }
 
     if (isNaN(rate)) {
-        return { ...result, error: `ERROR: Negotiated Fee is not a number. Key: ${key} at line ${line}.` };
+        return { ...result, error: `ERROR: Negotiated Rate is not a number. Key: ${key} at line ${line}.` };
     }
 
-    if (rate < 0.0 || rate > 0.5) {
+    if (rate < 0.0 || rate > maxRate) {
         return {
             ...result,
-            error: `ERROR: Negotiated Fees is outside of acceptable ranges 0.0-0.5. Key: ${key} at line ${line}.`,
+            error: `ERROR: Negotiated Rate is outside of acceptable ranges 0.0-${maxRate}. Key: ${key} at line ${line}.`,
         };
     }
 

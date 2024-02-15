@@ -54,6 +54,7 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
                                     amountMina: otherKeyAmountMina,
                                     feeMina: t.feeMina,
                                     memo: t.memo,
+                                    summaryGroup: 0,
                                 };
 
                                 return [t, otherKeyTransaction];

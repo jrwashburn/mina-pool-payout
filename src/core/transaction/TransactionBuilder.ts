@@ -20,8 +20,9 @@ export class TransactionBuilder implements ITransactionBuilder {
         let transactions: PayoutTransaction[] = [
             ...payouts
                 .reduce((r, o) => {
+                    const summaryGrouping = `${o.publicKey}:${o.summaryGroup}`;
                     const item: PayoutTransaction =
-                        r.get(o.publicKey) ||
+                        r.get(summaryGrouping) ||
                         Object.assign({}, o, {
                             amount: 0,
                             fee: 0,
@@ -35,7 +36,7 @@ export class TransactionBuilder implements ITransactionBuilder {
                     item.amountMina = item.amount / 1000000000;
                     item.feeMina = item.fee / 1000000000;
                     item.memo = o.memo;
-                    return r.set(o.publicKey, item);
+                    return r.set(summaryGrouping, item);
                 }, new Map())
                 .values(),
         ];
