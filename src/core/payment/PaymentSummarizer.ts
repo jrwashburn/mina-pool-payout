@@ -66,6 +66,8 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
                 (coinbasesum - feetransferfromcoinbasesum + usercommandtransactionfeessum) / 1000000000,
             payoutAmountsSum: amountsum / 1000000000,
             payoutFeesSum: feesum / 1000000000,
+            payoutBurnSum: base.totalBurn / 1000000000,
+            payoutStakersSum: (amountsum - base.totalBurn) / 1000000000,
             netMinaToPoolOperator: (netcoinbasereceived - amountsum - feesum) / 1000000000,
         };
     }
@@ -74,7 +76,9 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
         console.log('------------------- Summary & Totals ------------------');
         console.log('Calculations based on entire pool');
         console.log(`\x1b[42m%s\x1b[0m`, `Net Coinbase Received: ${base.totals?.netCoinBaseReceived}`);
-        console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts Due To Stakers / To Burn: ${base.totals?.payoutAmountsSum}`);
+        console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts Due To Payout: ${base.totals?.payoutAmountsSum}`);
+        console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts Due To Stakers: ${base.totals?.payoutStakersSum}`);
+        console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts To Burn: ${base.totals?.payoutBurnSum}`);
         console.log(
             `\x1b[42m%s\x1b[0m`,
             `Net MINA to Pool Operator (after send transaction fees): ${base.totals?.netMinaToPoolOperator}`,
