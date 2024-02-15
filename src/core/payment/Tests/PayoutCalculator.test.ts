@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { KeyCommissionRate } from '../../../configuration/Model';
+import { KeyedRate } from '../../../configuration/Model';
 import { Block, Stake } from '../../dataProvider/dataprovider-types';
 import { PayoutCalculator } from '../../payoutCalculator/PayoutCalculator';
 
@@ -68,6 +68,7 @@ describe('Payout Calculator tests', () => {
                         feeMina: 0,
                         memo: 'memo',
                         publicKey: '123645789',
+                        summaryGroup: 0,
                     },
                     {
                         amount: 961200000190,
@@ -76,6 +77,7 @@ describe('Payout Calculator tests', () => {
                         feeMina: 0,
                         memo: 'memo',
                         publicKey: '123645782',
+                        summaryGroup: 0,
                     },
                 ],
                 [
@@ -131,7 +133,7 @@ describe('Payout Calculator tests', () => {
                         sumEffectiveCommonPoolStakes: 200,
                         sumEffectiveNPSPoolStakes: 200,
                         sumEffectiveSuperchargedPoolStakes: 0,
-                        superchargedWeightingDiscount: .000000000013888888888888888,
+                        superchargedWeightingDiscount: 0.000000000013888888888888888,
                         totalRewards: 719999999991,
                         totalRewardsCommonPool: -9,
                         totalRewardsNPSPool: 720000000000,
@@ -203,9 +205,11 @@ describe('Payout Calculator tests', () => {
                 [10, 11],
                 1922400000380,
                 0,
+                0,
             ];
 
-            const commissionRates: KeyCommissionRate = {};
+            const commissionRates: KeyedRate = {};
+            const keyBurnRates: KeyedRate = {};
 
             return calculator
                 .getPayouts(
@@ -217,9 +221,10 @@ describe('Payout Calculator tests', () => {
                     0.05,
                     0.08,
                     commissionRates,
-                    'burnz',
+                    keyBurnRates,
+                    'burnAddress',
                     'md5hash',
-                    'memo',
+                    'memo'
                 )
                 .then((result) => {
                     expect(result).toStrictEqual(mockResult);
@@ -270,7 +275,7 @@ describe('Payout Calculator tests', () => {
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
-                    totalToBurn:0,
+                    totalToBurn: 0,
                 },
                 {
                     publicKey: '123645782',
@@ -278,11 +283,12 @@ describe('Payout Calculator tests', () => {
                     stakingBalance: 100,
                     total: 200,
                     untimedAfterSlot: 11,
-                    totalToBurn:0,
+                    totalToBurn: 0,
                 },
             ];
 
-            const commissionRates: KeyCommissionRate = {};
+            const commissionRates: KeyedRate = {};
+            const keyBurnRates: KeyedRate = {};
 
             return calculator
                 .getPayouts(
@@ -294,13 +300,14 @@ describe('Payout Calculator tests', () => {
                     0.05,
                     0.08,
                     commissionRates,
+                    keyBurnRates,
                     'burnz',
                     'md5hash',
                     'memo',
                 )
                 .then((result) => {
-                expect(result).toThrow();
-            });
+                    expect(result).toThrow();
+                });
         });
     });
 });

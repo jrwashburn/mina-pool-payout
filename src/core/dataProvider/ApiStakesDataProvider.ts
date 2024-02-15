@@ -1,11 +1,10 @@
 import { injectable } from 'inversify';
-import { getStakes } from './dataprovider-archivedb/staking-ledger-json-file';
+import { getStakes } from './dataprovider-api/staking-ledger-api';
 import { Ledger } from './dataprovider-types';
 import { IStakeDataProvider } from './Models';
 
 @injectable()
-export class ArchiveStakeDataProvider implements IStakeDataProvider {
-    //TODO: Refactor the core logic here
+export class ApiStakeDataProvider implements IStakeDataProvider {
     async getStakes(ledgerHash: string, key: string): Promise<Ledger> {
         return getStakes(ledgerHash, key);
     }

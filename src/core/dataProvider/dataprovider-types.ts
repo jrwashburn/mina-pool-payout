@@ -16,6 +16,11 @@ export type Block = {
 
 export type Blocks = Array<Block>;
 
+export type Ledger = {
+    stakes: Stake[];
+    totalStakingBalance: number;
+};
+
 export type Stake = {
     publicKey: string;
     total: number;

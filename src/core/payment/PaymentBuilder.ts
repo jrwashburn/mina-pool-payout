@@ -72,9 +72,9 @@ export class PaymentBuilder implements IPaymentBuilder {
             ledgerHashes.map(async (ledgerHash) => {
                 console.log(`### Calculating payouts for ledger ${ledgerHash}`);
 
-                const [stakers, totalStake] = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey);
+                const ledger = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey);
 
-                console.log(`The pool total staking balance is ${totalStake}`);
+                console.log(`The pool total staking balance is ${ledger.totalStakingBalance}`);
 
                 const ledgerBlocks = blocks.filter((x) => x.stakingledgerhash == ledgerHash);
 
@@ -87,8 +87,8 @@ export class PaymentBuilder implements IPaymentBuilder {
                     totalNegotiatedBurn,
                 ] = await this.payoutCalculator.getPayouts(
                     ledgerBlocks,
-                    stakers,
-                    totalStake,
+                    ledger.stakes,
+                    ledger.totalStakingBalance,
                     defaultCommissionRate,
                     mfCommissionRate,
                     o1CommissionRate,
@@ -99,7 +99,6 @@ export class PaymentBuilder implements IPaymentBuilder {
                     config.bpKeyMd5Hash,
                     config.payoutMemo,
                 );
-
                 payouts.push(...ledgerPayouts);
 
                 globalTotalPayout = totalPayout;

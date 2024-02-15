@@ -124,6 +124,7 @@ describe('Payment Builder Tests', () => {
                     amountMina: 0,
                     feeMina: 0,
                     memo: '',
+                    summaryGroup: 0,
                 },
                 {
                     amount: 100,
@@ -132,6 +133,7 @@ describe('Payment Builder Tests', () => {
                     amountMina: 0,
                     feeMina: 0,
                     memo: '',
+                    summaryGroup: 0,
                 },
             ];
 
@@ -213,6 +215,8 @@ describe('Payment Builder Tests', () => {
                     payoutAmountsSum: 12,
                     payoutFeesSum: 13,
                     userCommandTransactionFeeSum: 12,
+                    payoutBurnSum: 0,
+                    payoutStakersSum: 12,
                 },
                 totalPayouts: 0,
                 totalBurn: 0,
@@ -239,6 +243,7 @@ describe('Payment Builder Tests', () => {
                     amountMina: 0,
                     feeMina: 0,
                     memo: '',
+                    summaryGroup: 0,
                 },
                 {
                     amount: 100,
@@ -247,6 +252,7 @@ describe('Payment Builder Tests', () => {
                     amountMina: 0,
                     feeMina: 0,
                     memo: '',
+                    summaryGroup: 0,
                 },
             ];
 
@@ -328,6 +334,8 @@ describe('Payment Builder Tests', () => {
                     payoutAmountsSum: 11,
                     payoutFeesSum: 11,
                     userCommandTransactionFeeSum: 11,
+                    payoutBurnSum: 0,
+                    payoutStakersSum: 11,
                 },
                 totalPayouts: 0,
                 totalBurn: 0,

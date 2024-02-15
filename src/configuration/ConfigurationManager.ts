@@ -155,7 +155,7 @@ const validateRate = (key: string, rate: number, index: number, maxRate: number)
 const getMemoMd5Hash = (memo: string) => {
     if (typeof memo !== 'string' || memo.length === 0) {
         return createHash('md5').update('default-memo-value').digest('hex');
-    } else { 
+    } else {
         return createHash('md5').update(memo).digest('hex');
     }
 };

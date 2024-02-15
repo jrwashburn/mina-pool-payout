@@ -1,4 +1,4 @@
-import { Blocks, Stake } from './dataprovider-types';
+import { Blocks, Ledger } from './dataprovider-types';
 
 export interface IDataProviderFactory<T> {
     build(dataSource: string): T;
@@ -11,5 +11,5 @@ export interface IBlockDataProvider {
 }
 
 export interface IStakeDataProvider {
-    getStakes(ledgerHash: string, key: string): Promise<[Stake[], number]>;
+    getStakes(ledgerHash: string, key: string): Promise<Ledger>;
 }

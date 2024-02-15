@@ -1,5 +1,5 @@
 import { fetchGraphQL } from '../../../infrastructure/graphql-me';
-import { Stake, LedgerEntry } from '../dataprovider-types';
+import { Ledger, Stake, LedgerEntry } from '../dataprovider-types';
 import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util';
 import { gql } from '@apollo/client/core';
 
@@ -22,16 +22,16 @@ const LEDGERQUERY = gql`
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards
-export async function getStakes(ledgerHash: string, key: string): Promise<[Stake[], number]> {
+export async function getStakes(ledgerHash: string, key: string): Promise<Ledger> {
     let totalStakingBalance = 0;
-    let stakers: Stake[] = [];
+    let stakes: Stake[] = [];
     const { errors, data } = await fetchGraphQL(LEDGERQUERY, { ledgerHash: ledgerHash, delegate: key });
 
     if (errors) {
         console.log(errors);
         throw new Error('could not get ledger from MinaExplorer');
     } else {
-        stakers = data.stakes.map((stake: LedgerEntry) => {
+        stakes = data.stakes.map((stake: LedgerEntry) => {
             const balance = Number(stake.balance);
             totalStakingBalance += balance;
             return {
@@ -44,5 +44,5 @@ export async function getStakes(ledgerHash: string, key: string): Promise<[Stake
             };
         });
     }
-    return [stakers, totalStakingBalance];
+    return { stakes: stakes, totalStakingBalance: totalStakingBalance };
 }

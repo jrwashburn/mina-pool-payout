@@ -117,7 +117,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                     const effectiveSuperchargedPoolWeighting =
                         sumEffectiveSuperchargedPoolStakes > 0
                             ? effectivePoolStakes[staker.publicKey].superchargedStake /
-                              sumEffectiveSuperchargedPoolStakes
+                            sumEffectiveSuperchargedPoolStakes
                             : 0;
 
                     //TODO APPLY NEW COMMISSION RATES Extract function
@@ -132,8 +132,8 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
                             Math.floor((1 - commissionRate) * totalCommonPoolRewards * effectiveCommonPoolWeighting) +
                             Math.floor(
                                 (1 - commissionRate) *
-                                    totalSuperchargedPoolRewards *
-                                    effectiveSuperchargedPoolWeighting,
+                                totalSuperchargedPoolRewards *
+                                effectiveSuperchargedPoolWeighting,
                             );
                     } else if (staker.shareClass.shareClass == 'NPS') {
                         if (staker.shareClass.shareOwner == 'MF') {

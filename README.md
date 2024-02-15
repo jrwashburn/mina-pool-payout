@@ -1,4 +1,5 @@
 # TLDR; Step by Step:
+
 Thanks Naamah https://discord.com/channels/484437221055922177/808895957978447882/1186797525160710204
 
 Pre-requisites  
@@ -17,12 +18,12 @@ Copy sample.env into .env
 `cp sample.env .env`
 
 Edit .env file  
-Set `POOL_PUBLIC_KEY` to your node public key   
+Set `POOL_PUBLIC_KEY` to your node public key  
 Set `COMMISSION_RATE` to your commission rate  
 Set `POOL_MEMO` to a value that will be used for the memo of your payouts (except mina foundation payout)  
 Set `SEND_PRIVATE_KEY` to your sender private key  
 (export using `mina advanced dump-keypair --privkey-path keys/my-payout-wallet` if needed - suggest using isolated keys for this)  
-Set `SEND_PAYMENT_GRAPHQL` to your local node e.g. `SEND_PAYMENT_GRAPHQL_ENDPOINT=http://127.0.0.1:3085/graphql`  
+Set `SEND_PAYMENT_GRAPHQL` to your local node e.g. `SEND_PAYMENT_GRAPHQL_ENDPOINT=http://127.0.0.1:3085/graphql`
 
 Go back to script root directory  
 Run the script in dry run mode for the full epoch (or from block to block if needed)  
@@ -46,9 +47,11 @@ Before to send any payout please make sure:
 -   You can see more details by enabling the debug mode. This can be achieved by adding --verbose=true to the command line.
 
 ## Example 1:
+
 ![Alt Verification steps](./src/img/dry-run-supercharged.png?raw=true)
 
 ## Example 2:
+
 ![Alt Verification steps](./src/img/dry-run-no-supercharged.png?raw=true)
 
 # mina-pool-payout
@@ -122,10 +125,11 @@ The recommended run process is:
 
 Copy `sample.env` to `.env` and make the following changes within the `.env`:
 
--   Set `BLOCK_DATA_SOURCE` to either ARCHIVEDB or MINAEXPLORER.
+-   Set `BLOCK_DATA_SOURCE` to either ARCHIVEDB or MINAEXPLORER or API.
 
 -   ARCHIVEDB will use the database connection string to get blocks and the current max height, and will expect [hash].json files for the ledgers being processed.
--   MINAEXPLORER will use endpoint specified in MINAEXPLORER_GRAPHQL_ENDPOINT (expect: graphql.minaexplorer.com) to get blocks and the staking ledger
+-   MINAEXPLORER will use endpoint specified in MINAEXPLORER_GRAPHQL_ENDPOINT (expect: https://graphql.minaexplorer.com) to get blocks and the staking ledger
+-   API will use an endpoint specified in PAYOUT_DATA_PROVIDER_API_ENDPOINT (one available endpoint is https://api.minastakes.com)
 
 -   Set `COMMISSION_RATE` to the commission your pool charges unknown delegators. (Mina Foundation and O1 delegations have separate configurations in the .env file, and you can set override rates for known delegators -- see "Using payor specific commission rates" below.)
 
@@ -171,6 +175,8 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
 -   minaexplorer provides a graphql endpoint that will shutdown at Hard Fork of mainnet: https://proxy.minaexplorer.com/graphql
 
 -   Set `MINAEXPLORER_GRAPHQL_ENDPOINT` to the url of the mina explorer graphql api if the block data source is set to minaexplorer.
+
+-   Set `PAYOUT_DATA_PROVIDER_API_ENDPOINT=https://api.minastakes.com` or to the url of the preferred data provider.
 
 ## Providing the Staking Ledgers
 
