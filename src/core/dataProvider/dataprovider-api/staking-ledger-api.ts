@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import { Ledger } from '../dataprovider-types';
 
 const baseUrl = process.env.PAYOUT_DATA_PROVIDER_API_ENDPOINT;
