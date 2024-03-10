@@ -14,6 +14,7 @@ export class ConfigurationManager {
             o1CommissionRate: Number(process.env.O1_COMMISSION_RATE || 0.05),
             investorsCommissionRate: Number(process.env.INVESTORS_COMMISSION_RATE || 0.08),
             epoch: args.epoch ?? Number(args.epoch),
+            fork: args.fork ?? null,
             slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
             commissionRatesByPublicKey: await getComissionRates(),
             burnRatesByPublicKey: await getBurnRates(),
@@ -37,19 +38,19 @@ export class ConfigurationManager {
 
         await this.validate();
 
-        if (this.Setup.epoch) {
+        if (Number.isInteger(this.Setup.epoch)) {
             await this.setupEpochMode();
         }
     }
 
     private static async setupEpochMode() {
-        console.log(`Working for configured Epoch: ${this.Setup.epoch}`);
+        console.log(`Working for configured Epoch: ${this.Setup.epoch} for Fork: ${this.Setup.fork}`);
 
         const dataProvider = Container.get<IDataProviderFactory<IBlockDataProvider>>(TYPES.BlockDataProviderFactory);
 
         const provider = dataProvider.build(this.Setup.blockDataSource);
 
-        const { min, max } = await provider.getMinMaxBlocksByEpoch(this.Setup.epoch);
+        const { min, max } = await provider.getMinMaxBlocksByEpoch(this.Setup.epoch, this.Setup.fork);
 
         this.Setup.minimumHeight = min;
 
@@ -61,31 +62,34 @@ export class ConfigurationManager {
     }
 
     private static async validate() {
+        let msg = '';
         if (Number.isNaN(this.Setup.defaultCommissionRate)) {
-            console.log('ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file');
-            throw new Error('.env COMMISSION_RATE not set');
+            msg += 'ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file';
         }
         if (Number.isNaN(this.Setup.o1CommissionRate)) {
-            console.log('ERROR: Comission Rate is not a number - please set O1_COMMISSION_RATE in .env file');
-            throw new Error('.env COMMISSION_RATE not set');
+            msg += 'ERROR: Comission Rate is not a number - please set O1_COMMISSION_RATE in .env file';
         }
         if (Number.isNaN(this.Setup.mfCommissionRate)) {
-            console.log('ERROR: Comission Rate is not a number - please set MF_COMMISSION_RATE in .env file');
-            throw new Error('.env COMMISSION_RATE not set');
+            msg += 'ERROR: Comission Rate is not a number - please set MF_COMMISSION_RATE in .env file';
         }
         if (this.Setup.payorSendTransactionFee < 1000000) {
-            console.log(
-                'WARNING: Payor Send Transaction Fee is too low or not specified, set SEND_TRANSACTION_FEE of at least 0.001 in .env file',
-            );
+            msg += 'ERROR: Payor Send Transaction Fee is too low or not specified, set SEND_TRANSACTION_FEE of at least 0.001 in .env file';
         }
         if (this.Setup.stakingPoolPublicKey === '') {
-            console.log('WARNING: Staking Pool Public Key not provided - please specify POOL_PUBLIC_KEY in .env file');
+            msg += 'ERROR: Staking Pool Public Key not provided - please specify POOL_PUBLIC_KEY in .env file';
         }
-
-        if (!this.Setup.epoch && (!this.Setup.minimumHeight || !this.Setup.configuredMaximum)) {
-            const msg = 'ERROR: Minimum or maximum block height not provided.';
+        if (!Number.isInteger(this.Setup.epoch) && (!this.Setup.minimumHeight || !this.Setup.configuredMaximum)) {
+            msg += 'ERROR: Minimum or maximum block height not provided.';
+        }
+        if (Number.isInteger(this.Setup.epoch) && !Number.isInteger(this.Setup.fork)) {
+            msg += 'ERROR: Must provide fork number when processing by epoch';
+        }
+        if (this.Setup.fork < 0 || this.Setup.fork > 1) {
+            msg += 'ERROR: Fork number must be 0 or 1. Data provider must be updated to be aware of any additional forks.';
+        }
+        if (msg !== '') {
             console.log(msg);
-            throw new Error(msg);
+            process.exit(1);
         }
     }
 }

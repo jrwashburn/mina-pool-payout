@@ -12,8 +12,8 @@ export async function getLatestHeight(): Promise<number> {
     return Number(responseData.blockHeight);
 }
 
-export async function getMinMaxBlocksByEpoch(epoch: number): Promise<{ min: number; max: number }> {
-    const responseData = await fetch(`${baseUrl}/epoch/${epoch}`).then((x) => x.json());
+export async function getMinMaxBlocksByEpoch(epoch: number, fork: number): Promise<{ min: number; max: number }> {
+    const responseData = await fetch(`${baseUrl}/epoch/${epoch}?fork=${fork}`).then((x) => x.json());
     return { min: Number(responseData.minBlockHeight), max: Number(responseData.maxBlockHeight) };
 }
 

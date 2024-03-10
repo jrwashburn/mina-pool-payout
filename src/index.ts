@@ -11,6 +11,7 @@ const oargs = yargs.options({
     maxheight: { type: 'number', alias: ['x', 'max'], default: Number.MAX_VALUE },
     verbose: { type: 'boolean', alias: ['v'], default: false },
     epoch: { type: 'number', alias: ['e'] },
+    fork: { type: 'number', alias: ['f']},
 }).argv;
 
 const main = async () => {

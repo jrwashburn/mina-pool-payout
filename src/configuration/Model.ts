@@ -9,6 +9,7 @@ export interface PaymentConfiguration {
     configuredMaximum: number;
     defaultCommissionRate: number;
     epoch: number;
+    fork: number;
     investorsCommissionRate: number;
     mfCommissionRate: number;
     minimumConfirmations: number;
@@ -26,4 +27,9 @@ export interface PaymentConfiguration {
 
 export interface KeyedRate {
     [publicKey: string]: { rate: number };
+}
+
+const baseUrl = process.env.PAYOUT_DATA_PROVIDER_API_ENDPOINT;
+if (!baseUrl) {
+    throw new Error('The PAYOUT_API_ENDPOINT environment variable is not set.');
 }

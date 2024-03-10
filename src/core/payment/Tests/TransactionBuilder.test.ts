@@ -49,6 +49,7 @@ describe('Transaction Builder Tests', () => {
                 payoutHash: '',
                 payoutThreshold: 0,
                 epoch: 0,
+                fork: 0,
                 slotsInEpoch: 0,
                 burnAddress: '',
             };
