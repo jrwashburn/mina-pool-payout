@@ -6,92 +6,92 @@ import TYPES from '../composition/Types';
 import { createHash } from 'node:crypto';
 
 export class ConfigurationManager {
-    public static Setup: PaymentConfiguration;
-    public static async build(args: any) {
-      this.Setup = {
-        defaultCommissionRate: Number(process.env.COMMISSION_RATE),
-        mfCommissionRate: Number(process.env.MF_COMMISSION_RATE || 0.08),
-        o1CommissionRate: Number(process.env.O1_COMMISSION_RATE || 0.05),
-        investorsCommissionRate: Number(process.env.INVESTORS_COMMISSION_RATE || 0.08),
-        epoch: args.epoch ?? Number(args.epoch),
-        fork: args.fork ?? null,
-        slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
-        commissionRatesByPublicKey: await getComissionRates(),
-        burnRatesByPublicKey: await getBurnRates(),
-        stakingPoolPublicKey: process.env.POOL_PUBLIC_KEY || '',
-        payoutMemo: process.env.POOL_MEMO || 'mina-pool-payout',
-        bpKeyMd5Hash: getMemoMd5Hash(process.env.POOL_PUBLIC_KEY || ''),
-        senderKeys: {
-          privateKey: process.env.SEND_PRIVATE_KEY || '',
-          publicKey: process.env.SEND_PUBLIC_KEY || '',
-        },
-        payorSendTransactionFee: (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000,
-        minimumConfirmations: Number(process.env.MIN_CONFIRMATIONS) || 290,
-        minimumHeight: args.minheight,
-        configuredMaximum: args.maxheight,
-        blockDataSource: process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB',
-        verbose: args.verbose,
-        payoutHash: args.payouthash,
-        payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0,
-        burnAddress: 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X',
-      };
+  public static Setup: PaymentConfiguration;
+  public static async build(args: any) {
+    this.Setup = {
+      defaultCommissionRate: Number(process.env.COMMISSION_RATE),
+      mfCommissionRate: Number(process.env.MF_COMMISSION_RATE || 0.08),
+      o1CommissionRate: Number(process.env.O1_COMMISSION_RATE || 0.05),
+      investorsCommissionRate: Number(process.env.INVESTORS_COMMISSION_RATE || 0.08),
+      epoch: args.epoch ?? Number(args.epoch),
+      fork: args.fork ?? null,
+      slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
+      commissionRatesByPublicKey: await getComissionRates(),
+      burnRatesByPublicKey: await getBurnRates(),
+      stakingPoolPublicKey: process.env.POOL_PUBLIC_KEY || '',
+      payoutMemo: process.env.POOL_MEMO || 'mina-pool-payout',
+      bpKeyMd5Hash: getMemoMd5Hash(process.env.POOL_PUBLIC_KEY || ''),
+      senderKeys: {
+        privateKey: process.env.SEND_PRIVATE_KEY || '',
+        publicKey: process.env.SEND_PUBLIC_KEY || '',
+      },
+      payorSendTransactionFee: (Number(process.env.SEND_TRANSACTION_FEE) || 0) * 1000000000,
+      minimumConfirmations: Number(process.env.MIN_CONFIRMATIONS) || 290,
+      minimumHeight: args.minheight,
+      configuredMaximum: args.maxheight,
+      blockDataSource: process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB',
+      verbose: args.verbose,
+      payoutHash: args.payouthash,
+      payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0,
+      burnAddress: 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X',
+    };
 
-      await this.validate();
+    await this.validate();
 
-      if (Number.isInteger(this.Setup.epoch)) {
-        await this.setupEpochMode();
-      }
+    if (Number.isInteger(this.Setup.epoch)) {
+      await this.setupEpochMode();
     }
+  }
 
-    private static async setupEpochMode() {
-      console.log(`Working for configured Epoch: ${this.Setup.epoch} for Fork: ${this.Setup.fork}`);
+  private static async setupEpochMode() {
+    console.log(`Working for configured Epoch: ${this.Setup.epoch} for Fork: ${this.Setup.fork}`);
 
-      const dataProvider = Container.get<IDataProviderFactory<IBlockDataProvider>>(TYPES.BlockDataProviderFactory);
+    const dataProvider = Container.get<IDataProviderFactory<IBlockDataProvider>>(TYPES.BlockDataProviderFactory);
 
-      const provider = dataProvider.build(this.Setup.blockDataSource);
+    const provider = dataProvider.build(this.Setup.blockDataSource);
 
-      const { min, max } = await provider.getMinMaxBlocksByEpoch(this.Setup.epoch, this.Setup.fork);
+    const { min, max } = await provider.getMinMaxBlocksByEpoch(this.Setup.epoch, this.Setup.fork);
 
-      this.Setup.minimumHeight = min;
+    this.Setup.minimumHeight = min;
 
-      this.Setup.configuredMaximum = max;
+    this.Setup.configuredMaximum = max;
 
-      console.log(
-        `Epoch Minimum Height: ${this.Setup.minimumHeight} - Epoch Maximum Height: ${this.Setup.configuredMaximum}`,
-      );
+    console.log(
+      `Epoch Minimum Height: ${this.Setup.minimumHeight} - Epoch Maximum Height: ${this.Setup.configuredMaximum}`,
+    );
+  }
+
+  private static async validate() {
+    let msg = '';
+    if (Number.isNaN(this.Setup.defaultCommissionRate)) {
+      msg += 'ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file';
     }
-
-    private static async validate() {
-      let msg = '';
-      if (Number.isNaN(this.Setup.defaultCommissionRate)) {
-        msg += 'ERROR: Comission Rate is not a number - please set COMMISSION_RATE in .env file';
-      }
-      if (Number.isNaN(this.Setup.o1CommissionRate)) {
-        msg += 'ERROR: Comission Rate is not a number - please set O1_COMMISSION_RATE in .env file';
-      }
-      if (Number.isNaN(this.Setup.mfCommissionRate)) {
-        msg += 'ERROR: Comission Rate is not a number - please set MF_COMMISSION_RATE in .env file';
-      }
-      if (this.Setup.payorSendTransactionFee < 1000000) {
-        msg += 'ERROR: Payor Send Transaction Fee is too low or not specified, set SEND_TRANSACTION_FEE of at least 0.001 in .env file';
-      }
-      if (this.Setup.stakingPoolPublicKey === '') {
-        msg += 'ERROR: Staking Pool Public Key not provided - please specify POOL_PUBLIC_KEY in .env file';
-      }
-      if (!Number.isInteger(this.Setup.epoch) && (!this.Setup.minimumHeight || !this.Setup.configuredMaximum)) {
-        msg += 'ERROR: Minimum or maximum block height not provided.';
-      }
-      if (Number.isInteger(this.Setup.epoch) && !Number.isInteger(this.Setup.fork)) {
-        msg += 'ERROR: Must provide fork number when processing by epoch';
-      }
-      if (this.Setup.fork < 0 || this.Setup.fork > 1) {
-        msg += 'ERROR: Fork number must be 0 or 1. Data provider must be updated to be aware of any additional forks.';
-      }
-      if (msg !== '') {
-        console.log(msg);
-        process.exit(1);
-      }
+    if (Number.isNaN(this.Setup.o1CommissionRate)) {
+      msg += 'ERROR: Comission Rate is not a number - please set O1_COMMISSION_RATE in .env file';
     }
+    if (Number.isNaN(this.Setup.mfCommissionRate)) {
+      msg += 'ERROR: Comission Rate is not a number - please set MF_COMMISSION_RATE in .env file';
+    }
+    if (this.Setup.payorSendTransactionFee < 1000000) {
+      msg += 'ERROR: Payor Send Transaction Fee is too low or not specified, set SEND_TRANSACTION_FEE of at least 0.001 in .env file';
+    }
+    if (this.Setup.stakingPoolPublicKey === '') {
+      msg += 'ERROR: Staking Pool Public Key not provided - please specify POOL_PUBLIC_KEY in .env file';
+    }
+    if (!Number.isInteger(this.Setup.epoch) && (!this.Setup.minimumHeight || !this.Setup.configuredMaximum)) {
+      msg += 'ERROR: Minimum or maximum block height not provided.';
+    }
+    if (Number.isInteger(this.Setup.epoch) && !Number.isInteger(this.Setup.fork)) {
+      msg += 'ERROR: Must provide fork number when processing by epoch';
+    }
+    if (this.Setup.fork < 0 || this.Setup.fork > 1) {
+      msg += 'ERROR: Fork number must be 0 or 1. Data provider must be updated to be aware of any additional forks.';
+    }
+    if (msg !== '') {
+      console.log(msg);
+      process.exit(1);
+    }
+  }
 }
 
 const getComissionRates = async (): Promise<KeyedRate> => {
