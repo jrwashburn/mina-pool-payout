@@ -31,5 +31,5 @@ export interface KeyedRate {
 
 const baseUrl = process.env.PAYOUT_DATA_PROVIDER_API_ENDPOINT;
 if (!baseUrl) {
-    throw new Error('The PAYOUT_API_ENDPOINT environment variable is not set.');
+  throw new Error('The PAYOUT_API_ENDPOINT environment variable is not set.');
 }

@@ -87,92 +87,92 @@ const getNullParentsQuery = `
 `;
 
 export async function getLatestHeight(): Promise<number> {
-    const result = await db.one<height>(`
+  const result = await db.one<height>(`
         SELECT MAX(height) AS height FROM public.blocks
     `);
-    return result.height;
+  return result.height;
 }
 
 export async function getMinMaxBlocksByEpoch(epoch: number): Promise<{ min: number; max: number }> {
-    const [minSlot, maxSlot] = await getMinMaxSlotHeight(epoch);
-    const [minHeight, maxHeight] = await getMinMaxBlocksInSlotRange(minSlot, maxSlot);
-    return {
-        min: minHeight,
-        max: maxHeight,
-    };
+  const [minSlot, maxSlot] = await getMinMaxSlotHeight(epoch);
+  const [minHeight, maxHeight] = await getMinMaxBlocksInSlotRange(minSlot, maxSlot);
+  return {
+    min: minHeight,
+    max: maxHeight,
+  };
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
-    let blocks: Blocks = await db.any(blockQuery, [key, minHeight, maxHeight]);
+  let blocks: Blocks = await db.any(blockQuery, [key, minHeight, maxHeight]);
 
-    const missingHeights = await getHeightMissing(minHeight, maxHeight);
-    if (
-        (minHeight === 0 && (missingHeights.length > 1 || missingHeights[0] != 0)) ||
+  const missingHeights = await getHeightMissing(minHeight, maxHeight);
+  if (
+    (minHeight === 0 && (missingHeights.length > 1 || missingHeights[0] != 0)) ||
         (minHeight > 0 && missingHeights.length > 0)
-    ) {
-        throw new Error(
-            `Archive database is missing blocks in the specified range. Import them and try again. Missing blocks were: ${JSON.stringify(
-                missingHeights,
-            )}`,
-        );
-    }
-    const nullParents = await getNullParents(minHeight, maxHeight);
-    if (
-        (minHeight === 0 && (nullParents.length > 1 || nullParents[0] != 1)) ||
+  ) {
+    throw new Error(
+      `Archive database is missing blocks in the specified range. Import them and try again. Missing blocks were: ${JSON.stringify(
+        missingHeights,
+      )}`,
+    );
+  }
+  const nullParents = await getNullParents(minHeight, maxHeight);
+  if (
+    (minHeight === 0 && (nullParents.length > 1 || nullParents[0] != 1)) ||
         (minHeight > 0 && nullParents.length > 0)
-    ) {
-        throw new Error(
-            `Archive database has null parents in the specified range. Import them and try again. Blocks with null parents were: ${JSON.stringify(
-                nullParents,
-            )}`,
-        );
-    }
+  ) {
+    throw new Error(
+      `Archive database has null parents in the specified range. Import them and try again. Blocks with null parents were: ${JSON.stringify(
+        nullParents,
+      )}`,
+    );
+  }
 
-    const blockFile = `${__dirname}/../../../data/.paidblocks`;
+  const blockFile = `${__dirname}/../../../data/.paidblocks`;
 
-    const filterBlocks = () => {
-        return new Promise((resolve, reject) => {
-            fs.createReadStream(blockFile)
-                .pipe(parse({ delimiter: '|' }))
-                .on('data', (record) => {
-                    blocks = blocks.filter(
-                        (block) => !(block.blockheight == record[0] && block.statehash == record[1]),
-                    );
-                })
-                .on('end', resolve)
-                .on('error', reject);
-        });
-    };
-    if (fs.existsSync(blockFile)) {
-        await filterBlocks();
-    }
-    return blocks;
+  const filterBlocks = () => {
+    return new Promise((resolve, reject) => {
+      fs.createReadStream(blockFile)
+        .pipe(parse({ delimiter: '|' }))
+        .on('data', (record) => {
+          blocks = blocks.filter(
+            (block) => !(block.blockheight == record[0] && block.statehash == record[1]),
+          );
+        })
+        .on('end', resolve)
+        .on('error', reject);
+    });
+  };
+  if (fs.existsSync(blockFile)) {
+    await filterBlocks();
+  }
+  return blocks;
 }
 
 async function getHeightMissing(minHeight: number, maxHeight: number) {
-    const heights: Array<height> = await db.any(getHeightsMissingQuery, [minHeight, maxHeight]);
-    return heights.map((x) => x.height);
+  const heights: Array<height> = await db.any(getHeightsMissingQuery, [minHeight, maxHeight]);
+  return heights.map((x) => x.height);
 }
 
 async function getNullParents(minHeight: number, maxHeight: number) {
-    const heights: Array<height> = await db.any(getNullParentsQuery, [minHeight, maxHeight]);
-    return heights.map((x) => x.height);
+  const heights: Array<height> = await db.any(getNullParentsQuery, [minHeight, maxHeight]);
+  return heights.map((x) => x.height);
 }
 
 async function getMinMaxSlotHeight(epoch: number): Promise<[number, number]> {
-    if (!process.env.NUM_SLOTS_IN_EPOCH) throw Error('ERROR: NUM_SLOTS_IN_EPOCH not present in .env file. ');
+  if (!process.env.NUM_SLOTS_IN_EPOCH) throw Error('ERROR: NUM_SLOTS_IN_EPOCH not present in .env file. ');
 
-    const slotsInEpoch = Number.parseInt(process.env.NUM_SLOTS_IN_EPOCH);
+  const slotsInEpoch = Number.parseInt(process.env.NUM_SLOTS_IN_EPOCH);
 
-    const min = slotsInEpoch * epoch;
+  const min = slotsInEpoch * epoch;
 
-    const max = slotsInEpoch * (epoch + 1) - 1;
+  const max = slotsInEpoch * (epoch + 1) - 1;
 
-    return [min, max];
+  return [min, max];
 }
 
 async function getMinMaxBlocksInSlotRange(min: number, max: number): Promise<[number, number]> {
-    const query = `
+  const query = `
       SELECT min(height) as epochminblockheight, max(height) as epochmaxblockheight
       FROM
       blocks b
@@ -195,10 +195,10 @@ async function getMinMaxBlocksInSlotRange(min: number, max: number): Promise<[nu
         )
       AND b.global_slot_since_genesis >= CAST($1 AS INTEGER)
       AND b.global_slot_since_genesis <= CAST($2 AS INTEGER)`;
-    const result = await db.one(query, [min, max]);
-    const epochminblockheight = result.epochminblockheight;
-    const epochmaxblockheight = result.epochmaxblockheight;
-    return [epochminblockheight, epochmaxblockheight];
+  const result = await db.one(query, [min, max]);
+  const epochminblockheight = result.epochminblockheight;
+  const epochmaxblockheight = result.epochmaxblockheight;
+  return [epochminblockheight, epochmaxblockheight];
 }
 
 type height = {

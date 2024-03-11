@@ -4,12 +4,12 @@ import TYPES from './Types';
 
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../core/dataProvider/Models';
 import {
-    ISubstituteAndExcludePayToAddresses,
-    IBlockProcessor,
-    IPaymentBuilder,
-    IPaymentProcessor,
-    ISummarizer,
-    PaymentProcess,
+  ISubstituteAndExcludePayToAddresses,
+  IBlockProcessor,
+  IPaymentBuilder,
+  IPaymentProcessor,
+  ISummarizer,
+  PaymentProcess,
 } from '../core/payment/Model';
 import { IPayoutCalculator } from '../core/payoutCalculator/Model';
 import { BlockProcessor } from '../core/payment/BlockProcessor';
@@ -42,7 +42,7 @@ container.bind<ISummarizer<PaymentProcess>>(TYPES.PaymentSummarizer).to(PaymentS
 //Add a factory to change Calculator based on a setting or argument
 container.bind<IPayoutCalculator>(TYPES.IPayoutCalculator).to(PayoutCalculatorIsolateSuperCharge);
 container
-    .bind<ISubstituteAndExcludePayToAddresses>(TYPES.IAddressRemover)
-    .to(SubstituteAndExcludePayToAddressesForSuperCharge);
+  .bind<ISubstituteAndExcludePayToAddresses>(TYPES.IAddressRemover)
+  .to(SubstituteAndExcludePayToAddressesForSuperCharge);
 
 export default container;

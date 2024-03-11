@@ -11,122 +11,122 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
     private fileWriter: IFileWriter;
 
     constructor(@inject(TYPES.IFileWriter) fileWriter: IFileWriter) {
-        this.fileWriter = fileWriter;
+      this.fileWriter = fileWriter;
     }
 
     async calculateTotals(base: PaymentProcess): Promise<void> {
-        const getTotalsFromBlocks = (blocks: Block[]) => {
-            let coinbasesum = 0;
-            let feetransferfromcoinbasesum = 0;
-            let usercommandtransactionfeessum = 0;
-            blocks.forEach((block) => {
-                coinbasesum += block.coinbase ?? 0;
-                feetransferfromcoinbasesum += block.feetransferfromcoinbase ?? 0;
-                usercommandtransactionfeessum += block.usercommandtransactionfees ?? 0;
-            });
+      const getTotalsFromBlocks = (blocks: Block[]) => {
+        let coinbasesum = 0;
+        let feetransferfromcoinbasesum = 0;
+        let usercommandtransactionfeessum = 0;
+        blocks.forEach((block) => {
+          coinbasesum += block.coinbase ?? 0;
+          feetransferfromcoinbasesum += block.feetransferfromcoinbase ?? 0;
+          usercommandtransactionfeessum += block.usercommandtransactionfees ?? 0;
+        });
 
-            return { coinbasesum, feetransferfromcoinbasesum, usercommandtransactionfeessum };
-        };
+        return { coinbasesum, feetransferfromcoinbasesum, usercommandtransactionfeessum };
+      };
 
-        const getTotalAmountSum = (transactions: PayoutTransaction[]) => {
-            let amountsum = 0;
+      const getTotalAmountSum = (transactions: PayoutTransaction[]) => {
+        let amountsum = 0;
 
-            transactions.forEach((transaction) => {
-                amountsum += transaction.amount ?? 0;
-            });
+        transactions.forEach((transaction) => {
+          amountsum += transaction.amount ?? 0;
+        });
 
-            return amountsum;
-        };
+        return amountsum;
+      };
 
-        const getTotalFeeSum = (transactions: PayoutTransaction[]) => {
-            let feesum = 0;
+      const getTotalFeeSum = (transactions: PayoutTransaction[]) => {
+        let feesum = 0;
 
-            transactions.forEach((transaction) => {
-                feesum += transaction.fee ?? 0;
-            });
+        transactions.forEach((transaction) => {
+          feesum += transaction.fee ?? 0;
+        });
 
-            return feesum;
-        };
+        return feesum;
+      };
 
-        const { coinbasesum, feetransferfromcoinbasesum, usercommandtransactionfeessum } = getTotalsFromBlocks(
-            base.blocks,
-        );
+      const { coinbasesum, feetransferfromcoinbasesum, usercommandtransactionfeessum } = getTotalsFromBlocks(
+        base.blocks,
+      );
 
-        const netcoinbasereceived = coinbasesum - feetransferfromcoinbasesum + usercommandtransactionfeessum;
+      const netcoinbasereceived = coinbasesum - feetransferfromcoinbasesum + usercommandtransactionfeessum;
 
-        const amountsum = getTotalAmountSum(base.payoutsBeforeExclusions);
+      const amountsum = getTotalAmountSum(base.payoutsBeforeExclusions);
 
-        const feesum = getTotalFeeSum(base.payouts);
+      const feesum = getTotalFeeSum(base.payouts);
 
-        base.totals = {
-            coinBaseSum: coinbasesum / 1000000000,
-            feeTransferFromCoinBaseSum: feetransferfromcoinbasesum / 1000000000,
-            userCommandTransactionFeeSum: usercommandtransactionfeessum / 1000000000,
-            netCoinBaseReceived:
+      base.totals = {
+        coinBaseSum: coinbasesum / 1000000000,
+        feeTransferFromCoinBaseSum: feetransferfromcoinbasesum / 1000000000,
+        userCommandTransactionFeeSum: usercommandtransactionfeessum / 1000000000,
+        netCoinBaseReceived:
                 (coinbasesum - feetransferfromcoinbasesum + usercommandtransactionfeessum) / 1000000000,
-            payoutAmountsSum: amountsum / 1000000000,
-            payoutFeesSum: feesum / 1000000000,
-            payoutBurnSum: base.totalBurn / 1000000000,
-            payoutStakersSum: (amountsum - base.totalBurn) / 1000000000,
-            netMinaToPoolOperator: (netcoinbasereceived - amountsum - feesum) / 1000000000,
-        };
+        payoutAmountsSum: amountsum / 1000000000,
+        payoutFeesSum: feesum / 1000000000,
+        payoutBurnSum: base.totalBurn / 1000000000,
+        payoutStakersSum: (amountsum - base.totalBurn) / 1000000000,
+        netMinaToPoolOperator: (netcoinbasereceived - amountsum - feesum) / 1000000000,
+      };
     }
 
     async printTotals(base: PaymentProcess): Promise<void> {
-        console.log('------------------- Summary & Totals ------------------');
-        console.log('Calculations based on entire pool');
-        console.log(`\x1b[42m%s\x1b[0m`, `Net Coinbase Received: ${base.totals?.netCoinBaseReceived}`);
-        console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts Due To Payout: ${base.totals?.payoutAmountsSum}`);
-        console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts Due To Stakers: ${base.totals?.payoutStakersSum}`);
-        console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts To Burn: ${base.totals?.payoutBurnSum}`);
-        console.log(
-            `\x1b[42m%s\x1b[0m`,
-            `Net MINA to Pool Operator (after send transaction fees): ${base.totals?.netMinaToPoolOperator}`,
-        );
-        console.log(`Total Coin Base Generated: ${base.totals?.coinBaseSum}`);
-        console.log(
-            `User Transaction Fees Generated (net of snark fees): ${base.totals?.userCommandTransactionFeeSum}`,
-        );
-        console.log(`Total Snark Fees Paid From Coinbase: ${base.totals?.feeTransferFromCoinBaseSum}`);
-        console.log(`Total Payout Transaction Fees: ${base.totals?.payoutFeesSum}`);
+      console.log('------------------- Summary & Totals ------------------');
+      console.log('Calculations based on entire pool');
+      console.log(`\x1b[42m%s\x1b[0m`, `Net Coinbase Received: ${base.totals?.netCoinBaseReceived}`);
+      console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts Due To Payout: ${base.totals?.payoutAmountsSum}`);
+      console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts Due To Stakers: ${base.totals?.payoutStakersSum}`);
+      console.log(`\x1b[42m%s\x1b[0m`, `Total Amounts To Burn: ${base.totals?.payoutBurnSum}`);
+      console.log(
+        `\x1b[42m%s\x1b[0m`,
+        `Net MINA to Pool Operator (after send transaction fees): ${base.totals?.netMinaToPoolOperator}`,
+      );
+      console.log(`Total Coin Base Generated: ${base.totals?.coinBaseSum}`);
+      console.log(
+        `User Transaction Fees Generated (net of snark fees): ${base.totals?.userCommandTransactionFeeSum}`,
+      );
+      console.log(`Total Snark Fees Paid From Coinbase: ${base.totals?.feeTransferFromCoinBaseSum}`);
+      console.log(`Total Payout Transaction Fees: ${base.totals?.payoutFeesSum}`);
 
-        console.log('------------------- Summary & Totals ------------------');
+      console.log('------------------- Summary & Totals ------------------');
     }
 
     async writeTotals(config: PaymentConfiguration, base: PaymentProcess): Promise<void> {
-        const runDateTime = new Date();
+      const runDateTime = new Date();
 
-        const { maximumHeight, totals } = base;
-        const { minimumHeight } = config;
-        const payoutSummaryFileName = this.generateOutputFileName(
-            'payout_summary',
-            runDateTime,
-            minimumHeight,
-            maximumHeight,
-        );
+      const { maximumHeight, totals } = base;
+      const { minimumHeight } = config;
+      const payoutSummaryFileName = this.generateOutputFileName(
+        'payout_summary',
+        runDateTime,
+        minimumHeight,
+        maximumHeight,
+      );
 
-        const data = {
-            ...totals,
-            defaultCommissionRate: config.defaultCommissionRate,
-            mfCommissionRate: config.mfCommissionRate,
-            o1CommissionRate: config.o1CommissionRate,
-            stakingPoolPublicKey: config.stakingPoolPublicKey,
-            payorComissionRates: config.commissionRatesByPublicKey,
-        };
+      const data = {
+        ...totals,
+        defaultCommissionRate: config.defaultCommissionRate,
+        mfCommissionRate: config.mfCommissionRate,
+        o1CommissionRate: config.o1CommissionRate,
+        stakingPoolPublicKey: config.stakingPoolPublicKey,
+        payorComissionRates: config.commissionRatesByPublicKey,
+      };
 
-        this.fileWriter.write(payoutSummaryFileName, JSON.stringify(data));
+      this.fileWriter.write(payoutSummaryFileName, JSON.stringify(data));
     }
 
     private generateOutputFileName(
-        identifier: string,
-        runDateTime: Date,
-        minimumHeight: number,
-        maximumHeight: number,
+      identifier: string,
+      runDateTime: Date,
+      minimumHeight: number,
+      maximumHeight: number,
     ) {
-        return `./src/data/${identifier}_${this.longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`;
+      return `./src/data/${identifier}_${this.longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`;
     }
 
     private longDateString(d: Date) {
-        return d.toISOString().replace(/\D/g, '');
+      return d.toISOString().replace(/\D/g, '');
     }
 }

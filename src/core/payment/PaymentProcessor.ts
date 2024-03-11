@@ -20,68 +20,68 @@ export class PaymentProcessor implements IPaymentProcessor {
         @inject(TYPES.ISender) sender: ISender,
         @inject(TYPES.PaymentSummarizer) summarizer: ISummarizer<PaymentProcess>,
     ) {
-        (this.paymentBuilder = paymentBuilder),
-            (this.transactionBuilder = transactionBuilder),
-            (this.transactionProcessor = transactionProcessor),
-            (this.sender = sender);
-        this.summarizer = summarizer;
+      (this.paymentBuilder = paymentBuilder),
+      (this.transactionBuilder = transactionBuilder),
+      (this.transactionProcessor = transactionProcessor),
+      (this.sender = sender);
+      this.summarizer = summarizer;
     }
 
     async run(args: any): Promise<void> {
-        await ConfigurationManager.build(args);
+      await ConfigurationManager.build(args);
 
-        const configuration = ConfigurationManager.Setup;
+      const configuration = ConfigurationManager.Setup;
 
-        if (await this.isValid(configuration)) {
-            const paymentProcess = await this.paymentBuilder.build();
+      if (await this.isValid(configuration)) {
+        const paymentProcess = await this.paymentBuilder.build();
 
-            await this.transactionBuilder.build(paymentProcess, configuration);
+        await this.transactionBuilder.build(paymentProcess, configuration);
 
-            await this.calculateTotalPayoutFundsNeeded(paymentProcess, configuration);
+        await this.calculateTotalPayoutFundsNeeded(paymentProcess, configuration);
 
-            await this.transactionProcessor.write(configuration, paymentProcess);
+        await this.transactionProcessor.write(configuration, paymentProcess);
 
-            await this.sender.send(configuration, paymentProcess);
+        await this.sender.send(configuration, paymentProcess);
 
-            await this.summarizer.calculateTotals(paymentProcess);
+        await this.summarizer.calculateTotals(paymentProcess);
 
-            await this.summarizer.printTotals(paymentProcess);
+        await this.summarizer.printTotals(paymentProcess);
 
-            await this.summarizer.writeTotals(configuration, paymentProcess);
-        } else {
-            //TODO: Use a custom error class
-            throw new Error('Unkown Data Source');
-        }
+        await this.summarizer.writeTotals(configuration, paymentProcess);
+      } else {
+        //TODO: Use a custom error class
+        throw new Error('Unkown Data Source');
+      }
     }
 
     private async calculateTotalPayoutFundsNeeded(paymentProcess: PaymentProcess, configuration: PaymentConfiguration) {
-        let totalPayoutFundsNeeded = 0;
+      let totalPayoutFundsNeeded = 0;
 
-        paymentProcess.payouts.map((t) => {
-            totalPayoutFundsNeeded += t.amount + t.fee;
-        });
+      paymentProcess.payouts.map((t) => {
+        totalPayoutFundsNeeded += t.amount + t.fee;
+      });
 
-        console.log(
-            `Total Funds Required for Payout = ${totalPayoutFundsNeeded} nanoMINA or ${
-                totalPayoutFundsNeeded / 1000000000
-            } MINA`,
-        );
-        console.log(
-            `Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${
-                configuration.senderKeys.publicKey
-            } ${totalPayoutFundsNeeded / 1000000000}`,
-        );
+      console.log(
+        `Total Funds Required for Payout = ${totalPayoutFundsNeeded} nanoMINA or ${
+          totalPayoutFundsNeeded / 1000000000
+        } MINA`,
+      );
+      console.log(
+        `Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${
+          configuration.senderKeys.publicKey
+        } ${totalPayoutFundsNeeded / 1000000000}`,
+      );
     }
 
     private async isValid(config: PaymentConfiguration): Promise<boolean> {
-        if (
-            config.blockDataSource != 'ARCHIVEDB' &&
+      if (
+        config.blockDataSource != 'ARCHIVEDB' &&
             config.blockDataSource != 'MINAEXPLORER' &&
             config.blockDataSource != 'API'
-        ) {
-            return false;
-        }
+      ) {
+        return false;
+      }
 
-        return true;
+      return true;
     }
 }

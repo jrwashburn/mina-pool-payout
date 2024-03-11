@@ -10,44 +10,44 @@ export class TransactionProcessor implements ITransactionProcessor {
     private fileWriter: IFileWriter;
 
     constructor(@inject(TYPES.IFileWriter) fileWriter: IFileWriter) {
-        this.fileWriter = fileWriter;
+      this.fileWriter = fileWriter;
     }
     async write(config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void> {
-        const runDateTime = new Date();
+      const runDateTime = new Date();
 
-        const { storePayout, maximumHeight, totalPayoutFundsNeeded, payouts } = paymentProcess;
+      const { storePayout, maximumHeight, totalPayoutFundsNeeded, payouts } = paymentProcess;
 
-        const { minimumHeight } = config;
+      const { minimumHeight } = config;
 
-        const payoutTransactionsFileName = this.generateOutputFileName(
-            'payout_transactions',
-            runDateTime,
-            minimumHeight,
-            maximumHeight,
-        );
+      const payoutTransactionsFileName = this.generateOutputFileName(
+        'payout_transactions',
+        runDateTime,
+        minimumHeight,
+        maximumHeight,
+      );
 
-        this.fileWriter.write(payoutTransactionsFileName, JSON.stringify(payouts));
+      this.fileWriter.write(payoutTransactionsFileName, JSON.stringify(payouts));
 
-        const payoutDetailsFileName = this.generateOutputFileName(
-            'payout_details',
-            runDateTime,
-            minimumHeight,
-            maximumHeight,
-        );
+      const payoutDetailsFileName = this.generateOutputFileName(
+        'payout_details',
+        runDateTime,
+        minimumHeight,
+        maximumHeight,
+      );
 
-        this.fileWriter.write(payoutDetailsFileName, JSON.stringify(storePayout));
+      this.fileWriter.write(payoutDetailsFileName, JSON.stringify(storePayout));
     }
 
     private generateOutputFileName(
-        identifier: string,
-        runDateTime: Date,
-        minimumHeight: number,
-        maximumHeight: number,
+      identifier: string,
+      runDateTime: Date,
+      minimumHeight: number,
+      maximumHeight: number,
     ) {
-        return `./src/data/${identifier}_${this.longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`;
+      return `./src/data/${identifier}_${this.longDateString(runDateTime)}_${minimumHeight}_${maximumHeight}.json`;
     }
 
     private longDateString(d: Date) {
-        return d.toISOString().replace(/\D/g, '');
+      return d.toISOString().replace(/\D/g, '');
     }
 }
