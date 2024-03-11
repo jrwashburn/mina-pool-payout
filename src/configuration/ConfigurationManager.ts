@@ -82,14 +82,27 @@ export class ConfigurationManager {
       msg += 'ERROR: Minimum or maximum block height not provided.';
     }
     if (Number.isInteger(this.Setup.epoch) && !Number.isInteger(this.Setup.fork)) {
-      msg += 'ERROR: Must provide fork number when processing by epoch';
+      msg += `ERROR: Must provide fork number when processing by epoch - e.g. "npm run payout -- -e ${this.Setup.epoch} -f 0"`;
     }
     if (this.Setup.fork < 0 || this.Setup.fork > 1) {
       msg += 'ERROR: Fork number must be 0 or 1. Data provider must be updated to be aware of any additional forks.';
     }
+    if (this.Setup.fork == 1 && (this.Setup.blockDataSource === 'ARCHIVEDB' || this.Setup.blockDataSource === 'MINAEXPLORER')) {
+      msg += 'ERROR: Fork 1 is not currently supported by ARCHIVEDB or MINAEXPLORER data sources.';
+    }
     if (msg !== '') {
-      console.log(msg);
+      console.log('\x1b[31m%s\x1b[0m', msg);
       process.exit(1);
+    }
+    if (this.Setup.blockDataSource === 'ARCHIVEDB') {
+      console.log('\x1b[31m%s\x1b[0m', '******************************');
+      console.log('\x1b[31m%s\x1b[0m', 'WARNING: ARCHIVEDB data source only supports fork 0 currently. Please get in touch with @jrwashburn to notify that you need archivedb support for the hard fork.');
+      console.log('\x1b[31m%s\x1b[0m', '******************************');
+    }
+    if (this.Setup.blockDataSource === 'MINAEXPLORER') {
+      console.log('\x1b[31m%s\x1b[0m', '******************************');
+      console.log('\x1b[31m%s\x1b[0m', 'WARNING: MINAEXPLORER data source will be deprecated at the hard fork. Switch to alternative api providers such as api.minastakes.com or the Mina Foundation equivalent.');
+      console.log('\x1b[31m%s\x1b[0m', '******************************');
     }
   }
 }
