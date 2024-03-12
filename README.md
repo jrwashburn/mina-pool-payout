@@ -6,6 +6,7 @@ The burn of the supercharged rewards is related to blocks won by Mina Foundation
 _The burn address is: B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X_ . It's a public address without a private key. The tokens held by this address are locked forever.
 
 ### Delegation Program requirements
+
 The application implements the rules fo the Mina Foundation and O1 Labs Delegation Program requirements, including:
 
 -   All the rewards should be sent back to the delegators. Only the commision rate should be kept by the Block Producer.
@@ -14,28 +15,34 @@ The application implements the rules fo the Mina Foundation and O1 Labs Delegati
 -   The memo field of the payback and burn transaction should contain the md5 value of the block producer's public key that received the delegation.
 
 ## Calculating and Sending Payments
-Payouts may be calculated (and then sent) for a specific range of block heights, or for an entire epoch. 
+
+Payouts may be calculated (and then sent) for a specific range of block heights, or for an entire epoch. Details on the calculation can be found in [Payout Calculation.md](https://github.com/jrwashburn/mina-pool-payout/blob/main/PayoutCalculation.md)
 
 ### Commands to payout per epoch
-- `npm run payout -- -e [epoch number] -f [fork number]` will run the calculation for a specific epoch on a specific fork number, beginning with fork 0.
-- `npm run payout -- -e [epoch number] -f [fork number] -h [dry run hash]` will re-run the calculation, confirm they match the original run, and then automatically send payments to the network.
+
+-   `npm run payout -- -e [epoch number] -f [fork number]` will run the calculation for a specific epoch on a specific fork number, beginning with fork 0.
+-   `npm run payout -- -e [epoch number] -f [fork number] -h [dry run hash]` will re-run the calculation, confirm they match the original run, and then automatically send payments to the network.
 
 ### Commands to payout for a block height range
-- `npm run payout -- -m [min block height] -x [max block height]` will run the calculation for a specific range of block heights. Min block and Max block heights will be included.
-- `npm run payout -- -m [min block height] -x [max block height] -h [dry run hash]` will re-run the calculation, confirm they match the original run, and then automatically send payments to the network.
 
-- In between runs, depending on your key management process, you may need to transmit funds to the wallet that is configured to make the payments. This is assumed to be an offline process and is intentionally not automated to support movement of funds from a cold wallet to a hot wallet used for payments. **Note that you must wait for the funding transaction to complete before running the final payout.**
+-   `npm run payout -- -m [min block height] -x [max block height]` will run the calculation for a specific range of block heights. Min block and Max block heights will be included.
+-   `npm run payout -- -m [min block height] -x [max block height] -h [dry run hash]` will re-run the calculation, confirm they match the original run, and then automatically send payments to the network.
 
-- The blocks that were paid will be saved and will be excluded from future runs. (If you need to re-run for some reason, the processed blocks are saved in src/data/.paidblocks)
-    
+-   In between runs, depending on your key management process, you may need to transmit funds to the wallet that is configured to make the payments. This is assumed to be an offline process and is intentionally not automated to support movement of funds from a cold wallet to a hot wallet used for payments. **Note that you must wait for the funding transaction to complete before running the final payout.**
+
+-   The blocks that were paid will be saved and will be excluded from future runs. (If you need to re-run for some reason, the processed blocks are saved in src/data/.paidblocks)
+
 ## Simple Setup (ht: discord/@naamah8064)
+
 For more details, see [In Depth](#In Depth Configuration & Operation) below
 
 ### Install Prerequisites
-- Install nodejs/typescript/npm  
-https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+
+-   Install nodejs/typescript/npm  
+    https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 
 ### Download and install mina-pool-payout
+
 ```bash
 git clone https://github.com/jrwashburn/mina-pool-payout.git
 cd mina-pool-payout
@@ -44,9 +51,11 @@ cp sample.env .env
 ```
 
 ### Configuration settings for your pool
+
 Edit file to set environment variables:
+
 ```bash
-nano .env 
+nano .env
 ```
 
 Set `POOL_PUBLIC_KEY` to your node public key  
@@ -57,18 +66,20 @@ Set `SEND_PAYMENT_GRAPHQL` to your local node or a proxy e.g. `SEND_PAYMENT_GRAP
 Set `PAYOUT_DATA_PROVIDER_API_ENDPOINT` to a payout data provider root endpoint e.g. `PAYOUT_DATA_PROVIDER_API_ENDPOINT=https://api.minastakes.com`
 
 #### Key Management
+
 Because the payout script can send payments, it is recommended to generate and use an isolated keypair for these payouts. You may want to rotate this key periodically as well.  
 A keypair can be created with the mina-generate-keypair application and then exported with the mina application.
 For example:
+
 ```bash
 mina-generate-keypair --privkey-path keys/payout-key-2024
 mina advanced dump-keypair --privkey-path keys/payout-key-2024
 ```
 
 #### Other dependencies
+
 -   Access to a Mina Archive database, or to the MinaExplorer graphql API (until hardfork), or to a mina-payout-data-provider API endpoint such as `https://api.minastakes.com`
 -   If payments are to be sent, access to a graphql endpoint that can send signed transactions is required. This may be your own node, or third party proxy.
-
 
 ### Important
 
@@ -89,34 +100,34 @@ Before to send any payout please make sure:
 
 ![Alt Verification steps](./src/img/dry-run-no-supercharged.png?raw=true)
 
-# In Depth Configuration & Operation 
+# In Depth Configuration & Operation
 
 ## Setting up your environment
 
 Copy `sample.env` to `.env` and make the following changes within the `.env`:
 
-- Set `BLOCK_DATA_SOURCE` to either ARCHIVEDB or MINAEXPLORER or API.
-- ARCHIVEDB will use the database connection string to get blocks and the current max height, and will expect [hash].json files for the ledgers being processed.
-- MINAEXPLORER will use endpoint specified in MINAEXPLORER_GRAPHQL_ENDPOINT (expect: https://graphql.minaexplorer.com) to get blocks and the staking ledger
-- API will use an endpoint specified in PAYOUT_DATA_PROVIDER_API_ENDPOINT (one available endpoint is https://api.minastakes.com)
+-   Set `BLOCK_DATA_SOURCE` to either ARCHIVEDB or MINAEXPLORER or API.
+-   ARCHIVEDB will use the database connection string to get blocks and the current max height, and will expect [hash].json files for the ledgers being processed.
+-   MINAEXPLORER will use endpoint specified in MINAEXPLORER_GRAPHQL_ENDPOINT (expect: https://graphql.minaexplorer.com) to get blocks and the staking ledger
+-   API will use an endpoint specified in PAYOUT_DATA_PROVIDER_API_ENDPOINT (one available endpoint is https://api.minastakes.com)
 
-- Set `COMMISSION_RATE` to the commission your pool charges unknown delegators. (Mina Foundation and O1 delegations have separate configurations in the .env file, and you can set override rates for known delegators -- see "Using payor specific commission rates" below.)
+-   Set `COMMISSION_RATE` to the commission your pool charges unknown delegators. (Mina Foundation and O1 delegations have separate configurations in the .env file, and you can set override rates for known delegators -- see "Using payor specific commission rates" below.)
 
-- Set `MF_COMMISSION_RATE` to the commission your pool charges for Mina Foundation delegations, if any. Mina Foundation maximum rate was .05 from inception until delegation cycle 10, after which the maximum allowable is 0.08.
+-   Set `MF_COMMISSION_RATE` to the commission your pool charges for Mina Foundation delegations, if any. Mina Foundation maximum rate was .05 from inception until delegation cycle 10, after which the maximum allowable is 0.08.
 
-- Set `O1_COMMISSION_RATE` to the commission your pool charges for O(1) Labs delegations, if any.
+-   Set `O1_COMMISSION_RATE` to the commission your pool charges for O(1) Labs delegations, if any.
 
-- Set `INVESTORS_COMMISSION_RATE` to the commission your pool charges for Investors delegations, if any. the defaul value is 0.08.
+-   Set `INVESTORS_COMMISSION_RATE` to the commission your pool charges for Investors delegations, if any. the defaul value is 0.08.
 
-- Set `POOL_PUBLIC_KEY` to the public key of the pool account being tracked for payouts. This should be the block producer public key.
+-   Set `POOL_PUBLIC_KEY` to the public key of the pool account being tracked for payouts. This should be the block producer public key.
 
-- Set `POOL_MEMO` to the DiscordID or other message to be sent in the payout memo field. Note that in case of Mina Foundation is the winner, the memo will be forced to the md5 hash value of the BP Key.
+-   Set `POOL_MEMO` to the DiscordID or other message to be sent in the payout memo field. Note that in case of Mina Foundation is the winner, the memo will be forced to the md5 hash value of the BP Key.
 
-- Set `SEND_TRANSACTION_FEE` to the transaction fee for payout transactions. It is specified in the .env file in MINA, but will be translated to NANOMINA for the actual payment transactions. Double check that this is in Mina!
+-   Set `SEND_TRANSACTION_FEE` to the transaction fee for payout transactions. It is specified in the .env file in MINA, but will be translated to NANOMINA for the actual payment transactions. Double check that this is in Mina!
 
-- Set `SEND_PAYOUT_THRESHOLD` to a minimum threshold which payout amounts must exceed to be sent. Default is 0, and payout transaction amount must _exceed_ this number to be sent. Also specified in Mina!
+-   Set `SEND_PAYOUT_THRESHOLD` to a minimum threshold which payout amounts must exceed to be sent. Default is 0, and payout transaction amount must _exceed_ this number to be sent. Also specified in Mina!
 
-- Set `SEND_PRIVATE_KEY` to the sender private key
+-   Set `SEND_PRIVATE_KEY` to the sender private key
     The private key value can be retrieved from a pk file by running the mina advanced dump-keypair command, e.g.
 
 ```
@@ -269,16 +280,20 @@ For example, `npm run resend -- -f=3102 -t=3104` will try to re-transmit any fil
 _Inspired by [minaexplorer - mina-payout-script](https://github.com/garethtdavies/mina-payout-script)_
 This started out as a port from the original, but has morphed a fair amount. As of PR 59, direct comparisons between the two are no longer expected to produce the same results. The main differences vs. the Mina Explorer implementation include:
 
-- mina-payout-script spreads an unlocked key's weighted supercharged award across the entire epoch if it will unlock at any point during the epoch. mina-pool-payout will only supercharge an account after it is unlocked.
-- mina-pool-payout will (as of PR 59) reserve supercharged rewards entirely for unlocked keys versus spreading the supercharged award across normal coinbase blocks as well. This will result in more variability in unlocked payout versus mina-payout-script.
-- mina-pool-payout will (as of PR 107) burn supercharged rewards if the block was created by keys specified by Mina Foundation as be owned by MF or "investors".
+-   mina-payout-script spreads an unlocked key's weighted supercharged award across the entire epoch if it will unlock at any point during the epoch. mina-pool-payout will only supercharge an account after it is unlocked.
+-   mina-pool-payout will (as of PR 59) reserve supercharged rewards entirely for unlocked keys versus spreading the supercharged award across normal coinbase blocks as well. This will result in more variability in unlocked payout versus mina-payout-script.
+-   mina-pool-payout will (as of PR 107) burn supercharged rewards if the block was created by keys specified by Mina Foundation as be owned by MF or "investors".
 
 ### How are the rewards calculated ?
+
 `https://github.com/jrwashburn/mina-pool-payout/blob/main/src/core/payoutCalculator/PayoutCalculatorIsolateSuperCharge.ts`
+
 ### How to compute the md5 hash of the block producer's public key?
+
 Using node:crypto, `createHash('md5').update(BPKEY).digest('hex')`
 `https://github.com/jrwashburn/mina-pool-payout/blob/main/src/configuration/ConfigurationManager.ts`
 
 ### How are the supercharged rewards burned ?
+
 The supercharged portion that should be burned is sent to the burn address when payments are sent.
 `https://github.com/jrwashburn/mina-pool-payout/blob/main/src/utils/send-payments.ts` (see getMemoMd5Hash)
