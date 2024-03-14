@@ -3,7 +3,7 @@ import { PaymentConfiguration } from '../../configuration/Model';
 import { PayoutDetails, PayoutTransaction } from '../payoutCalculator/Model';
 
 export interface IPaymentProcessor {
-    run(args: any): Promise<void>;
+    run(args: unknown): Promise<void>;
 }
 
 export interface PaymentProcess {

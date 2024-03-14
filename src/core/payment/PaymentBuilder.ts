@@ -9,138 +9,138 @@ import { IPayoutCalculator } from '../payoutCalculator/Model';
 
 @injectable()
 export class PaymentBuilder implements IPaymentBuilder {
-    private blockProcessor: IBlockProcessor;
-    private payoutCalculator: IPayoutCalculator;
-    private stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>;
-    private blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>;
+  private blockProcessor: IBlockProcessor;
+  private payoutCalculator: IPayoutCalculator;
+  private stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>;
+  private blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>;
 
-    public constructor(
+  public constructor(
         @inject(TYPES.IBlockProcessor) blockHandler: IBlockProcessor,
         @inject(TYPES.IPayoutCalculator) payoutCalculator: IPayoutCalculator,
         @inject(TYPES.BlockDataProviderFactory) blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>,
         @inject(TYPES.StakeDataProviderFactory) stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>,
-    ) {
-        this.blockProcessor = blockHandler;
-        this.payoutCalculator = payoutCalculator;
-        this.blockDataProviderFactory = blockDataProviderFactory;
-        this.stakeDataProviderFactory = stakeDataProviderFactory;
-    }
+  ) {
+    this.blockProcessor = blockHandler;
+    this.payoutCalculator = payoutCalculator;
+    this.blockDataProviderFactory = blockDataProviderFactory;
+    this.stakeDataProviderFactory = stakeDataProviderFactory;
+  }
 
-    async build(): Promise<PaymentProcess> {
-        const config = ConfigurationManager.Setup;
+  async build(): Promise<PaymentProcess> {
+    const config = ConfigurationManager.Setup;
 
-        const stakesProvider = this.stakeDataProviderFactory.build(config.blockDataSource);
+    const stakesProvider = this.stakeDataProviderFactory.build(config.blockDataSource);
 
-        const blockProvider = this.blockDataProviderFactory.build(config.blockDataSource);
+    const blockProvider = this.blockDataProviderFactory.build(config.blockDataSource);
 
-        const {
-            configuredMaximum,
-            minimumConfirmations,
-            minimumHeight,
-            stakingPoolPublicKey,
-            defaultCommissionRate,
-            mfCommissionRate,
-            o1CommissionRate,
-            investorsCommissionRate,
-            commissionRatesByPublicKey,
-            burnRatesByPublicKey,
-        } = config;
+    const {
+      configuredMaximum,
+      minimumConfirmations,
+      minimumHeight,
+      stakingPoolPublicKey,
+      defaultCommissionRate,
+      mfCommissionRate,
+      o1CommissionRate,
+      investorsCommissionRate,
+      commissionRatesByPublicKey,
+      burnRatesByPublicKey,
+    } = config;
 
-        const latestHeight = await blockProvider.getLatestHeight();
+    const latestHeight = await blockProvider.getLatestHeight();
 
-        const maximumHeight = await this.blockProcessor.determineLastBlockHeightToProcess(
-            configuredMaximum,
-            minimumConfirmations,
-            latestHeight,
+    const maximumHeight = await this.blockProcessor.determineLastBlockHeightToProcess(
+      configuredMaximum,
+      minimumConfirmations,
+      latestHeight,
+    );
+
+    console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
+    console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey}`);
+
+    const blocks: Block[] = await blockProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);
+
+    const payouts: PayoutTransaction[] = [];
+
+    const storePayout: PayoutDetails[] = [];
+
+    let globalTotalPayout = 0;
+    let globalTotalToBurn = 0;
+
+    const ledgerHashes = [...new Set(blocks.map((block) => block.stakingledgerhash))];
+
+    return Promise.all(
+      ledgerHashes.map(async (ledgerHash) => {
+        console.log(`### Calculating payouts for ledger ${ledgerHash}`);
+
+        const ledger = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey);
+
+        console.log(`The pool total staking balance is ${ledger.totalStakingBalance}`);
+
+        const ledgerBlocks = blocks.filter((x) => x.stakingledgerhash == ledgerHash);
+
+        const [
+          ledgerPayouts,
+          ledgerStorePayout,
+          blocksIncluded,
+          totalPayout,
+          totalSuperchargedToBurn,
+          totalNegotiatedBurn,
+        ] = await this.payoutCalculator.getPayouts(
+          ledgerBlocks,
+          ledger.stakes,
+          ledger.totalStakingBalance,
+          defaultCommissionRate,
+          mfCommissionRate,
+          o1CommissionRate,
+          investorsCommissionRate,
+          commissionRatesByPublicKey,
+          burnRatesByPublicKey,
+          config.burnAddress,
+          config.bpKeyMd5Hash,
+          config.payoutMemo,
         );
+        payouts.push(...ledgerPayouts);
 
-        console.log(`This script will payout from block ${minimumHeight} to maximum height ${maximumHeight}`);
-        console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey}`);
+        globalTotalPayout = totalPayout;
+        globalTotalToBurn = totalSuperchargedToBurn + totalNegotiatedBurn;
+        //ADD TOTAL TO NEGOTIATED BURN
 
-        const blocks: Block[] = await blockProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);
+        for (let i = 0; i < ledgerStorePayout.length; i++) {
+          storePayout.push(ledgerStorePayout[i]);
+        }
 
-        const payouts: PayoutTransaction[] = [];
+        console.log(`We won these blocks: ${blocksIncluded}`);
 
-        const storePayout: PayoutDetails[] = [];
+        console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`);
 
-        let globalTotalPayout = 0;
-        let globalTotalToBurn = 0;
+        console.log(
+          `The Total amount to burn is: ${globalTotalToBurn} nm or ${globalTotalToBurn / 1000000000} mina`,
+        );
+      }),
+    ).then(async () => {
+      // added a sort because these payout details are hashed and need to be in a reliable order
+      storePayout.sort(function (p1: PayoutDetails, p2: PayoutDetails) {
+        if (p1.blockHeight + p1.publicKey < p2.blockHeight + p2.publicKey) {
+          return -1;
+        }
+        if (p1.blockHeight + p1.publicKey > p2.blockHeight + p2.publicKey) {
+          return 1;
+        }
+        return 0;
+      });
 
-        const ledgerHashes = [...new Set(blocks.map((block) => block.stakingledgerhash))];
+      const paymentProcess: PaymentProcess = {
+        payouts,
+        storePayout,
+        maximumHeight,
+        blocks,
+        totalPayoutFundsNeeded: 0,
+        payoutsBeforeExclusions: [],
+        totalPayouts: globalTotalPayout,
+        totalBurn: globalTotalToBurn,
+      };
 
-        return Promise.all(
-            ledgerHashes.map(async (ledgerHash) => {
-                console.log(`### Calculating payouts for ledger ${ledgerHash}`);
-
-                const ledger = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey);
-
-                console.log(`The pool total staking balance is ${ledger.totalStakingBalance}`);
-
-                const ledgerBlocks = blocks.filter((x) => x.stakingledgerhash == ledgerHash);
-
-                const [
-                    ledgerPayouts,
-                    ledgerStorePayout,
-                    blocksIncluded,
-                    totalPayout,
-                    totalSuperchargedToBurn,
-                    totalNegotiatedBurn,
-                ] = await this.payoutCalculator.getPayouts(
-                    ledgerBlocks,
-                    ledger.stakes,
-                    ledger.totalStakingBalance,
-                    defaultCommissionRate,
-                    mfCommissionRate,
-                    o1CommissionRate,
-                    investorsCommissionRate,
-                    commissionRatesByPublicKey,
-                    burnRatesByPublicKey,
-                    config.burnAddress,
-                    config.bpKeyMd5Hash,
-                    config.payoutMemo,
-                );
-                payouts.push(...ledgerPayouts);
-
-                globalTotalPayout = totalPayout;
-                globalTotalToBurn = totalSuperchargedToBurn + totalNegotiatedBurn;
-                //ADD TOTAL TO NEGOTIATED BURN
-
-                for (let i = 0; i < ledgerStorePayout.length; i++) {
-                    storePayout.push(ledgerStorePayout[i]);
-                }
-
-                console.log(`We won these blocks: ${blocksIncluded}`);
-
-                console.log(`The Total Payout is: ${totalPayout} nm or ${totalPayout / 1000000000} mina`);
-
-                console.log(
-                    `The Total amount to burn is: ${globalTotalToBurn} nm or ${globalTotalToBurn / 1000000000} mina`,
-                );
-            }),
-        ).then(async () => {
-            // added a sort because these payout details are hashed and need to be in a reliable order
-            storePayout.sort(function (p1: PayoutDetails, p2: PayoutDetails) {
-                if (p1.blockHeight + p1.publicKey < p2.blockHeight + p2.publicKey) {
-                    return -1;
-                }
-                if (p1.blockHeight + p1.publicKey > p2.blockHeight + p2.publicKey) {
-                    return 1;
-                }
-                return 0;
-            });
-
-            const paymentProcess: PaymentProcess = {
-                payouts,
-                storePayout,
-                maximumHeight,
-                blocks,
-                totalPayoutFundsNeeded: 0,
-                payoutsBeforeExclusions: [],
-                totalPayouts: globalTotalPayout,
-                totalBurn: globalTotalToBurn,
-            };
-
-            return paymentProcess;
-        });
-    }
+      return paymentProcess;
+    });
+  }
 }
