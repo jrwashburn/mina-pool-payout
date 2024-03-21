@@ -1,24 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { signPayment, keypair, signed, payment } from '@o1labs/client-sdk';
+import Client from 'mina-signer'
 import fs from 'fs';
 import { sendPaymentGraphQL, fetchGraphQL } from '../infrastructure/graphql-pay';
 import { PayoutTransaction } from '../core/payoutCalculator/Model';
 import { gql } from '@apollo/client/core';
 import { print } from 'graphql';
+import { SignedLegacy, UInt64, UInt32, } from 'mina-signer/dist/node/mina-signer/src/types';
 
-async function getPaymentMutation(payment: signed<payment>): Promise<any> {
+const minaClient = new Client({ network: 'mainnet' });
+interface Payment {
+  to: PublicKey;
+  from: PublicKey;
+  fee: UInt64;
+  nonce: UInt32;
+  memo?: string;
+  validUntil?: UInt32;
+  amount: UInt64;
+}
+type PublicKey = string;
+type PrivateKey = string;
+
+async function getPaymentMutation(payment: SignedLegacy<Payment>): Promise<any> {
   const operationsDoc = gql`
     mutation SendSignedPayment {
       __typename
       sendPayment(
         input: {
-          fee: "${payment.payload.fee}"
-          amount: "${payment.payload.amount}"
-          to: "${payment.payload.to}"
-          from: "${payment.payload.from}"
-          nonce: "${payment.payload.nonce}"
-          validUntil: "${payment.payload.validUntil}"
-          memo: "${payment.payload.memo}"
+          fee: "${payment.data.fee}"
+          amount: "${payment.data.amount}"
+          to: "${payment.data.to}"
+          from: "${payment.data.from}"
+          nonce: "${payment.data.nonce}"
+          validUntil: "${payment.data.validUntil}"
+          memo: "${payment.data.memo}"
         }
         signature: {
           field: "${payment.signature.field}",
@@ -62,19 +76,19 @@ export async function getNonce(publicKey: string): Promise<any> {
   return data.account.inferredNonce ?? 0;
 }
 
-export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], keys: keypair): Promise<any> {
+export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], senderKeys: { publicKey: PublicKey, privateKey: PrivateKey }): Promise<any> {
   let continueSending = true;
   let timeout = 5000;
-  let nonce = await getNonce(keys.publicKey);
+  let nonce = await getNonce(senderKeys.publicKey);
 
   payoutsToSign.reduce(async (previousPromise, payout) => {
     await previousPromise;
     return new Promise<void>((resolve, reject) => {
       setTimeout(async () => {
         console.log(`#### Processing nonce ${nonce}...`);
-        const paymentTransaction: payment = {
+        const paymentTransaction: Payment = {
           to: payout.publicKey,
-          from: keys.publicKey,
+          from: senderKeys.publicKey,
           fee: payout.fee,
           amount: payout.amount,
           nonce: nonce,
@@ -86,7 +100,7 @@ export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[],
           // if any transmission errors encontered, now still generate and sign transactions, but do not send
           // this will allow resending transactions later via resend-payments command.
           // ---------> send payouts
-          const signedPayment = signPayment(paymentTransaction, keys);
+          const signedPayment: SignedLegacy<Payment> = await minaClient.signPayment(paymentTransaction, senderKeys.privateKey);
           const opsDoc = await getPaymentMutation(signedPayment);
           //console.log(opsDoc);
           fs.writeFileSync('./src/data/' + nonce + '.gql', print(opsDoc));
