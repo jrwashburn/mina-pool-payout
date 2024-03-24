@@ -2,6 +2,9 @@
   "name": "mina-payout",
   "version": "1.4.0",
   "description": "",
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "main": "index.js",
   "scripts": {
     "build": "tsc -p .",
