@@ -88,7 +88,7 @@ export class PaymentBuilder implements IPaymentBuilder {
         ] = await this.payoutCalculator.getPayouts(
           ledgerBlocks,
           ledger.stakes,
-          ledger.totalStakingBalance,
+          Number(ledger.totalStakingBalance),
           defaultCommissionRate,
           mfCommissionRate,
           o1CommissionRate,

@@ -76,9 +76,9 @@ export async function getNonce(publicKey: string): Promise<any> {
   return data.account.inferredNonce ?? 0;
 }
 
-export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], senderKeys: { publicKey: PublicKey, privateKey: PrivateKey }): Promise<any> {
-  let continueSending = true;
-  let timeout = 5000;
+export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], senderKeys: { publicKey: PublicKey, privateKey: PrivateKey }, doNotTransmit: boolean): Promise<any> {
+  let continueSending = !doNotTransmit;
+  let timeout = continueSending ? 5000 : 0;
   let nonce = await getNonce(senderKeys.publicKey);
 
   payoutsToSign.reduce(async (previousPromise, payout) => {

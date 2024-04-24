@@ -6,6 +6,7 @@ export interface PaymentConfiguration {
   commissionRatesByPublicKey: KeyedRate;
   configuredMaximum: number;
   defaultCommissionRate: number;
+  doNotTransmit: boolean;
   epoch: number;
   fork: number;
   investorsCommissionRate: number;

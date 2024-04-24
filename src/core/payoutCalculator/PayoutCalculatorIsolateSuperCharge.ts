@@ -3,6 +3,7 @@ import { KeyedRate } from '../../configuration/Model';
 import { stakeIsLocked } from '../../utils/staking-ledger-util';
 import { Block, Stake } from '../dataProvider/dataprovider-types';
 import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
+import { Decimal } from 'decimal.js';
 
 @injectable()
 export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
@@ -53,9 +54,9 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
           (winner.shareClass.shareOwner == 'MF' ||
             winner.shareClass.shareOwner == 'INVEST' ||
             winner.shareClass.shareOwner == 'BURN');
-        let sumEffectiveCommonPoolStakes = 0;
-        let sumEffectiveNPSPoolStakes = 0;
-        let sumEffectiveSuperchargedPoolStakes = 0;
+        let sumEffectiveCommonPoolStakes = new Decimal(0.0);
+        let sumEffectiveNPSPoolStakes = new Decimal(0.0);
+        let sumEffectiveSuperchargedPoolStakes = new Decimal(0.0);
         const effectivePoolStakes: {
           [key: string]: { npsStake: number; commonStake: number; superchargedStake: number };
         } = {};
@@ -69,36 +70,36 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
           totalRewards - totalNPSPoolRewards - burnSuperchargedAmount - totalSuperchargedPoolRewards;
         totalSuperchargedToBurn += burnSuperchargedAmount;
 
-        let totalUnweightedCommonStake = 0;
+        let totalUnweightedCommonStake = new Decimal(0.0);
 
         // Determine the non-participating and common pool weighting for each staker
         stakers.forEach((staker: Stake) => {
-          const effectiveNPSStake = staker.stakingBalance;
-          let effectiveSuperchargedStake = 0;
-          let effectiveCommonStake = 0;
+          const effectiveNPSStake = new Decimal(staker.stakingBalance);
+          let effectiveSuperchargedStake = new Decimal(0.0);
+          let effectiveCommonStake = new Decimal(0.0);
           // common stake stays at 0 for NPS shares - they do not participate with the common in fees or supercharged block coinbase
           if (staker.shareClass.shareClass == 'Common') {
-            effectiveCommonStake = staker.stakingBalance;
-            totalUnweightedCommonStake += staker.stakingBalance;
+            effectiveCommonStake = new Decimal(staker.stakingBalance);
+            totalUnweightedCommonStake = totalUnweightedCommonStake.plus(effectiveCommonStake);
             if (!stakeIsLocked(staker, block) && !burnSuperChargedRewards) {
-              effectiveSuperchargedStake = staker.stakingBalance;
+              effectiveSuperchargedStake = effectiveCommonStake;
             }
           }
-          sumEffectiveNPSPoolStakes += effectiveNPSStake;
-          sumEffectiveCommonPoolStakes += effectiveCommonStake;
-          sumEffectiveSuperchargedPoolStakes += effectiveSuperchargedStake;
+          sumEffectiveNPSPoolStakes = sumEffectiveNPSPoolStakes.plus(effectiveNPSStake);
+          sumEffectiveCommonPoolStakes = sumEffectiveCommonPoolStakes.plus(effectiveCommonStake);
+          sumEffectiveSuperchargedPoolStakes = sumEffectiveSuperchargedPoolStakes.plus(effectiveSuperchargedStake);
           effectivePoolStakes[staker.publicKey] = {
-            npsStake: effectiveNPSStake,
-            commonStake: effectiveCommonStake,
-            superchargedStake: effectiveSuperchargedStake,
+            npsStake: effectiveNPSStake.toNumber(),
+            commonStake: effectiveCommonStake.toNumber(),
+            superchargedStake: effectiveSuperchargedStake.toNumber(),
           };
         });
 
         // Sense check the effective pool stakes must be at least equal to total_staking_balance and less than 2x
-        if (sumEffectiveNPSPoolStakes != totalStake) {
+        if (sumEffectiveNPSPoolStakes.toNumber() !== totalStake) {
           throw new Error('NPS Share must be equal to total staked amount');
         }
-        if (sumEffectiveCommonPoolStakes !== totalUnweightedCommonStake) {
+        if (sumEffectiveCommonPoolStakes.toNumber() !== totalUnweightedCommonStake.toNumber()) {
           throw new Error('Common share must equal total common stake');
         }
         if (totalSuperchargedPoolRewards > 0 && totalSuperchargedPoolRewards !== REGULARCOINBASE) {
@@ -107,17 +108,17 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
 
         stakers.forEach((staker: Stake) => {
           const effectiveNPSPoolWeighting =
-            sumEffectiveNPSPoolStakes > 0
-              ? effectivePoolStakes[staker.publicKey].npsStake / sumEffectiveNPSPoolStakes
+            sumEffectiveNPSPoolStakes.greaterThan(0)
+              ? effectivePoolStakes[staker.publicKey].npsStake / sumEffectiveNPSPoolStakes.toNumber()
               : 0;
           const effectiveCommonPoolWeighting =
-            sumEffectiveCommonPoolStakes > 0
-              ? effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes
+            sumEffectiveCommonPoolStakes.greaterThan(0)
+              ? effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes.toNumber()
               : 0;
           const effectiveSuperchargedPoolWeighting =
-            sumEffectiveSuperchargedPoolStakes > 0
+            sumEffectiveSuperchargedPoolStakes.greaterThan(0)
               ? effectivePoolStakes[staker.publicKey].superchargedStake /
-              sumEffectiveSuperchargedPoolStakes
+              sumEffectiveSuperchargedPoolStakes.toNumber()
               : 0;
 
           //TODO APPLY NEW COMMISSION RATES Extract function
@@ -187,9 +188,9 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
             effectiveSuperchargedPoolWeighting: effectiveSuperchargedPoolWeighting,
             effectiveSuperchargedPoolStakes: effectivePoolStakes[staker.publicKey].superchargedStake,
             stakingBalance: staker.stakingBalance,
-            sumEffectiveNPSPoolStakes: sumEffectiveNPSPoolStakes,
-            sumEffectiveCommonPoolStakes: sumEffectiveCommonPoolStakes,
-            sumEffectiveSuperchargedPoolStakes: sumEffectiveSuperchargedPoolStakes,
+            sumEffectiveNPSPoolStakes: sumEffectiveNPSPoolStakes.toNumber(),
+            sumEffectiveCommonPoolStakes: sumEffectiveCommonPoolStakes.toNumber(),
+            sumEffectiveSuperchargedPoolStakes: sumEffectiveSuperchargedPoolStakes.toNumber(),
             superchargedWeightingDiscount: 0,
             dateTime: block.blockdatetime,
             coinbase: block.coinbase,
