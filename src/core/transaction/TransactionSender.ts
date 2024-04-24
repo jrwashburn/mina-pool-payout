@@ -1,6 +1,6 @@
 import { sendSignedTransactions } from '../../utils/send-payments';
 import fs from 'fs';
-import hash from 'object-hash';
+import { createHash } from 'node:crypto';
 import { PaymentConfiguration } from '../../configuration/Model';
 import { injectable } from 'inversify';
 import { ISender } from './Model';
@@ -11,21 +11,22 @@ export class TransactionSender implements ISender {
   async send(config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void> {
     const { payoutHash, senderKeys } = config;
 
-    const { blocks, payouts } = paymentProcess;
+    const { blocks, payoutTransactions } = paymentProcess;
 
-    const calculatedHash = hash(paymentProcess.storePayout, { algorithm: 'sha1' });
+    //const calculatedHash = hash(paymentProcess.payoutDetails, { algorithm: 'sha1' });
+    const calculatedHash = createHash('md5').update(paymentProcess.payoutDetails.toString()).digest('hex');
 
     if (payoutHash) {
       console.log(`### Processing signed payout for hash ${payoutHash}...`);
       if (payoutHash == calculatedHash) {
-        sendSignedTransactions(payouts, senderKeys);
+        sendSignedTransactions(payoutTransactions, senderKeys);
         const paidblockStream = fs.createWriteStream(`${__dirname}/../../data/.paidblocks`, { flags: 'a' });
         blocks.forEach((block) => {
           paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
         });
         paidblockStream.end();
       } else {
-        console.error("HASHES DON'T MATCH");
+        console.error(`ERROR: HASHES DON'T MATCH. Expected: ${payoutHash} Calculated: ${calculatedHash}`);
       }
     } else {
       console.log(`PAYOUT HASH: ${calculatedHash}`);

@@ -14,16 +14,16 @@ export class PaymentProcessor implements IPaymentProcessor {
   private summarizer: ISummarizer<PaymentProcess>;
 
   public constructor(
-        @inject(TYPES.IPaymentBuilder) paymentBuilder: IPaymentBuilder,
-        @inject(TYPES.ITransactionBuilder) transactionBuilder: ITransactionBuilder,
-        @inject(TYPES.ITransactionProcessor) transactionProcessor: ITransactionProcessor,
-        @inject(TYPES.ISender) sender: ISender,
-        @inject(TYPES.PaymentSummarizer) summarizer: ISummarizer<PaymentProcess>,
+    @inject(TYPES.IPaymentBuilder) paymentBuilder: IPaymentBuilder,
+    @inject(TYPES.ITransactionBuilder) transactionBuilder: ITransactionBuilder,
+    @inject(TYPES.ITransactionProcessor) transactionProcessor: ITransactionProcessor,
+    @inject(TYPES.ISender) sender: ISender,
+    @inject(TYPES.PaymentSummarizer) summarizer: ISummarizer<PaymentProcess>,
   ) {
     (this.paymentBuilder = paymentBuilder),
-    (this.transactionBuilder = transactionBuilder),
-    (this.transactionProcessor = transactionProcessor),
-    (this.sender = sender);
+      (this.transactionBuilder = transactionBuilder),
+      (this.transactionProcessor = transactionProcessor),
+      (this.sender = sender);
     this.summarizer = summarizer;
   }
 
@@ -57,18 +57,16 @@ export class PaymentProcessor implements IPaymentProcessor {
   private async calculateTotalPayoutFundsNeeded(paymentProcess: PaymentProcess, configuration: PaymentConfiguration) {
     let totalPayoutFundsNeeded = 0;
 
-    paymentProcess.payouts.map((t) => {
+    paymentProcess.payoutTransactions.map((t) => {
       totalPayoutFundsNeeded += t.amount + t.fee;
     });
 
     console.log(
-      `Total Funds Required for Payout = ${totalPayoutFundsNeeded} nanoMINA or ${
-        totalPayoutFundsNeeded / 1000000000
+      `Total Funds Required for Payout = ${totalPayoutFundsNeeded} nanoMINA or ${totalPayoutFundsNeeded / 1000000000
       } MINA`,
     );
     console.log(
-      `Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${
-        configuration.senderKeys.publicKey
+      `Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${configuration.senderKeys.publicKey
       } ${totalPayoutFundsNeeded / 1000000000}`,
     );
   }
@@ -76,8 +74,8 @@ export class PaymentProcessor implements IPaymentProcessor {
   private async isValid(config: PaymentConfiguration): Promise<boolean> {
     if (
       config.blockDataSource != 'ARCHIVEDB' &&
-            config.blockDataSource != 'MINAEXPLORER' &&
-            config.blockDataSource != 'API'
+      config.blockDataSource != 'MINAEXPLORER' &&
+      config.blockDataSource != 'API'
     ) {
       return false;
     }

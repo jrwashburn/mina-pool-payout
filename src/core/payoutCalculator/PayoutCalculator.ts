@@ -20,20 +20,20 @@ export class PayoutCalculator implements IPayoutCalculator {
     bpKeyMd5Hash: string,
     configuredMemo: string,
   ): Promise<
-        [
-            payoutJson: PayoutTransaction[],
-            storePayout: PayoutDetails[],
-            blocksIncluded: number[],
-            totalPayout: number,
-            totalSuperchargedToBurn: number,
-            totalNegotiatedBurn: number,
-        ]
-    > {
+    [
+      payoutTransactions: PayoutTransaction[],
+      payoutDetails: PayoutDetails[],
+      blocksIncluded: number[],
+      totalPayout: number,
+      totalSuperchargedToBurn: number,
+      totalNegotiatedBurn: number,
+    ]
+  > {
     // Initialize some stuff
     const SUPERCHARGEDCOINBASE = 1440000000000;
     const REGULARCOINBASE = 720000000000;
     const blocksIncluded: number[] = [];
-    const storePayout: PayoutDetails[] = [];
+    const payoutDetails: PayoutDetails[] = [];
     let totalSuperchargedToBurn = 0;
     let totalNegotiatedBurn = 0;
 
@@ -48,15 +48,15 @@ export class PayoutCalculator implements IPayoutCalculator {
         const winner = this.getWinner(stakers, block);
         const winnerStakeIsLocked = stakeIsLocked(winner, block);
         const burnSuperChargedRewards =
-                    block.coinbase == SUPERCHARGEDCOINBASE &&
-                    (winner.shareClass.shareOwner == 'MF' ||
-                        winner.shareClass.shareOwner == 'INVEST' ||
-                        winner.shareClass.shareOwner == 'BURN');
+          block.coinbase == SUPERCHARGEDCOINBASE &&
+          (winner.shareClass.shareOwner == 'MF' ||
+            winner.shareClass.shareOwner == 'INVEST' ||
+            winner.shareClass.shareOwner == 'BURN');
         let sumEffectiveCommonPoolStakes = 0;
         let sumEffectiveNPSPoolStakes = 0;
         const effectivePoolStakes: {
-                    [key: string]: { npsStake: number; commonStake: number };
-                } = {};
+          [key: string]: { npsStake: number; commonStake: number };
+        } = {};
 
         const transactionFees = block.usercommandtransactionfees || 0;
         const totalRewards = block.coinbase + block.feetransfertoreceiver - block.feetransferfromcoinbase;
@@ -71,7 +71,7 @@ export class PayoutCalculator implements IPayoutCalculator {
         //  unlocked accounts generate extra coinbase, but if fees are significant, that coinbase would have a lower relative weight
         // 20231231 adding guard for transaction fees > coinbase so that supercharged weight doesn't get out of control. See upstream issue #103.
         const superchargedWeightingDiscount =
-                    transactionFees >= block.coinbase ? 1 : transactionFees / block.coinbase;
+          transactionFees >= block.coinbase ? 1 : transactionFees / block.coinbase;
 
         let totalUnweightedCommonStake = 0;
         // Determine the non-participating and common pool weighting for each staker
@@ -81,9 +81,9 @@ export class PayoutCalculator implements IPayoutCalculator {
           // common stake stays at 0 for NPS shares - they do not participate with the common in fees or supercharged block coinbase
           if (staker.shareClass.shareClass == 'Common') {
             effectiveCommonStake =
-                            !stakeIsLocked(staker, block) && !burnSuperChargedRewards
-                              ? staker.stakingBalance * (2 - superchargedWeightingDiscount)
-                              : staker.stakingBalance;
+              !stakeIsLocked(staker, block) && !burnSuperChargedRewards
+                ? staker.stakingBalance * (2 - superchargedWeightingDiscount)
+                : staker.stakingBalance;
             totalUnweightedCommonStake += staker.stakingBalance;
           }
           sumEffectiveNPSPoolStakes += effectiveNPSStake;
@@ -104,9 +104,9 @@ export class PayoutCalculator implements IPayoutCalculator {
 
         stakers.forEach((staker: Stake) => {
           const effectiveNPSPoolWeighting =
-                        effectivePoolStakes[staker.publicKey].npsStake / sumEffectiveNPSPoolStakes;
+            effectivePoolStakes[staker.publicKey].npsStake / sumEffectiveNPSPoolStakes;
           const effectiveCommonPoolWeighting =
-                        effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes;
+            effectivePoolStakes[staker.publicKey].commonStake / sumEffectiveCommonPoolStakes;
 
           //TODO APPLY NEW COMMISSION RATES Extract function
           const commissionRate = commissionRates[staker.publicKey]
@@ -116,8 +116,8 @@ export class PayoutCalculator implements IPayoutCalculator {
           let blockTotal = 0;
           if (staker.shareClass.shareClass == 'Common') {
             blockTotal =
-                            Math.floor((1 - commissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting) +
-                            Math.floor((1 - commissionRate) * totalCommonPoolRewards * effectiveCommonPoolWeighting);
+              Math.floor((1 - commissionRate) * totalNPSPoolRewards * effectiveNPSPoolWeighting) +
+              Math.floor((1 - commissionRate) * totalCommonPoolRewards * effectiveCommonPoolWeighting);
           } else if (staker.shareClass.shareClass == 'NPS') {
             if (staker.shareClass.shareOwner == 'MF') {
               blockTotal = Math.floor(
@@ -154,7 +154,7 @@ export class PayoutCalculator implements IPayoutCalculator {
           staker.total += blockTotal;
 
           // Store this data in a structured format for later querying and for the payment script, handled seperately
-          storePayout.push({
+          payoutDetails.push({
             publicKey: staker.publicKey,
             owner: staker.shareClass.shareOwner,
             blockHeight: block.blockheight,
@@ -186,7 +186,7 @@ export class PayoutCalculator implements IPayoutCalculator {
           });
         });
         if (totalSuperchargedToBurn > 0) {
-          storePayout.push({
+          payoutDetails.push({
             publicKey: burnAddress,
             owner: 'BURN',
             blockHeight: block.blockheight,
@@ -218,7 +218,7 @@ export class PayoutCalculator implements IPayoutCalculator {
           });
         }
         if (totalNegotiatedBurn > 0) {
-          storePayout.push({
+          payoutDetails.push({
             publicKey: burnAddress,
             owner: 'BURN',
             blockHeight: block.blockheight,
@@ -252,28 +252,28 @@ export class PayoutCalculator implements IPayoutCalculator {
       }
     });
 
-    const payoutJson: PayoutTransaction[] = [];
+    const payoutTransactions: PayoutTransaction[] = [];
     let totalPayout = 0;
     stakers.forEach((staker: Stake) => {
       const amount = staker.total;
       if (amount > 0) {
-        payoutJson.push({
+        payoutTransactions.push({
           publicKey: staker.publicKey,
           amount: amount,
           fee: 0,
           amountMina: 0,
           feeMina: 0,
           memo:
-                        staker.shareClass.shareOwner === 'MF' || staker.shareClass.shareOwner === 'INVEST'
-                          ? bpKeyMd5Hash
-                          : configuredMemo,
+            staker.shareClass.shareOwner === 'MF' || staker.shareClass.shareOwner === 'INVEST'
+              ? bpKeyMd5Hash
+              : configuredMemo,
           summaryGroup: 0,
         });
         totalPayout += amount;
       }
     });
     if (totalSuperchargedToBurn > 0) {
-      payoutJson.push({
+      payoutTransactions.push({
         publicKey: burnAddress,
         amount: totalSuperchargedToBurn,
         fee: 0,
@@ -284,7 +284,7 @@ export class PayoutCalculator implements IPayoutCalculator {
       });
     }
     if (totalNegotiatedBurn > 0) {
-      payoutJson.push({
+      payoutTransactions.push({
         publicKey: burnAddress,
         amount: totalNegotiatedBurn,
         fee: 0,
@@ -294,7 +294,7 @@ export class PayoutCalculator implements IPayoutCalculator {
         summaryGroup: 2,
       });
     }
-    return [payoutJson, storePayout, blocksIncluded, totalPayout, totalSuperchargedToBurn, totalNegotiatedBurn];
+    return [payoutTransactions, payoutDetails, blocksIncluded, totalPayout, totalSuperchargedToBurn, totalNegotiatedBurn];
   }
 
   private getWinner(stakers: Stake[], block: Block): Stake {

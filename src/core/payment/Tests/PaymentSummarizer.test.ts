@@ -53,9 +53,9 @@ describe('Payment Summarizer tests', () => {
       const process: PaymentProcess = {
         blocks: mockedBlocks,
         maximumHeight: 1,
-        payouts: [],
+        payoutTransactions: [],
         payoutsBeforeExclusions: [],
-        storePayout: [],
+        payoutDetails: [],
         totalPayoutFundsNeeded: 0,
         totalPayouts: 0,
         totalBurn: 0,

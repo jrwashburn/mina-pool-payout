@@ -7,9 +7,9 @@ export interface IPaymentProcessor {
 }
 
 export interface PaymentProcess {
-  payouts: PayoutTransaction[];
+  payoutTransactions: PayoutTransaction[];
   payoutsBeforeExclusions: PayoutTransaction[];
-  storePayout: PayoutDetails[];
+  payoutDetails: PayoutDetails[];
   maximumHeight: number;
   blocks: Block[];
   totalPayoutFundsNeeded: number;
