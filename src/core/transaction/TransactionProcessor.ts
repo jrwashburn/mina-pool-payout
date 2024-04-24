@@ -15,7 +15,7 @@ export class TransactionProcessor implements ITransactionProcessor {
   async write(config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void> {
     const runDateTime = new Date();
 
-    const { storePayout, maximumHeight, totalPayoutFundsNeeded, payouts } = paymentProcess;
+    const { payoutDetails, maximumHeight, totalPayoutFundsNeeded, payoutTransactions } = paymentProcess;
 
     const { minimumHeight } = config;
 
@@ -26,7 +26,7 @@ export class TransactionProcessor implements ITransactionProcessor {
       maximumHeight,
     );
 
-    this.fileWriter.write(payoutTransactionsFileName, JSON.stringify(payouts));
+    this.fileWriter.write(payoutTransactionsFileName, JSON.stringify(payoutTransactions));
 
     const payoutDetailsFileName = this.generateOutputFileName(
       'payout_details',
@@ -35,7 +35,7 @@ export class TransactionProcessor implements ITransactionProcessor {
       maximumHeight,
     );
 
-    this.fileWriter.write(payoutDetailsFileName, JSON.stringify(storePayout));
+    this.fileWriter.write(payoutDetailsFileName, JSON.stringify(payoutDetails));
   }
 
   private generateOutputFileName(

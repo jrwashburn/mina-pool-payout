@@ -137,7 +137,7 @@ describe('Payment Builder Tests', () => {
         },
       ];
 
-      const expectedStorePayouts: PayoutDetails[] = [
+      const expectedPayoutDetails: PayoutDetails[] = [
         {
           blockHeight: 10,
           coinbase: 10,
@@ -203,8 +203,8 @@ describe('Payment Builder Tests', () => {
       const expectedPaymentProcess: PaymentProcess = {
         blocks: mockedBlocks,
         maximumHeight: 11,
-        payouts: expectedPayoutTransaction,
-        storePayout: expectedStorePayouts,
+        payoutTransactions: expectedPayoutTransaction,
+        payoutDetails: expectedPayoutDetails,
         totalPayoutFundsNeeded: 0,
         payoutsBeforeExclusions: [],
         totals: {
@@ -256,7 +256,7 @@ describe('Payment Builder Tests', () => {
         },
       ];
 
-      const expectedStorePayouts: PayoutDetails[] = [
+      const expectedPayoutDetails: PayoutDetails[] = [
         {
           blockHeight: 10,
           coinbase: 10,
@@ -322,8 +322,8 @@ describe('Payment Builder Tests', () => {
       const expectedPaymentProcess: PaymentProcess = {
         blocks: mockedBlocks,
         maximumHeight: 11,
-        payouts: expectedPayoutTransaction,
-        storePayout: expectedStorePayouts,
+        payoutTransactions: expectedPayoutTransaction,
+        payoutDetails: expectedPayoutDetails,
         totalPayoutFundsNeeded: 0,
         payoutsBeforeExclusions: [],
         totals: {

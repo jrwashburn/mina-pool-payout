@@ -18,8 +18,8 @@ describe('Transaction Builder Tests', () => {
       const mockPaymentProcess: PaymentProcess = {
         blocks: [],
         maximumHeight: 1,
-        payouts: [],
-        storePayout: [],
+        payoutTransactions: [],
+        payoutDetails: [],
         totalPayoutFundsNeeded: 11,
         payoutsBeforeExclusions: [],
         totalPayouts: 0,

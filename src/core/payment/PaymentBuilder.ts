@@ -15,10 +15,10 @@ export class PaymentBuilder implements IPaymentBuilder {
   private blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>;
 
   public constructor(
-        @inject(TYPES.IBlockProcessor) blockHandler: IBlockProcessor,
-        @inject(TYPES.IPayoutCalculator) payoutCalculator: IPayoutCalculator,
-        @inject(TYPES.BlockDataProviderFactory) blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>,
-        @inject(TYPES.StakeDataProviderFactory) stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>,
+    @inject(TYPES.IBlockProcessor) blockHandler: IBlockProcessor,
+    @inject(TYPES.IPayoutCalculator) payoutCalculator: IPayoutCalculator,
+    @inject(TYPES.BlockDataProviderFactory) blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>,
+    @inject(TYPES.StakeDataProviderFactory) stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>,
   ) {
     this.blockProcessor = blockHandler;
     this.payoutCalculator = payoutCalculator;
@@ -59,9 +59,9 @@ export class PaymentBuilder implements IPaymentBuilder {
 
     const blocks: Block[] = await blockProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);
 
-    const payouts: PayoutTransaction[] = [];
+    const payoutTransactions: PayoutTransaction[] = [];
 
-    const storePayout: PayoutDetails[] = [];
+    const payoutDetails: PayoutDetails[] = [];
 
     let globalTotalPayout = 0;
     let globalTotalToBurn = 0;
@@ -80,7 +80,7 @@ export class PaymentBuilder implements IPaymentBuilder {
 
         const [
           ledgerPayouts,
-          ledgerStorePayout,
+          ledgerPayoutDetails,
           blocksIncluded,
           totalPayout,
           totalSuperchargedToBurn,
@@ -99,14 +99,14 @@ export class PaymentBuilder implements IPaymentBuilder {
           config.bpKeyMd5Hash,
           config.payoutMemo,
         );
-        payouts.push(...ledgerPayouts);
+        payoutTransactions.push(...ledgerPayouts);
 
         globalTotalPayout = totalPayout;
         globalTotalToBurn = totalSuperchargedToBurn + totalNegotiatedBurn;
         //ADD TOTAL TO NEGOTIATED BURN
 
-        for (let i = 0; i < ledgerStorePayout.length; i++) {
-          storePayout.push(ledgerStorePayout[i]);
+        for (let i = 0; i < ledgerPayoutDetails.length; i++) {
+          payoutDetails.push(ledgerPayoutDetails[i]);
         }
 
         console.log(`We won these blocks: ${blocksIncluded}`);
@@ -119,7 +119,16 @@ export class PaymentBuilder implements IPaymentBuilder {
       }),
     ).then(async () => {
       // added a sort because these payout details are hashed and need to be in a reliable order
-      storePayout.sort(function (p1: PayoutDetails, p2: PayoutDetails) {
+      payoutTransactions.sort(function (p1: PayoutTransaction, p2: PayoutTransaction) {
+        if (p1.amount > p2.amount) {
+          return -1;
+        }
+        if (p1.amount < p2.amount) {
+          return 1;
+        }
+        return 0;
+      });
+      payoutDetails.sort(function (p1: PayoutDetails, p2: PayoutDetails) {
         if (p1.blockHeight + p1.publicKey < p2.blockHeight + p2.publicKey) {
           return -1;
         }
@@ -130,8 +139,8 @@ export class PaymentBuilder implements IPaymentBuilder {
       });
 
       const paymentProcess: PaymentProcess = {
-        payouts,
-        storePayout,
+        payoutTransactions,
+        payoutDetails,
         maximumHeight,
         blocks,
         totalPayoutFundsNeeded: 0,

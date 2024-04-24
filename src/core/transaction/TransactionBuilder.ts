@@ -15,10 +15,10 @@ export class TransactionBuilder implements ITransactionBuilder {
   async build(paymentProcess: PaymentProcess, config: PaymentConfiguration): Promise<PayoutTransaction[]> {
     // Aggregate to a single transaction per key and track the total for funding transaction
 
-    const { payouts, storePayout } = paymentProcess;
+    const { payoutTransactions, payoutDetails } = paymentProcess;
 
     let transactions: PayoutTransaction[] = [
-      ...payouts
+      ...payoutTransactions
         .reduce((r, o) => {
           const summaryGrouping = `${o.publicKey}:${o.summaryGroup}`;
           const item: PayoutTransaction =
@@ -42,7 +42,7 @@ export class TransactionBuilder implements ITransactionBuilder {
     ];
 
     if (config.verbose) {
-      console.table(storePayout);
+      console.table(payoutDetails);
       /*, [
                 'publicKey',
                 'blockHeight',
@@ -71,7 +71,7 @@ export class TransactionBuilder implements ITransactionBuilder {
 
     console.table(transactions);
 
-    paymentProcess.payouts = transactions;
+    paymentProcess.payoutTransactions = transactions;
 
     return transactions;
   }

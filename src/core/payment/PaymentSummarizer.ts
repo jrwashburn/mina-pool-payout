@@ -56,14 +56,14 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
 
     const amountsum = getTotalAmountSum(base.payoutsBeforeExclusions);
 
-    const feesum = getTotalFeeSum(base.payouts);
+    const feesum = getTotalFeeSum(base.payoutTransactions);
 
     base.totals = {
       coinBaseSum: coinbasesum / 1000000000,
       feeTransferFromCoinBaseSum: feetransferfromcoinbasesum / 1000000000,
       userCommandTransactionFeeSum: usercommandtransactionfeessum / 1000000000,
       netCoinBaseReceived:
-                (coinbasesum - feetransferfromcoinbasesum + usercommandtransactionfeessum) / 1000000000,
+        (coinbasesum - feetransferfromcoinbasesum + usercommandtransactionfeessum) / 1000000000,
       payoutAmountsSum: amountsum / 1000000000,
       payoutFeesSum: feesum / 1000000000,
       payoutBurnSum: base.totalBurn / 1000000000,

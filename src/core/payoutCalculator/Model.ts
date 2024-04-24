@@ -59,8 +59,8 @@ export interface IPayoutCalculator {
         configuredMemo: string,
     ): Promise<
         [
-            payoutJson: PayoutTransaction[],
-            storePayout: PayoutDetails[],
+            payoutTransactions: PayoutTransaction[],
+            payoutDetails: PayoutDetails[],
             blocksIncluded: number[],
             totalPayout: number,
             totalSuperchargedToBurn: number,
