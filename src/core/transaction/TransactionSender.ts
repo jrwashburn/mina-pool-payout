@@ -14,7 +14,7 @@ export class TransactionSender implements ISender {
     const { blocks, payoutTransactions } = paymentProcess;
 
     //const calculatedHash = hash(paymentProcess.payoutDetails, { algorithm: 'sha1' });
-    const calculatedHash = createHash('sha1').update(paymentProcess.payoutDetails.toString()).digest('hex');
+    const calculatedHash = createHash('sha1').update(JSON.stringify(paymentProcess.payoutDetails)).digest('hex');
 
     if (payoutHash) {
       console.log(`### Processing signed payout for hash ${payoutHash}...`);
