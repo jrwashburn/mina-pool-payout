@@ -34,6 +34,7 @@ export class ConfigurationManager {
       payoutHash: args.payouthash,
       payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0,
       burnAddress: 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X',
+      doNotTransmit: args.donottransmit || false,
     };
 
     await this.validate();

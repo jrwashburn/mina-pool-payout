@@ -13,6 +13,7 @@ const oargs = yargs.options({
   verbose: { type: 'boolean', alias: ['v'], default: false },
   epoch: { type: 'number', alias: ['e'] },
   fork: { type: 'number', alias: ['f'] },
+  donottransmit: { type: 'boolean', alias: ['d'], default: false },
 }).argv;
 
 const main = async () => {

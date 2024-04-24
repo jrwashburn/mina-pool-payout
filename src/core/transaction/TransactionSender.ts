@@ -19,7 +19,7 @@ export class TransactionSender implements ISender {
     if (payoutHash) {
       console.log(`### Processing signed payout for hash ${payoutHash}...`);
       if (payoutHash == calculatedHash) {
-        sendSignedTransactions(payoutTransactions, senderKeys);
+        sendSignedTransactions(payoutTransactions, senderKeys, config.doNotTransmit);
         const paidblockStream = fs.createWriteStream(`${__dirname}/../../data/.paidblocks`, { flags: 'a' });
         blocks.forEach((block) => {
           paidblockStream.write(`${block.blockheight}|${block.statehash}\n`);
