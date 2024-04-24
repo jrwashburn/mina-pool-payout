@@ -275,6 +275,12 @@ All attempted payouts are automatically logged in the src/data directory. The re
 
 For example, `npm run resend -- -f=3102 -t=3104` will try to re-transmit any files it finds named 3102.gql up to 3104.gql. This command uses the graphql endpoint specified in the .env file.
 
+## Calculating and saving signed payouts without attempting to broadcast
+
+Some pools may want to use other sending strategies and have requested to simply generate signed files without attempting to send them. This is now supported with the command line parameter `-doNotTransmit` or `-d`.
+
+For example `npm run payout -- -e 76 -f 0 -h eb630596e9805a163d4720f9a0fd5f44e7087628 -d ` will generate the nonce.gql files but will not attempt to broadcast the transactions.
+
 # mina-pool-payout calculation history
 
 _Inspired by [minaexplorer - mina-payout-script](https://github.com/garethtdavies/mina-payout-script)_
