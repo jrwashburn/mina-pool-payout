@@ -26,7 +26,7 @@ export class TransactionSender implements ISender {
         });
         paidblockStream.end();
       } else {
-        console.error(`ERROR: HASHES DON'T MATCH. Expected: ${payoutHash} Calculated: ${calculatedHash}`);
+        console.error(`\x1b[41mERROR: HASHES DON'T MATCH. Expected: ${payoutHash} Calculated: ${calculatedHash}\x1b[0m`);
       }
     } else {
       console.log(`PAYOUT HASH: ${calculatedHash}`);
