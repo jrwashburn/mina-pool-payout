@@ -40,6 +40,7 @@
     "@apollo/client": "^3.6.9",
     "csv": "^6.2.0",
     "csv-parse": "^5.5.3",
+    "decimal.js": "^10.4.3",
     "graphql": "^16.5.0",
     "help": "^3.0.2",
     "inversify": "^6.0.1",
