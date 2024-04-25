@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
+import { IBlockDataProvider, IDataProviderFactory } from './Models';
 import { ArchiveBlockDataProvider } from './ArchiveBlockDataProvider';
 import { MinaExplorerBlockDataProvider } from './MinaExplorerBlockDataProvider';
-import { IBlockDataProvider, IDataProviderFactory } from './Models';
 import { ApiBlockDataProvider } from './ApiBlockDataProvider';
 
 @injectable()
