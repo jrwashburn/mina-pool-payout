@@ -67,9 +67,34 @@ export class PayoutCalculatorPostSuperCharge implements IPayoutCalculator {
           const commissionRate = commissionRates[staker.publicKey]
             ? commissionRates[staker.publicKey].rate
             : defaultCommissionRate;
+          let blockTotal = 0;
 
-          let blockTotal =
-            Math.floor((1 - commissionRate) * thisBlockReward * stakerPoolWeight);
+          if (staker.shareClass.shareClass == 'Common') {
+            blockTotal =
+              Math.floor((1 - commissionRate) * thisBlockReward * stakerPoolWeight);
+          } else if (staker.shareClass.shareClass == 'NPS') {
+            if (staker.shareClass.shareOwner == 'MF') {
+              blockTotal = Math.floor(
+                (1 - mfCommissionRate) * thisBlockReward * stakerPoolWeight);
+            } else if (staker.shareClass.shareOwner == 'O1') {
+              blockTotal = Math.floor(
+                (1 - o1CommissionRate) * thisBlockReward * stakerPoolWeight);
+            } else if (staker.shareClass.shareOwner == 'INVEST') {
+              blockTotal = Math.floor(
+                (1 - investorsCommissionRate) * thisBlockReward * stakerPoolWeight);
+            } else if (staker.shareClass.shareOwner == 'BURN') {
+              blockTotal = Math.floor(
+                (1 - commissionRate) * thisBlockReward * stakerPoolWeight);
+            } else {
+              throw new Error(
+                'NPS shares should be MF or O1 or INVEST or BURN. Found NPS Shares with other owner.',
+              );
+            }
+          } else {
+            throw new Error(
+              'Shares should be common or non-participating. Found shares with other shareClass.',
+            );
+          }
 
           // After calculating the block award, if the delegate has a fractional burn, move some of the blocktotal to the burn address
           const negotiatedBurnRate = burnRates[staker.publicKey] ? burnRates[staker.publicKey].rate : 0;
