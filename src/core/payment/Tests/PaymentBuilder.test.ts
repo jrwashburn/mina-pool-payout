@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { Block } from '../../dataProvider/dataprovider-types';
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../../dataProvider/Models';
-import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from '../../payoutCalculator/Model';
+import { IPayoutCalculatorFactory, IPayoutCalculator, PayoutDetails, PayoutTransaction } from '../../payoutCalculator/Model';
 import { IBlockProcessor, PaymentProcess } from '../Model';
 import { PaymentBuilder } from '../PaymentBuilder';
 
@@ -41,6 +41,16 @@ describe('Payment Builder Tests', () => {
     },
   ];
 
+  const mockedPayout: [PayoutTransaction[], PayoutDetails[], number[], number, number, number] =
+    [
+      [],
+      [],
+      [987, 995],
+      684,
+      0,
+      0,
+    ];
+
   const mockBlockDataProvider: IBlockDataProvider = {
     getBlocks: () =>
       new Promise(() => {
@@ -77,7 +87,25 @@ describe('Payment Builder Tests', () => {
       }),
   };
 
-  const mockedPayoutCalculator: IPayoutCalculator = { getPayouts: () => new Promise(() => [1]) };
+  const mockPayoutCalculator0: IPayoutCalculator = {
+    getPayouts: () => new Promise(() => mockedPayout)
+  }
+
+  const mockPayoutCalculator1: IPayoutCalculator = {
+    getPayouts: () => new Promise(() => mockedPayout)
+  }
+
+  const mockedPayoutCalculatorFactory: IPayoutCalculatorFactory<IPayoutCalculator> = {
+    build: (fork: number) => {
+      if (fork === 0) {
+        return mockPayoutCalculator0;
+      } else {
+        return mockPayoutCalculator1;
+      }
+
+    },
+
+  };
 
   const mockedBlockDataFactory: IDataProviderFactory<IBlockDataProvider> = {
     build: () => {
@@ -95,7 +123,7 @@ describe('Payment Builder Tests', () => {
     it('should call all dependencies correctly.', async () => {
       const builder = new PaymentBuilder(
         mockedBlockProcessor,
-        mockedPayoutCalculator,
+        mockedPayoutCalculatorFactory,
         mockedBlockDataFactory,
         mockedStakeDataFactory,
       );
@@ -103,7 +131,7 @@ describe('Payment Builder Tests', () => {
       builder.build().then(() => {
         expect(mockedBlockProcessor).toHaveBeenCalledTimes(1);
         expect(mockStakeDataProvider).toHaveBeenCalledTimes(1);
-        expect(mockedPayoutCalculator).toHaveBeenCalledTimes(1);
+        expect(mockedPayoutCalculatorFactory).toHaveBeenCalledTimes(1);
         expect(mockedBlockDataFactory).toHaveBeenCalledTimes(1);
         expect(mockedStakeDataFactory).toHaveBeenCalledTimes(1);
       });
@@ -111,7 +139,7 @@ describe('Payment Builder Tests', () => {
     it('should build a succesful payment process', async () => {
       const builder = new PaymentBuilder(
         mockedBlockProcessor,
-        mockedPayoutCalculator,
+        mockedPayoutCalculatorFactory,
         mockedBlockDataFactory,
         mockedStakeDataFactory,
       );
@@ -230,7 +258,7 @@ describe('Payment Builder Tests', () => {
     it('should build a succesful payment process strinct', async () => {
       const builder = new PaymentBuilder(
         mockedBlockProcessor,
-        mockedPayoutCalculator,
+        mockedPayoutCalculatorFactory,
         mockedBlockDataFactory,
         mockedStakeDataFactory,
       );
