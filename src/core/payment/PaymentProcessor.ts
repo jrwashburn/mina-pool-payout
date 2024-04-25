@@ -19,10 +19,10 @@ export class PaymentProcessor implements IPaymentProcessor {
     @inject(TYPES.ISender) sender: ISender,
     @inject(TYPES.PaymentSummarizer) summarizer: ISummarizer<PaymentProcess>,
   ) {
-    (this.paymentBuilder = paymentBuilder),
-      (this.transactionBuilder = transactionBuilder),
-      (this.transactionProcessor = transactionProcessor),
-      (this.sender = sender);
+    (this.paymentBuilder = paymentBuilder);
+    (this.transactionBuilder = transactionBuilder);
+    (this.transactionProcessor = transactionProcessor);
+    (this.sender = sender);
     (this.summarizer = summarizer);
   }
 
