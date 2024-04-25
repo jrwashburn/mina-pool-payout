@@ -1,37 +1,35 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../composition/Types';
-import { ConfigurationManager } from '../../configuration/ConfigurationManager';
 import { Block } from '../dataProvider/dataprovider-types';
-import { PayoutDetails, PayoutTransaction } from '../payoutCalculator/Model';
+import { IPayoutCalculatorFactory, IPayoutCalculator, PayoutDetails, PayoutTransaction } from '../payoutCalculator/Model';
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../dataProvider/Models';
 import { IBlockProcessor, IPaymentBuilder, PaymentProcess } from './Model';
-import { IPayoutCalculator } from '../payoutCalculator/Model';
+import { ConfigurationManager } from '../../configuration/ConfigurationManager';
 
 @injectable()
 export class PaymentBuilder implements IPaymentBuilder {
   private blockProcessor: IBlockProcessor;
-  private payoutCalculator: IPayoutCalculator;
+  private payoutCalculatorFactory: IPayoutCalculatorFactory<IPayoutCalculator>;
   private stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>;
   private blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>;
 
   public constructor(
     @inject(TYPES.IBlockProcessor) blockHandler: IBlockProcessor,
-    @inject(TYPES.IPayoutCalculator) payoutCalculator: IPayoutCalculator,
+    @inject(TYPES.PayoutCalculatorFactory) payoutCalculatorFactory: IPayoutCalculatorFactory<IPayoutCalculator>,
     @inject(TYPES.BlockDataProviderFactory) blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>,
     @inject(TYPES.StakeDataProviderFactory) stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>,
   ) {
     this.blockProcessor = blockHandler;
-    this.payoutCalculator = payoutCalculator;
+    this.payoutCalculatorFactory = payoutCalculatorFactory;
     this.blockDataProviderFactory = blockDataProviderFactory;
     this.stakeDataProviderFactory = stakeDataProviderFactory;
   }
 
   async build(): Promise<PaymentProcess> {
     const config = ConfigurationManager.Setup;
-
     const stakesProvider = this.stakeDataProviderFactory.build(config.blockDataSource);
-
     const blockProvider = this.blockDataProviderFactory.build(config.blockDataSource);
+    const payoutCalculator = this.payoutCalculatorFactory.build(config.fork);
 
     const {
       configuredMaximum,
@@ -85,7 +83,7 @@ export class PaymentBuilder implements IPaymentBuilder {
           totalPayout,
           totalSuperchargedToBurn,
           totalNegotiatedBurn,
-        ] = await this.payoutCalculator.getPayouts(
+        ] = await payoutCalculator.getPayouts(
           ledgerBlocks,
           ledger.stakes,
           Number(ledger.totalStakingBalance),
