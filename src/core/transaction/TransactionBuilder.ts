@@ -42,21 +42,19 @@ export class TransactionBuilder implements ITransactionBuilder {
     ];
 
     if (config.verbose) {
-      console.table(payoutDetails);
-      /*, [
-                'publicKey',
-                'blockHeight',
-                'shareClass',
-                'stakingBalance',
-                'effectiveNPSPoolWeighting',
-                'effectiveCommonPoolWeighting',
-                'coinbase',
-                'totalRewards',
-                'totalRewardsNPSPool',
-                'totalRewardsCommonPool',
-                'payout',
-                'toBurn',
-            ]);*/
+      console.table(payoutDetails, [
+        'publicKey',
+        'blockHeight',
+        'shareClass',
+        'stakingBalance',
+        'sumEffectiveCommonPoolStakes',
+        'effectiveCommonPoolWeighting',
+        'coinbase',
+        'totalRewards',
+        'totalRewardsCommonPool',
+        'payout',
+        'toBurn',
+      ]);
     }
 
     console.log(`before substitutions and exclusions`);
