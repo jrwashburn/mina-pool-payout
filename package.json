@@ -1,6 +1,6 @@
 {
   "name": "mina-payout",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "",
   "engines": {
     "node": ">=18.18.0"
