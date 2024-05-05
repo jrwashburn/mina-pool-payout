@@ -7,19 +7,31 @@ if (!baseUrl) {
   throw new Error('The PAYOUT_API_ENDPOINT environment variable is not set.');
 }
 export async function getLatestHeight(): Promise<number> {
-  const responseData = await fetch(`${baseUrl}/consensus`).then((x) => x.json());
+  const response = await fetch(`${baseUrl}/consensus`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+  }
+  const responseData = await response.json();
+
   return Number(responseData.blockHeight);
 }
 
 export async function getMinMaxBlocksByEpoch(epoch: number, fork: number): Promise<{ min: number; max: number }> {
-  const responseData = await fetch(`${baseUrl}/epoch/${epoch}?fork=${fork}`).then((x) => x.json());
+  const response = await fetch(`${baseUrl}/epoch/${epoch}?fork=${fork}`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+  }
+  const responseData = await response.json();
+  console.log(responseData);
   return { min: Number(responseData.minBlockHeight), max: Number(responseData.maxBlockHeight) };
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
-  const responseData = await fetch(`${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight}`).then(
-    (x) => x.json(),
-  );
+  const response = await fetch(`${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight}`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+  }
+  const responseData = await response.json();
   let blocks = responseData.blocks as Blocks;
 
   const blockFile = `${__dirname}/../../../data/.paidblocks`;
