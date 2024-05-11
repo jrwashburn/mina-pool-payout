@@ -9,7 +9,7 @@ if (!baseUrl) {
 export async function getLatestHeight(): Promise<number> {
   const response = await fetch(`${baseUrl}/consensus`);
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+    throw new Error(`HTTP error! ${baseUrl}/consensus returned status: ${response.status} ${response.statusText}`);
   }
   const responseData = await response.json();
 
@@ -19,7 +19,7 @@ export async function getLatestHeight(): Promise<number> {
 export async function getMinMaxBlocksByEpoch(epoch: number, fork: number): Promise<{ min: number; max: number }> {
   const response = await fetch(`${baseUrl}/epoch/${epoch}?fork=${fork}`);
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+    throw new Error(`HTTP error! ${baseUrl}/epoch/${epoch}?fork=${fork} returned status: ${response.status} ${response.statusText}`);
   }
   const responseData = await response.json();
   console.log(responseData);
@@ -29,7 +29,7 @@ export async function getMinMaxBlocksByEpoch(epoch: number, fork: number): Promi
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
   const response = await fetch(`${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight}`);
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+    throw new Error(`HTTP error! ${baseUrl}/blocks?key=${key}&minHeight=${minHeight}&maxHeight=${maxHeight} returned status: ${response.status} ${response.statusText}`);
   }
   const responseData = await response.json();
   let blocks = responseData.blocks as Blocks;
