@@ -56,6 +56,7 @@ export class PaymentBuilder implements IPaymentBuilder {
     console.log(`Processing mina pool payout for block producer key: ${stakingPoolPublicKey}`);
 
     const blocks: Block[] = await blockProvider.getBlocks(stakingPoolPublicKey, minimumHeight, maximumHeight);
+    blocks.sort((a, b) => a.blockheight - b.blockheight);
 
     const payoutTransactions: PayoutTransaction[] = [];
 
@@ -71,7 +72,6 @@ export class PaymentBuilder implements IPaymentBuilder {
         console.log(`### Calculating payouts for ledger ${ledgerHash}`);
 
         const ledger = await stakesProvider.getStakes(ledgerHash, stakingPoolPublicKey);
-
         console.log(`The pool total staking balance is ${ledger.totalStakingBalance}`);
 
         const ledgerBlocks = blocks.filter((x) => x.stakingledgerhash == ledgerHash);
