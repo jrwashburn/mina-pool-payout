@@ -1,17 +1,15 @@
 # Overview
 
 This application will calculate, and may sign and transmit, the required payouts for accounts delegating to a given account.
-It also may send the supercharged rewards to a burn address.
-The burn of the supercharged rewards is related to blocks won by Mina Foundation or delegators who want to burn their supercharged rewards.
-_The burn address is: B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X_ . It's a public address without a private key. The tokens held by this address are locked forever.
+It also may send some rewards to a burn address, depending on fork, epoch, and configuration.
 
 ### Delegation Program requirements
 
 The application implements the rules fo the Mina Foundation and O1 Labs Delegation Program requirements, including:
 
 -   All the rewards should be sent back to the delegators. Only the commision rate should be kept by the Block Producer.
--   The supercharged rewards of the blocks won by Mina Foundation should be sent to the burn address: `B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X`
--   The supercharged rewards of the blocks won by the delegators who requested to burn their supercharged rewards should be sent to the burn address: `B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X`
+-   Prior to the first hard fork, any supercharged rewards for the blocks won by Mina Foundation should be sent to the burn address: `B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X`
+-   The supercharged rewards of the blocks won by the delegators who requested to burn their supercharged rewards should be sent to the burn address: `B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X` It is a public address without a private key. The tokens held by this address are locked forever.
 -   The memo field of the payback and burn transaction should contain the md5 value of the block producer's public key that received the delegation.
 
 ## Calculating and Sending Payments
