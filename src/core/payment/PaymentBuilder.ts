@@ -119,14 +119,11 @@ export class PaymentBuilder implements IPaymentBuilder {
       }),
     ).then(async () => {
       // added a sort because these payout details are hashed and need to be in a reliable order
-      payoutTransactions.sort(function (p1: PayoutTransaction, p2: PayoutTransaction) {
-        if (p1.amount > p2.amount) {
-          return -1;
+      payoutTransactions.sort((p1: PayoutTransaction, p2: PayoutTransaction) => {
+        if (p1.amount !== p2.amount) {
+          return p2.amount - p1.amount; // sort by amount in descending order
         }
-        if (p1.amount < p2.amount) {
-          return 1;
-        }
-        return 0;
+        return p1.publicKey.localeCompare(p2.publicKey); // sort by publicKey in ascending order if amounts are equal
       });
       payoutDetails.sort(function (p1: PayoutDetails, p2: PayoutDetails) {
         if (p1.blockHeight + p1.publicKey < p2.blockHeight + p2.publicKey) {
