@@ -22,7 +22,6 @@ export async function getMinMaxBlocksByEpoch(epoch: number, fork: number): Promi
     throw new Error(`HTTP error! ${baseUrl}/epoch/${epoch}?fork=${fork} returned status: ${response.status} ${response.statusText}`);
   }
   const responseData = await response.json();
-  console.log(responseData);
   return { min: Number(responseData.minBlockHeight), max: Number(responseData.maxBlockHeight) };
 }
 
