@@ -23,7 +23,8 @@ import { FileWriter } from '../shared/FileWriter';
 import { ISender, ITransactionBuilder, ITransactionProcessor } from '../core/transaction/Model';
 import { TransactionSender } from '../core/transaction/TransactionSender';
 import { TransactionProcessor } from '../core/transaction/TransactionProcessor';
-import { PayoutCalculatorIsolateSuperCharge } from '../core/payoutCalculator/PayoutCalculatorIsolateSuperCharge';
+import { IPayoutCalculatorFactory } from '../core/payoutCalculator/Model';
+import { PayoutCalculatorFactory } from '../core/payoutCalculator/PayoutCalculatorFactory';
 import { SubstituteAndExcludePayToAddressesForSuperCharge } from '../core/payment/SubstituteAndExcludePayToAddressesForSuperCharge';
 import { PaymentSummarizer } from '../core/payment/PaymentSummarizer';
 
@@ -39,8 +40,7 @@ container.bind<IDataProviderFactory<IBlockDataProvider>>(TYPES.BlockDataProvider
 container.bind<IDataProviderFactory<IStakeDataProvider>>(TYPES.StakeDataProviderFactory).to(StakeDataProviderFactory);
 container.bind<IFileWriter>(TYPES.IFileWriter).to(FileWriter);
 container.bind<ISummarizer<PaymentProcess>>(TYPES.PaymentSummarizer).to(PaymentSummarizer);
-//Add a factory to change Calculator based on a setting or argument
-container.bind<IPayoutCalculator>(TYPES.IPayoutCalculator).to(PayoutCalculatorIsolateSuperCharge);
+container.bind<IPayoutCalculatorFactory<IPayoutCalculator>>(TYPES.PayoutCalculatorFactory).to(PayoutCalculatorFactory);
 container
   .bind<ISubstituteAndExcludePayToAddresses>(TYPES.IAddressRemover)
   .to(SubstituteAndExcludePayToAddressesForSuperCharge);

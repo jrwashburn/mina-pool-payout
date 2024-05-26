@@ -52,6 +52,7 @@ describe('Transaction Builder Tests', () => {
         fork: 0,
         slotsInEpoch: 0,
         burnAddress: '',
+        doNotTransmit: false,
       };
 
       const builder = new TransactionBuilder(mockAddressRemover);

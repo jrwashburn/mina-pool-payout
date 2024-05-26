@@ -1,6 +1,5 @@
 import { IPaymentBuilder, IPaymentProcessor as IPaymentProcessor, ISummarizer, PaymentProcess } from './Model';
 import { PaymentConfiguration } from '../../configuration/Model';
-import { ConfigurationManager } from '../../configuration/ConfigurationManager';
 import { inject, injectable } from 'inversify';
 import TYPES from '../../composition/Types';
 import { ISender, ITransactionBuilder, ITransactionProcessor } from '../transaction/Model';
@@ -20,38 +19,22 @@ export class PaymentProcessor implements IPaymentProcessor {
     @inject(TYPES.ISender) sender: ISender,
     @inject(TYPES.PaymentSummarizer) summarizer: ISummarizer<PaymentProcess>,
   ) {
-    (this.paymentBuilder = paymentBuilder),
-      (this.transactionBuilder = transactionBuilder),
-      (this.transactionProcessor = transactionProcessor),
-      (this.sender = sender);
-    this.summarizer = summarizer;
+    (this.paymentBuilder = paymentBuilder);
+    (this.transactionBuilder = transactionBuilder);
+    (this.transactionProcessor = transactionProcessor);
+    (this.sender = sender);
+    (this.summarizer = summarizer);
   }
 
-  async run(args: any): Promise<void> {
-    await ConfigurationManager.build(args);
-
-    const configuration = ConfigurationManager.Setup;
-
-    if (await this.isValid(configuration)) {
-      const paymentProcess = await this.paymentBuilder.build();
-
-      await this.transactionBuilder.build(paymentProcess, configuration);
-
-      await this.calculateTotalPayoutFundsNeeded(paymentProcess, configuration);
-
-      await this.transactionProcessor.write(configuration, paymentProcess);
-
-      await this.sender.send(configuration, paymentProcess);
-
-      await this.summarizer.calculateTotals(paymentProcess);
-
-      await this.summarizer.printTotals(paymentProcess);
-
-      await this.summarizer.writeTotals(configuration, paymentProcess);
-    } else {
-      //TODO: Use a custom error class
-      throw new Error('Unkown Data Source');
-    }
+  async run(configuration: PaymentConfiguration): Promise<void> {
+    const paymentProcess = await this.paymentBuilder.build();
+    await this.transactionBuilder.build(paymentProcess, configuration);
+    await this.calculateTotalPayoutFundsNeeded(paymentProcess, configuration);
+    await this.transactionProcessor.write(configuration, paymentProcess);
+    await this.sender.send(configuration, paymentProcess);
+    await this.summarizer.calculateTotals(paymentProcess);
+    await this.summarizer.printTotals(paymentProcess);
+    await this.summarizer.writeTotals(configuration, paymentProcess);
   }
 
   private async calculateTotalPayoutFundsNeeded(paymentProcess: PaymentProcess, configuration: PaymentConfiguration) {
@@ -69,17 +52,5 @@ export class PaymentProcessor implements IPaymentProcessor {
       `Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS ${configuration.senderKeys.publicKey
       } ${totalPayoutFundsNeeded / 1000000000}`,
     );
-  }
-
-  private async isValid(config: PaymentConfiguration): Promise<boolean> {
-    if (
-      config.blockDataSource != 'ARCHIVEDB' &&
-      config.blockDataSource != 'MINAEXPLORER' &&
-      config.blockDataSource != 'API'
-    ) {
-      return false;
-    }
-
-    return true;
   }
 }

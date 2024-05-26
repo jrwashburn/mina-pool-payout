@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import { IBlockDataProvider } from './Models';
 import { Blocks } from './dataprovider-types';
-import provider from '../../utils/provider-selector';
+import provider from '../../composition/provider-selector';
 
 @injectable()
 export class MinaExplorerBlockDataProvider implements IBlockDataProvider {

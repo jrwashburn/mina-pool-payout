@@ -1,6 +1,6 @@
 {
   "name": "mina-payout",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "description": "",
   "engines": {
     "node": ">=18.18.0"
@@ -44,7 +44,7 @@
     "graphql": "^16.5.0",
     "help": "^3.0.2",
     "inversify": "^6.0.1",
-    "mina-signer": "^3.0.5",
+    "mina-signer": "^3.0.7",
     "object-hash": "^3.0.0",
     "pg-promise": "^11.5.5",
     "ts-node": "^10.9.1",

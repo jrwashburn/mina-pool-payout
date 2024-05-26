@@ -30,6 +30,7 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
       totalNegotiatedBurn: number,
     ]
   > {
+    console.log('Using Isolate Super Charge Payout Calculator');
     //TODO: JC - Shared Logic must be moved into its own class, then isolate change in behaviors
     // Initialize some stuff
     const SUPERCHARGEDCOINBASE = 1440000000000;
@@ -44,8 +45,8 @@ export class PayoutCalculatorIsolateSuperCharge implements IPayoutCalculator {
       // Keep a log of all blocks we processed
       blocksIncluded.push(block.blockheight);
 
-      if (typeof block.coinbase === 'undefined' || block.coinbase == 0) {
-        // no coinbase, don't need to do anything
+      if (typeof block.coinbase === 'undefined' || block.coinbase == 0 || stakers.length == 0) {
+        // no coinbase or no stakers, don't need to do anything
       } else {
         const winner = this.getWinner(stakers, block);
         const winnerStakeIsLocked = stakeIsLocked(winner, block);

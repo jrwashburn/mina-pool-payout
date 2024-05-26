@@ -1,6 +1,5 @@
 import { KeyedRate } from '../../configuration/Model';
 import { Block, Stake, ShareClass } from '../dataProvider/dataprovider-types';
-import { IFeeCalculator } from '../transaction/Model';
 
 export type PayoutDetails = {
     publicKey: string;
@@ -69,6 +68,6 @@ export interface IPayoutCalculator {
     >;
 }
 
-export interface IFeeCalculatorFactory {
-    create(): IFeeCalculator;
+export interface IPayoutCalculatorFactory<T> {
+    build(fork: number): T;
 }

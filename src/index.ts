@@ -1,6 +1,8 @@
 import yargs from 'yargs';
+import { ConfigurationManager } from './configuration/ConfigurationManager';
 import Container from './composition/inversify.config';
 import { IPaymentProcessor } from './core/payment/Model';
+import { PaymentConfiguration } from './configuration/Model';
 import TYPES from './composition/Types';
 import { version } from '../package.json';
 
@@ -19,9 +21,24 @@ const oargs = yargs.options({
 const main = async () => {
   console.log(`*** MINAPOOL PAYOUT ${version} ***\n`);
 
+  await ConfigurationManager.build(oargs);
+  const configuration = ConfigurationManager.Setup;
+  await isValid(configuration)
+
   const payment = Container.get<IPaymentProcessor>(TYPES.IPaymentProcessor);
 
-  payment.run(oargs);
+  payment.run(configuration);
 };
+
+async function isValid(config: PaymentConfiguration): Promise<boolean> {
+  if (
+    config.blockDataSource != 'ARCHIVEDB' &&
+    config.blockDataSource != 'MINAEXPLORER' &&
+    config.blockDataSource != 'API'
+  ) {
+    return false;
+  }
+  return true;
+}
 
 main();

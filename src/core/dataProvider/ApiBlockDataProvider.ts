@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import provider from '../../utils/provider-selector';
+import provider from '../../composition/provider-selector';
 import { Blocks } from './dataprovider-types';
 import { IBlockDataProvider } from './Models';
 
