@@ -4,7 +4,7 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../../composition/Types';
 import { ITransactionProcessor } from './Model';
 import { PaymentProcess } from '../payment/Model';
-import { createWriteStream } from 'fs';
+import { createWriteStream, WriteStream } from 'fs';
 
 @injectable()
 export class TransactionProcessor implements ITransactionProcessor {
@@ -16,7 +16,6 @@ export class TransactionProcessor implements ITransactionProcessor {
 
   async write(config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void> {
     const runDateTime = new Date();
-
     const { payoutDetails, maximumHeight, payoutTransactions } = paymentProcess;
     const { minimumHeight } = config;
     const payoutTransactionsFileName = this.generateOutputFileName(
@@ -25,31 +24,28 @@ export class TransactionProcessor implements ITransactionProcessor {
       minimumHeight,
       maximumHeight,
     );
-    //this.fileWriter.write(payoutTransactionsFileName, JSON.stringify(payoutTransactions));
     const payoutTransactionsStream = createWriteStream(payoutTransactionsFileName);
-    payoutTransactions.forEach(transaction => payoutTransactionsStream.write(JSON.stringify(transaction)));
-    console.log(`writing transactions to ${payoutTransactionsFileName}`);
-    await new Promise((resolve, reject) => {
-      payoutTransactionsStream.on('finish', resolve);
-      payoutTransactionsStream.on('error', reject);
-      payoutTransactionsStream.end();
-    });
-
     const payoutDetailsFileName = this.generateOutputFileName(
       'payout_details',
       runDateTime,
       minimumHeight,
       maximumHeight,
     );
-    //this.fileWriter.write(payoutDetailsFileName, JSON.stringify(payoutDetails));
     const payoutDetailsStream = createWriteStream(payoutDetailsFileName);
-    payoutDetails.forEach(detail => payoutDetailsStream.write(JSON.stringify(detail)));
-    console.log(`writing transactions to ${payoutDetailsFileName}`);
-    await new Promise((resolve, reject) => {
-      payoutDetailsStream.on('finish', resolve);
-      payoutDetailsStream.on('error', reject);
-      payoutDetailsStream.end();
-    });
+
+    try {
+      console.log(`writing transactions to ${payoutTransactionsFileName}`);
+      this.writeJsonObjToFile(payoutTransactionsStream, payoutTransactions);
+      if (!config.doNotSaveTransactionDetails) {
+        console.log(`writing details to ${payoutDetailsFileName}`);
+        this.writeJsonObjToFile(payoutDetailsStream, payoutDetails);
+      } else {
+        console.log('skipping writing details to file due to DO_NOT_SAVE_TRANSACTION_DETAILS environment setting');
+      }
+      console.log('finished writing log files');
+    } catch (error) {
+      console.error('Error writing details to log file', error);
+    }
   }
 
   private generateOutputFileName(
@@ -63,6 +59,27 @@ export class TransactionProcessor implements ITransactionProcessor {
 
   private longDateString(d: Date) {
     return d.toISOString().replace(/\D/g, '');
+  }
+
+  private writeJsonObjToFile(stream: WriteStream, data: object[]): void {
+    let index = 0;
+
+    function writeObjects() {
+      let ok = true;
+      while (index < data.length && ok) {
+        ok = stream.write(JSON.stringify(data[index]));
+        index++;
+      }
+      if (index < data.length) {
+        if (!ok) {
+          stream.once('drain', writeObjects)
+        }
+        else {
+          stream.end();
+        }
+      }
+    }
+    writeObjects();
   }
 }
 
