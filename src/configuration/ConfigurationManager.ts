@@ -35,7 +35,7 @@ export class ConfigurationManager {
       payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0,
       burnAddress: 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X',
       doNotTransmit: args.donottransmit || false,
-      doNotSaveTransactionDetails: Boolean(process.env.DO_NOT_SAVE_TRANSACTION_DETAILS) || false,
+      doNotSaveTransactionDetails: (process.env.DO_NOT_SAVE_TRANSACTION_DETAILS?.toLowerCase() === 'true') || false,
     };
 
     await this.validate();
