@@ -22,6 +22,7 @@ export interface PaymentConfiguration {
   slotsInEpoch: number;
   stakingPoolPublicKey: string;
   verbose: boolean;
+  doNotSaveTransactionDetails: boolean;
 }
 
 export interface KeyedRate {
