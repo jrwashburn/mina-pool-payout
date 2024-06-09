@@ -5,16 +5,35 @@ import { PaymentConfiguration } from '../../configuration/Model';
 import { injectable } from 'inversify';
 import { ISender } from './Model';
 import { PaymentProcess } from '../payment/Model';
+import { Readable } from 'stream';
 
 @injectable()
 export class TransactionSender implements ISender {
   async send(config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void> {
     const { payoutHash, senderKeys } = config;
-
     const { blocks, payoutTransactions } = paymentProcess;
+    const calculatingHash = createHash('sha1');
 
     //const calculatedHash = hash(paymentProcess.payoutDetails, { algorithm: 'sha1' });
-    const calculatedHash = createHash('sha1').update(JSON.stringify(paymentProcess.payoutDetails)).digest('hex');
+    //const calculatedHash = createHash('sha1').update(JSON.stringify(paymentProcess.payoutDetails)).digest('hex');
+    const payoutDetailsStream = new Readable({ objectMode: true });
+    payoutDetailsStream._read = () => { };
+    payoutTransactions.forEach(transaction => {
+      payoutDetailsStream.push(JSON.stringify(transaction));
+    });
+    payoutDetailsStream.push(null);
+
+    const calculatedHash = await new Promise((resolve, reject) => {
+      payoutDetailsStream.on('data', (data) => {
+        calculatingHash.update(data);
+      }).on('end', () => {
+        resolve(calculatingHash.digest('hex'));
+      }).on('error', (err) => {
+        reject(err);
+      });
+    });
+
+    payoutDetailsStream.destroy();
 
     if (payoutHash) {
       console.log(`### Processing signed payout for hash ${payoutHash}...`);
