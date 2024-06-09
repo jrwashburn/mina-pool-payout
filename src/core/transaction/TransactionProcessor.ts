@@ -9,19 +9,9 @@ import { createWriteStream } from 'fs';
 @injectable()
 export class TransactionProcessor implements ITransactionProcessor {
   private fileWriter: IFileWriter;
-  private _payoutTransactionsFileName: string = '';
-  private _payoutDetailsFileName: string = '';
 
   constructor(@inject(TYPES.IFileWriter) fileWriter: IFileWriter) {
     this.fileWriter = fileWriter;
-  }
-
-  get payoutTransactionsFileName(): string {
-    return this._payoutTransactionsFileName;
-  }
-
-  get payoutDetailsFileName(): string {
-    return this._payoutDetailsFileName;
   }
 
   async write(config: PaymentConfiguration, paymentProcess: PaymentProcess): Promise<void> {
@@ -29,28 +19,37 @@ export class TransactionProcessor implements ITransactionProcessor {
 
     const { payoutDetails, maximumHeight, payoutTransactions } = paymentProcess;
     const { minimumHeight } = config;
-    this._payoutTransactionsFileName = this.generateOutputFileName(
+    const payoutTransactionsFileName = this.generateOutputFileName(
       'payout_transactions',
       runDateTime,
       minimumHeight,
       maximumHeight,
     );
-
     //this.fileWriter.write(payoutTransactionsFileName, JSON.stringify(payoutTransactions));
-    const payoutTransactionsStream = createWriteStream(this._payoutTransactionsFileName);
+    const payoutTransactionsStream = createWriteStream(payoutTransactionsFileName);
     payoutTransactions.forEach(transaction => payoutTransactionsStream.write(JSON.stringify(transaction)));
-    payoutTransactionsStream.end();
+    console.log(`writing transactions to ${payoutTransactionsFileName}`);
+    await new Promise((resolve, reject) => {
+      payoutTransactionsStream.on('finish', resolve);
+      payoutTransactionsStream.on('error', reject);
+      payoutTransactionsStream.end();
+    });
 
-    this._payoutDetailsFileName = this.generateOutputFileName(
+    const payoutDetailsFileName = this.generateOutputFileName(
       'payout_details',
       runDateTime,
       minimumHeight,
       maximumHeight,
     );
     //this.fileWriter.write(payoutDetailsFileName, JSON.stringify(payoutDetails));
-    const payoutDetailsStream = createWriteStream(this._payoutDetailsFileName);
+    const payoutDetailsStream = createWriteStream(payoutDetailsFileName);
     payoutDetails.forEach(detail => payoutDetailsStream.write(JSON.stringify(detail)));
-    payoutDetailsStream.end();
+    console.log(`writing transactions to ${payoutDetailsFileName}`);
+    await new Promise((resolve, reject) => {
+      payoutDetailsStream.on('finish', resolve);
+      payoutDetailsStream.on('error', reject);
+      payoutDetailsStream.end();
+    });
   }
 
   private generateOutputFileName(
