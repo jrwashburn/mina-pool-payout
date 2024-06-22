@@ -36,6 +36,7 @@ export class ConfigurationManager {
       burnAddress: 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X',
       doNotTransmit: args.donottransmit || false,
       doNotSaveTransactionDetails: (process.env.DO_NOT_SAVE_TRANSACTION_DETAILS?.toLowerCase() === 'true') || false,
+      payoutCalculator: process.env.PAYOUT_CALCULATOR || '',
     };
 
     await this.validate();
@@ -92,6 +93,9 @@ export class ConfigurationManager {
     if (this.Setup.fork == 1 && (this.Setup.blockDataSource === 'ARCHIVEDB' || this.Setup.blockDataSource === 'MINAEXPLORER')) {
       msg += 'ERROR: Fork 1 is not currently supported by ARCHIVEDB or MINAEXPLORER data sources.';
     }
+    if (!['postSuperChargeShareFees', 'postSuperChargeKeepFees', 'postSuperChargeCommonShareFees', 'isolateSuperCharge', 'original'].includes(this.Setup.payoutCalculator)) {
+      msg += 'ERROR: Invalid payout calculator specified. Must be one of postSuperChargeShareFees, postSuperChargeKeepFees, postSuperChargeCommonShareFees, isolateSuperCharge, or original';
+    }
     if (msg !== '') {
       console.log('\x1b[31m%s\x1b[0m', msg);
       process.exit(1);
@@ -100,11 +104,17 @@ export class ConfigurationManager {
       console.log('\x1b[31m%s\x1b[0m', '******************************');
       console.log('\x1b[31m%s\x1b[0m', 'WARNING: ARCHIVEDB data source only supports fork 0 currently. Please get in touch with @jrwashburn to notify that you need archivedb support for the hard fork.');
       console.log('\x1b[31m%s\x1b[0m', '******************************');
+      if (this.Setup.fork != 0) {
+        process.exit(1)
+      }
     }
     if (this.Setup.blockDataSource === 'MINAEXPLORER') {
       console.log('\x1b[31m%s\x1b[0m', '******************************');
       console.log('\x1b[31m%s\x1b[0m', 'WARNING: MINAEXPLORER data source will be deprecated at the hard fork. Switch to alternative api providers such as api.minastakes.com or the Mina Foundation equivalent.');
       console.log('\x1b[31m%s\x1b[0m', '******************************');
+      if (this.Setup.fork != 0) {
+        process.exit(1)
+      }
     }
   }
 }

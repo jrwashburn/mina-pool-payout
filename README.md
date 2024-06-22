@@ -156,6 +156,8 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASENAME
 
 -   Set `PAYOUT_DATA_PROVIDER_API_ENDPOINT=https://api.minastakes.com` or to the url of the preferred data provider.
 
+-   Set `PAYOUT_CALCULATOR=postSuperChargeCommonShareFees` (default) for the calculator that will have the Pool keep all fees. Valid calculators include: 'postSuperChargeShareFees', 'postSuperChargeKeepFees', 'postSuperChargeCommonShareFees', or Pre-Fork: 'isolateSuperCharge', 'original'
+
 ## Providing the Staking Ledgers
 
 -   Export the staking ledger and place it in src/data/ledger directory. You can export the current staking ledger with:

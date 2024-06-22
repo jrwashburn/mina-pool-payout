@@ -29,7 +29,7 @@ export class PaymentBuilder implements IPaymentBuilder {
     const config = ConfigurationManager.Setup;
     const stakesProvider = this.stakeDataProviderFactory.build(config.blockDataSource);
     const blockProvider = this.blockDataProviderFactory.build(config.blockDataSource);
-    const payoutCalculator = this.payoutCalculatorFactory.build(config.fork);
+    const payoutCalculator = this.payoutCalculatorFactory.build(config.fork, config.payoutCalculator);
 
     const {
       configuredMaximum,

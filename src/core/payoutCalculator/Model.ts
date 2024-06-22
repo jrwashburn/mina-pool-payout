@@ -69,5 +69,5 @@ export interface IPayoutCalculator {
 }
 
 export interface IPayoutCalculatorFactory<T> {
-    build(fork: number): T;
+    build(fork: number, payoutCalculator: string): T;
 }
