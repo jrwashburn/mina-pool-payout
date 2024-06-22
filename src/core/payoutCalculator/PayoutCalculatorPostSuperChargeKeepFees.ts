@@ -5,7 +5,7 @@ import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
 import { Decimal } from 'decimal.js';
 
 @injectable()
-export class PayoutCalculatorPostSuperCharge implements IPayoutCalculator {
+export class PayoutCalculatorPostSuperChargeKeepFees implements IPayoutCalculator {
   async getPayouts(
     blocks: Block[],
     stakers: Stake[],
@@ -44,7 +44,7 @@ export class PayoutCalculatorPostSuperCharge implements IPayoutCalculator {
         // no coinbase, don't need to do anything
       } else {
         const poolStakes: { [key: string]: { stake: number } } = {};
-        const thisBlockReward = block.coinbase + block.feetransfertoreceiver - block.feetransferfromcoinbase;
+        const thisBlockReward = block.coinbase; // Intentionally excluding fees from the payout, they are kept for the pool owner
         let sumPoolStakes = new Decimal(0.0);
 
         // Determine the non-participating and common pool weighting for each staker

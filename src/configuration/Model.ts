@@ -23,6 +23,7 @@ export interface PaymentConfiguration {
   stakingPoolPublicKey: string;
   verbose: boolean;
   doNotSaveTransactionDetails: boolean;
+  payoutCalculator: string;
 }
 
 export interface KeyedRate {
