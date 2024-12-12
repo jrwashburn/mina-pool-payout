@@ -10,3 +10,6 @@ package-lock.json
 *.code-workspace
 /documents/*.log
 GitVersion.yml
+/bin*
+/lib*
+pyvenv.cfg
