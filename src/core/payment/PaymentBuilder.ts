@@ -5,6 +5,7 @@ import { IPayoutCalculatorFactory, IPayoutCalculator, PayoutDetails, PayoutTrans
 import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../dataProvider/Models';
 import { IBlockProcessor, IPaymentBuilder, PaymentProcess } from './Model';
 import { ConfigurationManager } from '../../configuration/ConfigurationManager';
+import { PaymentConfiguration } from '../../configuration/Model';
 
 @injectable()
 export class PaymentBuilder implements IPaymentBuilder {
@@ -12,21 +13,24 @@ export class PaymentBuilder implements IPaymentBuilder {
   private payoutCalculatorFactory: IPayoutCalculatorFactory<IPayoutCalculator>;
   private stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>;
   private blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>;
+  private config: PaymentConfiguration;
 
   public constructor(
     @inject(TYPES.IBlockProcessor) blockHandler: IBlockProcessor,
     @inject(TYPES.PayoutCalculatorFactory) payoutCalculatorFactory: IPayoutCalculatorFactory<IPayoutCalculator>,
     @inject(TYPES.BlockDataProviderFactory) blockDataProviderFactory: IDataProviderFactory<IBlockDataProvider>,
     @inject(TYPES.StakeDataProviderFactory) stakeDataProviderFactory: IDataProviderFactory<IStakeDataProvider>,
+    @inject(TYPES.PaymentConfiguration) config?: PaymentConfiguration,
   ) {
     this.blockProcessor = blockHandler;
     this.payoutCalculatorFactory = payoutCalculatorFactory;
     this.blockDataProviderFactory = blockDataProviderFactory;
     this.stakeDataProviderFactory = stakeDataProviderFactory;
+    this.config = config || ConfigurationManager.Setup;
   }
 
-  async build(): Promise<PaymentProcess> {
-    const config = ConfigurationManager.Setup;
+  async build(testConfig?: PaymentConfiguration): Promise<PaymentProcess> {
+    const config = testConfig || this.config;
     const stakesProvider = this.stakeDataProviderFactory.build(config.blockDataSource);
     const blockProvider = this.blockDataProviderFactory.build(config.blockDataSource);
     const payoutCalculator = this.payoutCalculatorFactory.build(config.fork, config.payoutCalculator);

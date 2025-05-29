@@ -120,12 +120,41 @@ describe('Payment Builder Tests', () => {
   };
 
   describe('When all dependencies are met', () => {
+    const mockConfig = {
+      blockDataSource: 'MOCK',
+      bpKeyMd5Hash: 'md5-hash-123',
+      burnAddress: 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X',
+      burnRatesByPublicKey: {},
+      commissionRatesByPublicKey: {},
+      configuredMaximum: 1001,
+      defaultCommissionRate: 0.05,
+      doNotTransmit: false,
+      epoch: 0,
+      fork: 0,
+      investorsCommissionRate: 0.08,
+      mfCommissionRate: 0.08,
+      minimumConfirmations: 290,
+      minimumHeight: 1000,
+      o1CommissionRate: 0.05,
+      payoutHash: '',
+      payoutMemo: 'test-memo',
+      payorSendTransactionFee: 10000000,
+      payoutThreshold: 0,
+      senderKeys: { publicKey: 'B62qSenderPublicKey', privateKey: 'DUMMY_PRIVATE_KEY' },
+      slotsInEpoch: 7140,
+      stakingPoolPublicKey: 'B62qPoolPublicKey',
+      verbose: false,
+      doNotSaveTransactionDetails: false,
+      payoutCalculator: 'original',
+    };
+
     it('should call all dependencies correctly.', async () => {
       const builder = new PaymentBuilder(
         mockedBlockProcessor,
         mockedPayoutCalculatorFactory,
         mockedBlockDataFactory,
         mockedStakeDataFactory,
+        mockConfig
       );
 
       builder.build().then(() => {
@@ -142,6 +171,7 @@ describe('Payment Builder Tests', () => {
         mockedPayoutCalculatorFactory,
         mockedBlockDataFactory,
         mockedStakeDataFactory,
+        mockConfig
       );
 
       const expectedPayoutTransaction: PayoutTransaction[] = [
@@ -261,6 +291,7 @@ describe('Payment Builder Tests', () => {
         mockedPayoutCalculatorFactory,
         mockedBlockDataFactory,
         mockedStakeDataFactory,
+        mockConfig
       );
 
       const expectedPayoutTransaction: PayoutTransaction[] = [

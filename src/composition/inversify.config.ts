@@ -27,6 +27,8 @@ import { IPayoutCalculatorFactory } from '../core/payoutCalculator/Model';
 import { PayoutCalculatorFactory } from '../core/payoutCalculator/PayoutCalculatorFactory';
 import { SubstituteAndExcludePayToAddressesForSuperCharge } from '../core/payment/SubstituteAndExcludePayToAddressesForSuperCharge';
 import { PaymentSummarizer } from '../core/payment/PaymentSummarizer';
+import { ConfigurationManager } from '../configuration/ConfigurationManager';
+import { PaymentConfiguration } from '../configuration/Model';
 
 const container = new Container();
 
@@ -44,5 +46,11 @@ container.bind<IPayoutCalculatorFactory<IPayoutCalculator>>(TYPES.PayoutCalculat
 container
   .bind<ISubstituteAndExcludePayToAddresses>(TYPES.IAddressRemover)
   .to(SubstituteAndExcludePayToAddressesForSuperCharge);
+
+try {
+  container.bind<PaymentConfiguration>(TYPES.PaymentConfiguration).toConstantValue(ConfigurationManager.Setup);
+} catch (error) {
+  console.log('ConfigurationManager.Setup not available, tests should provide a mock');
+}
 
 export default container;

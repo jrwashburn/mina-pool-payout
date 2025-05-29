@@ -9,7 +9,7 @@ describe('Transaction Builder Tests', () => {
     it('when paymentProcess is success', async () => {
       const mockAddressRemover: ISubstituteAndExcludePayToAddresses = {
         run: (mockTransactions) => {
-          return new Promise(() => mockTransactions);
+          return Promise.resolve(mockTransactions);
         },
       };
 
@@ -25,7 +25,6 @@ describe('Transaction Builder Tests', () => {
         totalPayouts: 0,
         totalBurn: 0,
       };
-      //TODO: MOVE THIS TO ITS A SETUP FILE
       const configurationMock: PaymentConfiguration = {
         defaultCommissionRate: 0.05,
         mfCommissionRate: 0.08,
@@ -53,6 +52,8 @@ describe('Transaction Builder Tests', () => {
         slotsInEpoch: 0,
         burnAddress: '',
         doNotTransmit: false,
+        doNotSaveTransactionDetails: false,
+        payoutCalculator: 'original',
       };
 
       const builder = new TransactionBuilder(mockAddressRemover);

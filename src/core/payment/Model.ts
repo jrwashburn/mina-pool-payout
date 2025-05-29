@@ -31,7 +31,7 @@ export interface PaymentTotals {
 }
 
 export interface IPaymentBuilder {
-  build(): Promise<PaymentProcess>;
+  build(config?: PaymentConfiguration): Promise<PaymentProcess>;
 }
 
 export interface ISubstituteAndExcludePayToAddresses {
