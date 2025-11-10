@@ -4,9 +4,14 @@ import Container from './composition/inversify.config';
 import { IPaymentProcessor } from './core/payment/Model';
 import { PaymentConfiguration } from './configuration/Model';
 import TYPES from './composition/Types';
-import { version } from '../package.json';
+import { readFileSync } from 'fs';
+import path from 'path';
 
 // TODO: create mina currency types
+
+const { version } = JSON.parse(
+  readFileSync(path.resolve(__dirname, '../package.json'), 'utf8'),
+) as { version: string };
 
 const oargs = yargs.options({
   payouthash: { type: 'string', alias: ['h', 'hash'] },

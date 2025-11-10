@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { BlockProcessor } from '../BlockProcessor';
+import { BlockProcessor } from '../../src/core/payment/BlockProcessor';
 
 describe('BlockProcessor Tests', () => {
   describe('Should be succesful', () => {
