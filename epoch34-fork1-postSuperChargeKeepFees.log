@@ -1,0 +1,293 @@
+
+> mina-payout@1.7.1 payout
+> ts-node -r dotenv/config src/index.ts -e 34 -f 1
+
+*** MINAPOOL PAYOUT 1.7.1 ***
+
+Found /Users/jrwashburn/code/mina/mina-pool-payout/src/configuration/../data/.negotiatedFees file. Using Specific Rates.
+Found /Users/jrwashburn/code/mina/mina-pool-payout/src/configuration/../data/.negotiatedBurn file. Using Specific Rates.
+Working for configured Epoch: 34 for Fork: 1
+Epoch Minimum Height: 488279 - Epoch Maximum Height: 491393
+This script will payout from block 488279 to maximum height 491393
+Processing mina pool payout for block producer key: B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L
+### Calculating payouts for ledger jwjmGqiXosGg6Yo9Nz3EnDh9v8iHdbtgAS5KWVyrGAp7cnzavX8
+The pool total staking balance is 1893896.622523974
+Using Post Super Charge Payout Calculator
+We won these blocks: 489137,489165,489215,489463,489794,490769,490879,490931,491009,491033,491345,491392
+The Total Payout is: 8099757012288 nm or 8099.757012288 mina
+The Total amount to burn is: 0 nm or 0 mina
+before substitutions and exclusions
+┌─────────┬───────────────────────────────────────────────────────────┬───────────────┬─────────┬────────────────┬─────────┬────────────────────────────────────┬──────────────┐
+│ (index) │ publicKey                                                 │ amount        │ fee     │ amountMina     │ feeMina │ memo                               │ summaryGroup │
+├─────────┼───────────────────────────────────────────────────────────┼───────────────┼─────────┼────────────────┼─────────┼────────────────────────────────────┼──────────────┤
+│ 0       │ 'B62qjGkpDRu6bxJWRDdDRP3pByUvdnf2rQBdSuXTF2YkSpxmKkgdbss' │ 3319451597904 │ 1000000 │ 3319.451597904 │ 0.001   │ 'aa6e6ee40b7c72a7d744596dfa628be3' │ 0            │
+│ 1       │ 'B62qpLif5N7kkrSxFoh5B5iNL2s1k2tKhbuN7FLmybYM2AcwzmTuyrX' │ 2742291152256 │ 1000000 │ 2742.291152256 │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 2       │ 'B62qpjEJn5boKL7nqM7G49V4zY3jeE2M3czqG8FXJEbAADstvfF9T7Q' │ 1073888758872 │ 1000000 │ 1073.888758872 │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 3       │ 'B62qmNbNedwwDB3bLUzgeN6gAYXmnY4U9WBS6Ze92HghtU7x3v7a2sS' │ 594207299652  │ 1000000 │ 594.207299652  │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 4       │ 'B62qoigHEtJCoZ5ekbGHWyr9hYfc6fkZ2A41h9vvVZuvty9amzEz3yB' │ 108470440056  │ 1000000 │ 108.470440056  │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 5       │ 'B62qmMGz5dWhmrx7JgKtnmb4mqu87tqXsMr6wcRmnGzHrd3Y43iwhG9' │ 43450362288   │ 1000000 │ 43.450362288   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 6       │ 'B62qkbLxftUetPeHUR4K16d8JEsmXbZTPu6LCD4bD1tdx7y8x8Y9nA2' │ 27261752616   │ 1000000 │ 27.261752616   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 7       │ 'B62qnHjLNaDwc4WWy3BLJMmeS6YATWoTYd6MYJemF3uXRNaEoPAc9GV' │ 24877661208   │ 1000000 │ 24.877661208   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 8       │ 'B62qoGEXsSDG69BoYUQUuiG8NJ25m1hM9VceF1F36ntC6qxqNBdzwCT' │ 19613735436   │ 1000000 │ 19.613735436   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 9       │ 'B62qk449L7LDANBXVHdEcbvTnQqtxqweHptUwKqy1tHVxvGJrKapDwN' │ 12805235268   │ 1000000 │ 12.805235268   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 10      │ 'B62qmrrg2rPHXcFUNZoWSAtBS1kPYTcrvutdteffBayTZGsnpeK4hSJ' │ 10316469624   │ 1000000 │ 10.316469624   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 11      │ 'B62qpUH5qcvknkBNa8N1RVwn2sZCUxiffmvShXZ1hBgKmaJRYmKDFtz' │ 9360068088    │ 1000000 │ 9.360068088    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 12      │ 'B62qn5JSSckhhCXnMiDtDNKDa95zdhoTv7biatmiB6HS9YuwoH63xNc' │ 7451926848    │ 1000000 │ 7.451926848    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 13      │ 'B62qkUYxBqfxc4KBWw9pCX6MShVNYXBLb8M2s4enWBDDMbuWK8P9kjZ' │ 6616167384    │ 1000000 │ 6.616167384    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 14      │ 'B62qowtmtUeYUnvjWSDysfJQjk8kNva58xkZHwiAykjLyWcZxgF6mbr' │ 6465183216    │ 1000000 │ 6.465183216    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 15      │ 'B62qmpKqzKsgu1q2bG5USonaptVm7q5tJohJUkFverKF8GRJdHdHnZ6' │ 5280470820    │ 1000000 │ 5.28047082     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 16      │ 'B62qmwNXELHLkPPWnHRkVxEShPeuwWXXWfxYwfFP1ybA4rgsjexqYBf' │ 5036955252    │ 1000000 │ 5.036955252    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 17      │ 'B62qpcsKkUsZLxqp5hv4XV1NapG9KowUDDcT18GXo3XcS5sGzdFqxxB' │ 4834261848    │ 1000000 │ 4.834261848    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 18      │ 'B62qkg8neN5o1xVq2LG6VHygGsqf5UsitTFcgvWgRubwduTdUfK7JCd' │ 4147530528    │ 1000000 │ 4.147530528    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 19      │ 'B62qpQ4Mi9SwFx5mGo5iPZFS7DMcEc3zkv7Gxdo6W6GLPv828nHdVmo' │ 4040125956    │ 1000000 │ 4.040125956    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 20      │ 'B62qrUGAj9uft5f2g6LPxGB8vRycbZNYjDmNTmS13GqScLTupnw1WkM' │ 4016865156    │ 1000000 │ 4.016865156    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 21      │ 'B62qkmBdeg8z5ukKH3hCtXKiMRdhBoHJWeUCURFuPg8xvzGY4uTkjVn' │ 3509584356    │ 1000000 │ 3.509584356    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 22      │ 'B62qnnKrqqGdabhVHiVmsfqAzK7KbhMQvuXsREJVkFeKWfyHxhmw7We' │ 3465647580    │ 1000000 │ 3.46564758     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 23      │ 'B62qiaGTKNY3Yk7ASDqvJz56hhpX59tRKJ7K9NUtLDySrjrPguKHFyZ' │ 3460108728    │ 1000000 │ 3.460108728    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 24      │ 'B62qjqAQfj5pgYgfUEqTVM4mdj8m61rVRAaLBqhAJUjsSBgpmFiq9P5' │ 3069343836    │ 1000000 │ 3.069343836    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 25      │ 'B62qojHAgRv7rkbAH5vN5jYU4y4CcPH8cgzevFKKKgXLFgJDNJgzQuG' │ 2807377788    │ 1000000 │ 2.807377788    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 26      │ 'B62qjADS8mz88VSsUcJZ5M5LumY2ftmzD4Uovd6CforS3sctKzHCf14' │ 2730847368    │ 1000000 │ 2.730847368    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 27      │ 'B62qjKbNLZQ2ZQHHUooxNURFKShtGmgkibgLLGVzb47sng7wfHr85CG' │ 2662227072    │ 1000000 │ 2.662227072    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 28      │ 'B62qna7SRdnVJgyWqcxBrVpRHcXeYcbTTsvpnuydTjdGYvL5hsB1ofj' │ 2567687496    │ 1000000 │ 2.567687496    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 29      │ 'B62qkA7WVaJEk2TyTTkdXCPbaAT6EiHPHB9SyP2tPtcH8fKexEgt4mH' │ 2529803028    │ 1000000 │ 2.529803028    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 30      │ 'B62qmCimUz8zLKbsZDLSzmrm13G3Eb6c7KKEw1ywHS9Xah4JCqpruei' │ 2529803028    │ 1000000 │ 2.529803028    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 31      │ 'B62qomqB27xwfVxd2KUkDLEmM6DJZcRPPy6ubBkCvjk64EZNgVPBrtK' │ 2529803028    │ 1000000 │ 2.529803028    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 32      │ 'B62qpPBagTeXM9mveDEb9szqFHiBj1NqRNFmTAcVXLZFcK1qwTmUpix' │ 2529751920    │ 1000000 │ 2.52975192     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 33      │ 'B62qqg89aW2Ky4npHUR5YT1RSL4BkmAwibQPurHWRNACBBe5tuPpFAt' │ 2519965116    │ 1000000 │ 2.519965116    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 34      │ 'B62qpKmGZLAymDDTqPvGsSK7ErWxUg2anLoPnm6QX4H1ubiAuwhxmcZ' │ 2435547516    │ 1000000 │ 2.435547516    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 35      │ 'B62qk96mW2hsrALqWoQqnCWyTpkbsKmNpRBqp6YnwoEiaQVvmmfn2ds' │ 2301523872    │ 1000000 │ 2.301523872    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 36      │ 'B62qpXYJFaNaYdP21Qov9UHYBpStE1Rx48gFEn3sAn6hScvvoYnzMgY' │ 2143802964    │ 1000000 │ 2.143802964    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 37      │ 'B62qrF9avbuS1jfdbXvqy6YuhJr7DdjogCWtHcGYEfMi3XGy1QdSVGq' │ 2063765784    │ 1000000 │ 2.063765784    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 38      │ 'B62qjpTbdmeBDuCLofnYUGv3cMZFxKbqu266nLYT45FYzZFLD3iHjsT' │ 1954994640    │ 1000000 │ 1.95499464     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 39      │ 'B62qpjTyiNz1QvNRdAX9WUA7bx8zALSxUsC6AkZz4D54xVbqr915ztB' │ 1632012588    │ 1000000 │ 1.632012588    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 40      │ 'B62qnj1Mtc2qYDXFTAooVaGdt82W9HWu1XnrmtzwM43sLnjJYAdwxwe' │ 1413789888    │ 1000000 │ 1.413789888    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 41      │ 'B62qnmehRBzPWnSFFisurehmi8VTPhipWwu53EShdk9qv2yonXPhQsF' │ 1127570784    │ 1000000 │ 1.127570784    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 42      │ 'B62qp6opXDeizxByVqaj5SKrWHPTmUxvXRCgi35zkGpRwk7T5UEsraC' │ 1117767828    │ 1000000 │ 1.117767828    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 43      │ 'B62qipxYHcDhUnWxQkzWZCQjQueigHkCUCVwU4n3wr3o4cdxxZ91aPX' │ 1027807848    │ 1000000 │ 1.027807848    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 44      │ 'B62qn8tS8E5t6Qs8CLwPkUNCsUqCbX2STza3HXRDoJdXKxx3dyM4aZt' │ 1022929584    │ 1000000 │ 1.022929584    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 45      │ 'B62qrcCp195eiS7TPTN3hgn88EwtMCEbJ9FgdVVJtsiuPyQ9NnVpBZ4' │ 924097176     │ 1000000 │ 0.924097176    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 46      │ 'B62qjRkHdv9eGPAvTJjB1y7qgyLFrBnipZpyoKPzd6bP5La3sJZajRa' │ 916436304     │ 1000000 │ 0.916436304    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 47      │ 'B62qomNdG8BHSxCcgQSF2uv3nrP4S7yrETBNmASQnqL8qroPrSdcRVW' │ 864471120     │ 1000000 │ 0.86447112     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 48      │ 'B62qr38fgeRPnWdXSSrKGwBB9SHTbQ6DYwk7oKMHExWW5fgoK8fHv2B' │ 844407840     │ 1000000 │ 0.84440784     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 49      │ 'B62qq1YJNr1jdxTMCAuQdb4cgu5U91CRLY3AHgnUXtUn6LKx8BcuttT' │ 772072512     │ 1000000 │ 0.772072512    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 50      │ 'B62qowDLdtUzG4VYsTb6JAQsJDx9XxvxfDzatb2ZKCr9DCp3HZKFtKK' │ 682221576     │ 1000000 │ 0.682221576    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 51      │ 'B62qiYS7LJSunkSjiZenPifsqeaBcZ8DivvYAYMiic2iNPfxSHEQHyn' │ 555331392     │ 1000000 │ 0.555331392    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 52      │ 'B62qpDbie83q9m26ejcHhEmtSdbHGuUd9CxSCHGbABhnouvvmJgeCbg' │ 553203948     │ 1000000 │ 0.553203948    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 53      │ 'B62qm38y2SHPx6Qv2nwpRyegPM4TDiuFBjGDfhHqJgZCd1j5m1amoyK' │ 532352772     │ 1000000 │ 0.532352772    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 54      │ 'B62qpUEp5aSkK9MwBJDt7hMTFpS5QN5eYjSm162oGH6M5WuspSnPH7X' │ 521805348     │ 1000000 │ 0.521805348    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 55      │ 'B62qijSsDtum3W8Em9v6qBG1p4ms6f518KDJGzvg4ChDvLLNxuknstC' │ 502406784     │ 1000000 │ 0.502406784    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 56      │ 'B62qrjMZ8HAtzS69hK8UxcHYqNpkzrT8CDR93enhQid8TAP26hksmUN' │ 462108420     │ 1000000 │ 0.46210842     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 57      │ 'B62qqLZqEEQEAu7wjVLurUmEfsKuyhkywBdajEKK8wKcpBWtn9q9gqb' │ 318628956     │ 1000000 │ 0.318628956    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 58      │ 'B62qjf5Bp2SXq3ZhCa8zf68FeXFMpyDibU85MrxxZ97NUdNcqiVQpFA' │ 270993036     │ 1000000 │ 0.270993036    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 59      │ 'B62qjL8reca5GBHSLL56mjRhidNcZbvZ3dDjkcn8udDamV3gBduqdGM' │ 208240488     │ 1000000 │ 0.208240488    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 60      │ 'B62qibE3XXWvJJ2witvF9UHSW5N3YxbnRb4LLwreMPViKEbnaYRjCiN' │ 181488756     │ 1000000 │ 0.181488756    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 61      │ 'B62qqR8ZM8UmL7dZEwD9dR5NnTYu4UrNk663okVgu9KfdhQ9QpjUHf4' │ 154649436     │ 1000000 │ 0.154649436    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 62      │ 'B62qrj8zTWCZAxK2EvVqscM2c1JDQuDm4GWa3uJpveb2oxCyWcRHGsF' │ 110657988     │ 1000000 │ 0.110657988    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 63      │ 'B62qr1iTaiBnMABRYHxNLtXnYzcW3Kr4mojiBg177XC4t33iD7ZXRsp' │ 97381824      │ 1000000 │ 0.097381824    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 64      │ 'B62qjVEYEepC5KM4igHuuw7E5d5sCW7MFGPqRir94CVUCMeiXXHF8aE' │ 93838224      │ 1000000 │ 0.093838224    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 65      │ 'B62qj1VUVZgzoEvCd9GNvbQgkkmeedyHCtf68PKJBCcPZBxEYdDnKUV' │ 87964680      │ 1000000 │ 0.08796468     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 66      │ 'B62qp3ES848GVohMjxLdv768RysY16VNUWBdkdX7H8UKrTx3ZoSMx4V' │ 83434080      │ 1000000 │ 0.08343408     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 67      │ 'B62qrTGqJfwPXLgR9FEosc3CkHCNGVTaQYe2v58hXFTiQeX7AyCsg8z' │ 83180796      │ 1000000 │ 0.083180796    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 68      │ 'B62qmmFAkd55Vzz4f9F6v5zziAiEnBZArQrmumd3giacLNxhJ4ydHuZ' │ 65775792      │ 1000000 │ 0.065775792    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 69      │ 'B62qqWVPmZq7kTPPXir2EQ8GUFF8PDm2mGE5gS9q2NMtEtGknWmoqAa' │ 59455380      │ 1000000 │ 0.05945538     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 70      │ 'B62qqeKZX2etkrguVWr9NQiLVQJBJ48En6SvDVGFyKPghW3QZAVyVNj' │ 54084636      │ 1000000 │ 0.054084636    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 71      │ 'B62qkTDX59fTdZvGVH42yhfUfGaKTJ71FRqkD71p1UGd32tygHGoSiJ' │ 51671328      │ 1000000 │ 0.051671328    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 72      │ 'B62qk7mwRHHqXo9uwHXXb3Lti8rtowwGUcpGQNmqbFb1VggjtCQEKoC' │ 47994876      │ 1000000 │ 0.047994876    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 73      │ 'B62qjxPaAL3NNdFbmxNFDME3xUnwquCsj44AZX6ToevYFsHuRH5Z2nJ' │ 45888852      │ 1000000 │ 0.045888852    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 74      │ 'B62qqr9ekFvzri2LLmHVeH1iquz9EXnkSb3jmrKwZtq4WNLmNn5MeNN' │ 43951848      │ 1000000 │ 0.043951848    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 75      │ 'B62qrHrm23nhXzNdvuimpYzhUVXddzhkVLA1kSkfLhdhyRraYrG25ng' │ 42361896      │ 1000000 │ 0.042361896    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 76      │ 'B62qmp5jc2AHy43qN1To1di3DWmuB4PEk53cFB9A6Rf6MDtLP1jH5Rw' │ 37149876      │ 1000000 │ 0.037149876    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 77      │ 'B62qpbireFMvbNfiwiFEoz44TLB9EYuMHJ71PV89WtjH6iY9ef8pwMn' │ 36526596      │ 1000000 │ 0.036526596    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 78      │ 'B62qkGXYkt4DHG3imcFic5zXRdWfcyQTGFEhbMypVLxmrqP7nsyCTte' │ 35250060      │ 1000000 │ 0.03525006     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 79      │ 'B62qnGBCFuSSw1hPFFhMptFyLcAXg2GpWFNbBYQom7ZDdv6NrrTByzQ' │ 34308504      │ 1000000 │ 0.034308504    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 80      │ 'B62qj4BduTVPQpUWQ6Ge2KiiQoaiujMpSr2pRHx7ZP7YF1V5GBptGzi' │ 30568632      │ 1000000 │ 0.030568632    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 81      │ 'B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L' │ 26355336      │ 1000000 │ 0.026355336    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 82      │ 'B62qqjtzsC8Uv5dUhe6mxwecUjJi6UTB82a78onVbEhjbRL4gdVnA7w' │ 24328296      │ 1000000 │ 0.024328296    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 83      │ 'B62qmYFyXMuYE78pPiozBSmEYNfTnurGzSfPjZhjjpumNxM3RyndK1W' │ 23958396      │ 1000000 │ 0.023958396    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 84      │ 'B62qrM4SEK2uM99CkfJCBZcN1xtV4DzWjq9sWpimTEjJD2ZUH9CcDT9' │ 23809392      │ 1000000 │ 0.023809392    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 85      │ 'B62qjQYSDE1gSgFTemZDkSdRPPg8aCoP36VAnS6MrMsq16h29Xfcii5' │ 19332864      │ 1000000 │ 0.019332864    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 86      │ 'B62qofuuZxZpg8fbdE5uV4pwF4RBKHuQsHfvFEp2MVsYu7BxRx39tEY' │ 18484308      │ 1000000 │ 0.018484308    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 87      │ 'B62qpZLKfn3EXhD3HU2QSRUXhJ2fNoDmH83pAk6Th2pxJPyRovV1BkL' │ 14277552      │ 1000000 │ 0.014277552    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 88      │ 'B62qq6UKWhzxrEuyFm46QoxP8fNXrHRJz6N7S2Zhnuww9mDnYzNhfcN' │ 14277552      │ 1000000 │ 0.014277552    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 89      │ 'B62qnaFP3qPgBfyY51ea1c4iSBQD2D3vZ7Ff3F8zb5jgSRxDuMD3h38' │ 14230884      │ 1000000 │ 0.014230884    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 90      │ 'B62qpr7RYckfwA7dxryu6K7StHarRkXQzVDQ1Hq3vPcwL25bNxb526f' │ 12610332      │ 1000000 │ 0.012610332    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 91      │ 'B62qmog4xQjk5a1FKyqNXLbQKwnsTN797EfT7wXT53uCcBpNuyLQpda' │ 11586216      │ 1000000 │ 0.011586216    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 92      │ 'B62qoaxDvGEGYaWAMWG9Qk5uuKykVC3NgbUhudTRRNoTExiVJWH2CdD' │ 11230248      │ 1000000 │ 0.011230248    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 93      │ 'B62qk5BJ7DWW62eTzPamzA1iQNbxwVevjgSqBRrpoSi89pAXuJEhvG1' │ 9970572       │ 1000000 │ 0.009970572    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 94      │ 'B62qihv96NnW2PTuaqyCaiFdqm6fnbQfAYfyb21XnBQeeLvHBAk7fqi' │ 9194760       │ 1000000 │ 0.00919476     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 95      │ 'B62qrMSeLWGB5SkCMiohZLQrd8jPEoxsktLWzeLNtnw7GMh1zykUAQi' │ 9194760       │ 1000000 │ 0.00919476     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 96      │ 'B62qmJrcWKJF4djtGz5zMJPH4bR16PnK18BHTsJgN9YWtQugE2EgLra' │ 8512152       │ 1000000 │ 0.008512152    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 97      │ 'B62qjSu6iy4aVAJ1NDXECvbJW3UziKUoS8QYMzcNgPW3APuAFoioYpJ' │ 8391840       │ 1000000 │ 0.00839184     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 98      │ 'B62qqCY1g6hvhjGQwAR2DAVwBjojvxAgAeRwUkhLMnoH93557bzZnGu' │ 7255680       │ 1000000 │ 0.00725568     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 99      │ 'B62qnyDgWWFHTVKFRJoLCWWgKe4mfRJzBFXMMJ163RjjVxxcgPnqAWT' │ 6740472       │ 1000000 │ 0.006740472    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 100     │ 'B62qoDpMaxGj7W64rEy2Qnn8nWuVeuUzwahBEwg2aw6rZofn6kVUbWG' │ 5149704       │ 1000000 │ 0.005149704    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 101     │ 'B62qpQN96tZ9kQNmUVLt6QmtHe5VTJcM9dsN14rkbnGLEcdawpPYvdY' │ 5056512       │ 1000000 │ 0.005056512    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 102     │ 'B62qmJAmEyc92HwT65SHMmdsV5c9pbZ1jFn1jdCLY5Q2XDYbhZaSddG' │ 4118040       │ 1000000 │ 0.00411804     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 103     │ 'B62qkSumb4MunaxubL64a5FvXhGjkUDniXfpLJqhAHxL3zbmicy9Z6K' │ 3742476       │ 1000000 │ 0.003742476    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 104     │ 'B62qjoSQPK9nQze84TAeoCsNn7z3dWi6Crxzq1FE6eC7pHQAsbM9VwW' │ 3683124       │ 1000000 │ 0.003683124    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 105     │ 'B62qnVeh96Nx4nLikmjr58p44FR2Q4jrdqX58ARcFCBS7gqEk3baBti' │ 2792112       │ 1000000 │ 0.002792112    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 106     │ 'B62qonXAYHauG3g5LUWF8UkLaoha2gSh292Dixaw6PdLxFTzXzzyGkz' │ 2393964       │ 1000000 │ 0.002393964    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 107     │ 'B62qnMmkrG4EPbfqZtPtpii174hC46MrbXyfE3W9RjLcW1Vm7GMRZwu' │ 2247036       │ 1000000 │ 0.002247036    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 108     │ 'B62qqhjgsKWN466fxzjyrp1uH2zqFT5gMnuBLdHY9CMxRaiER6M97JS' │ 1205712       │ 1000000 │ 0.001205712    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 109     │ 'B62qqwNbAoivZGASXLExDhbWARBBT6tPKVQxUPPrxYrmaaM3o3AapMn' │ 630372        │ 1000000 │ 0.000630372    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 110     │ 'B62qpV7BQVkVwTcx5sm7qUXSdwpy3AyjPhhZ16RUEE4xjfWgP8NYjoZ' │ 547860        │ 1000000 │ 0.00054786     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 111     │ 'B62qkyi3CLthcpGDfg4V3UAcijDPFQw5uDeEBaAKdJ5UQk5SNpk2QZ6' │ 528120        │ 1000000 │ 0.00052812     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 112     │ 'B62qjYgdYhgUY1dLcuy28hCPpRDMdth4RFGo5VoYjnsCPZ6TJZTRRUf' │ 492072        │ 1000000 │ 0.000492072    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 113     │ 'B62qpLwJk82BM3pH3wAEmAeLuaScfwwEpZeABWJghX7MmZrGufY67Qf' │ 471000        │ 1000000 │ 0.000471       │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 114     │ 'B62qqhbSGUW56jjikxUYJsW8674b11PZRTrerLycJVxMkSjSakfG4Dy' │ 436548        │ 1000000 │ 0.000436548    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 115     │ 'B62qqqmMh6bk7u8JTDWQfkpgmL43WWSDL3soV9aYkgua2eRU6YNM9wf' │ 422268        │ 1000000 │ 0.000422268    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 116     │ 'B62qkXuDEWRBJSNh9QoPcUgpP9SHcYDtDcvvRVJYPnnYiMmWaV9xSr5' │ 390012        │ 1000000 │ 0.000390012    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 117     │ 'B62qrodVyskqz5Ld3aA5MjB2RXkYUwzjuoveGaNQZJ4HSKdb8SfncZM' │ 355956        │ 1000000 │ 0.000355956    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 118     │ 'B62qmC1mbpozWA5LXRsQnmN3bBbu6WCUmtcHYZz5gKU8hH9gpHy2j84' │ 342276        │ 1000000 │ 0.000342276    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 119     │ 'B62qiuuSboSrp8ZW8ifbcDVZNubHp3SMKiVP8z2KQrrWXPNTUG941jx' │ 341076        │ 1000000 │ 0.000341076    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 120     │ 'B62qnrCSpPc8dLsoDrvXqYysYr8dEyLhnVqUQ2VkAb5qEosDwBAzKc8' │ 341076        │ 1000000 │ 0.000341076    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 121     │ 'B62qokcyDx91t9MHwFTHTzQ77Rv6SAQ8xHqdsV5thnGaqkaVjYb8Kch' │ 340980        │ 1000000 │ 0.00034098     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 122     │ 'B62qp4vteujR2Q9Bhh2kTWTKd6ZKuqSgbUDT4vpy94eVgPyeW1kXDJg' │ 340860        │ 1000000 │ 0.00034086     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 123     │ 'B62qrJ3nsqccoyM1jbrM9iCVJ4J61yuzLC4WVxksTMaZLUYy5VFSShC' │ 280500        │ 1000000 │ 0.0002805      │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 124     │ 'B62qnJVQcj4gvfY1GBFryQZ4RJgfwqmVwCXB6umnH5cJQPFMLvotRL3' │ 277164        │ 1000000 │ 0.000277164    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 125     │ 'B62qrc2Y9L8fvpMrMcWuZ4qCuFpTDa3RLvUYg91wtQaeU4f2xyYu2wu' │ 268140        │ 1000000 │ 0.00026814     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 126     │ 'B62qrpBLx4SgQBsbQVFPY9aKxVyyAboKvgmxA1Tv8eYwFokZY5Ksduy' │ 267564        │ 1000000 │ 0.000267564    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 127     │ 'B62qmLLtt6rAfbsgbkFiVYeFH8npSABBErj3DGqpxBcF9H2kDMvc55k' │ 267048        │ 1000000 │ 0.000267048    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 128     │ 'B62qr3kQibM6m88MPFdrUCLppCphTx29rLLAgMGvVdbX5yF6UGnBRQT' │ 267000        │ 1000000 │ 0.000267       │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 129     │ 'B62qjk8gV2exRwRdHsTwQcpbHmt2cd1ZrXypSEUjiMu3qcg4DmshGhy' │ 266712        │ 1000000 │ 0.000266712    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 130     │ 'B62qnvJVpgGbxuviuEhV4jdDVhSFTEB6tBMbD1BeKGSLvw69g9DidjK' │ 242076        │ 1000000 │ 0.000242076    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 131     │ 'B62qouNgTR3wA4Q3k4swY4ExuJ3jbEc87Qe7Wy88Ew6g2yP9s2aTjFv' │ 239808        │ 1000000 │ 0.000239808    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 132     │ 'B62qiYHw2wqcYmCsoxRfFwYmAMTj8cwTBULJoewZ7bqhTCcEcRobHVW' │ 191472        │ 1000000 │ 0.000191472    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 133     │ 'B62qn29kPY7Lom1uZFqVN68dwJsLj9xmrckaMAVf2cYh27JdRd6VHH6' │ 128532        │ 1000000 │ 0.000128532    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 134     │ 'B62qmLHpWmgZbam2DCdiShNC9jRuifCqHT9byo2kP7HkY3zkiTdVxps' │ 123600        │ 1000000 │ 0.0001236      │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 135     │ 'B62qr5X4FDmPYyPjnjCNs8R6LfZqzYeYDrUf9a3gjzxqppkujdzPqfz' │ 102852        │ 1000000 │ 0.000102852    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 136     │ 'B62qjdzSu2UxcXSyZte7QS5S33PcZfNdv8LqKBzLa1xP12V1tEhx5aN' │ 86652         │ 1000000 │ 0.000086652    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 137     │ 'B62qmgnRxeMJcEGfF9Hbr1FzLPuzPqhzXvacK3rJ4LVnNdURp2jxvzG' │ 46752         │ 1000000 │ 0.000046752    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+└─────────┴───────────────────────────────────────────────────────────┴───────────────┴─────────┴────────────────┴─────────┴────────────────────────────────────┴──────────────┘
+after substitutions and exclusions
+┌─────────┬───────────────────────────────────────────────────────────┬───────────────┬─────────┬────────────────┬─────────┬────────────────────────────────────┬──────────────┐
+│ (index) │ publicKey                                                 │ amount        │ fee     │ amountMina     │ feeMina │ memo                               │ summaryGroup │
+├─────────┼───────────────────────────────────────────────────────────┼───────────────┼─────────┼────────────────┼─────────┼────────────────────────────────────┼──────────────┤
+│ 0       │ 'B62qoUVTKseKucekfhegBxuaMkoJ37ThTE12gpGWjExV4UZvhqZD6w9' │ 3319451597904 │ 1000000 │ 3319.451597904 │ 0.001   │ 'aa6e6ee40b7c72a7d744596dfa628be3' │ 0            │
+│ 1       │ 'B62qpLif5N7kkrSxFoh5B5iNL2s1k2tKhbuN7FLmybYM2AcwzmTuyrX' │ 2742291152256 │ 1000000 │ 2742.291152256 │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 2       │ 'B62qpjEJn5boKL7nqM7G49V4zY3jeE2M3czqG8FXJEbAADstvfF9T7Q' │ 1073888758872 │ 1000000 │ 1073.888758872 │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 3       │ 'B62qmNbNedwwDB3bLUzgeN6gAYXmnY4U9WBS6Ze92HghtU7x3v7a2sS' │ 594207299652  │ 1000000 │ 594.207299652  │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 4       │ 'B62qpjEJn5boKL7nqM7G49V4zY3jeE2M3czqG8FXJEbAADstvfF9T7Q' │ 108470440056  │ 1000000 │ 108.470440056  │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 5       │ 'B62qmMGz5dWhmrx7JgKtnmb4mqu87tqXsMr6wcRmnGzHrd3Y43iwhG9' │ 43450362288   │ 1000000 │ 43.450362288   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 6       │ 'B62qkbLxftUetPeHUR4K16d8JEsmXbZTPu6LCD4bD1tdx7y8x8Y9nA2' │ 27261752616   │ 1000000 │ 27.261752616   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 7       │ 'B62qnHjLNaDwc4WWy3BLJMmeS6YATWoTYd6MYJemF3uXRNaEoPAc9GV' │ 24877661208   │ 1000000 │ 24.877661208   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 8       │ 'B62qoGEXsSDG69BoYUQUuiG8NJ25m1hM9VceF1F36ntC6qxqNBdzwCT' │ 19613735436   │ 1000000 │ 19.613735436   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 9       │ 'B62qk449L7LDANBXVHdEcbvTnQqtxqweHptUwKqy1tHVxvGJrKapDwN' │ 12805235268   │ 1000000 │ 12.805235268   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 10      │ 'B62qmrrg2rPHXcFUNZoWSAtBS1kPYTcrvutdteffBayTZGsnpeK4hSJ' │ 10316469624   │ 1000000 │ 10.316469624   │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 11      │ 'B62qpUH5qcvknkBNa8N1RVwn2sZCUxiffmvShXZ1hBgKmaJRYmKDFtz' │ 9360068088    │ 1000000 │ 9.360068088    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 12      │ 'B62qn5JSSckhhCXnMiDtDNKDa95zdhoTv7biatmiB6HS9YuwoH63xNc' │ 7451926848    │ 1000000 │ 7.451926848    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 13      │ 'B62qkUYxBqfxc4KBWw9pCX6MShVNYXBLb8M2s4enWBDDMbuWK8P9kjZ' │ 6616167384    │ 1000000 │ 6.616167384    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 14      │ 'B62qowtmtUeYUnvjWSDysfJQjk8kNva58xkZHwiAykjLyWcZxgF6mbr' │ 6465183216    │ 1000000 │ 6.465183216    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 15      │ 'B62qmpKqzKsgu1q2bG5USonaptVm7q5tJohJUkFverKF8GRJdHdHnZ6' │ 5280470820    │ 1000000 │ 5.28047082     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 16      │ 'B62qmwNXELHLkPPWnHRkVxEShPeuwWXXWfxYwfFP1ybA4rgsjexqYBf' │ 5036955252    │ 1000000 │ 5.036955252    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 17      │ 'B62qpcsKkUsZLxqp5hv4XV1NapG9KowUDDcT18GXo3XcS5sGzdFqxxB' │ 4834261848    │ 1000000 │ 4.834261848    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 18      │ 'B62qkg8neN5o1xVq2LG6VHygGsqf5UsitTFcgvWgRubwduTdUfK7JCd' │ 4147530528    │ 1000000 │ 4.147530528    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 19      │ 'B62qpQ4Mi9SwFx5mGo5iPZFS7DMcEc3zkv7Gxdo6W6GLPv828nHdVmo' │ 4040125956    │ 1000000 │ 4.040125956    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 20      │ 'B62qrUGAj9uft5f2g6LPxGB8vRycbZNYjDmNTmS13GqScLTupnw1WkM' │ 4016865156    │ 1000000 │ 4.016865156    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 21      │ 'B62qkmBdeg8z5ukKH3hCtXKiMRdhBoHJWeUCURFuPg8xvzGY4uTkjVn' │ 3509584356    │ 1000000 │ 3.509584356    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 22      │ 'B62qnnKrqqGdabhVHiVmsfqAzK7KbhMQvuXsREJVkFeKWfyHxhmw7We' │ 3465647580    │ 1000000 │ 3.46564758     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 23      │ 'B62qiaGTKNY3Yk7ASDqvJz56hhpX59tRKJ7K9NUtLDySrjrPguKHFyZ' │ 3460108728    │ 1000000 │ 3.460108728    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 24      │ 'B62qjqAQfj5pgYgfUEqTVM4mdj8m61rVRAaLBqhAJUjsSBgpmFiq9P5' │ 3069343836    │ 1000000 │ 3.069343836    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 25      │ 'B62qojHAgRv7rkbAH5vN5jYU4y4CcPH8cgzevFKKKgXLFgJDNJgzQuG' │ 2807377788    │ 1000000 │ 2.807377788    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 26      │ 'B62qjADS8mz88VSsUcJZ5M5LumY2ftmzD4Uovd6CforS3sctKzHCf14' │ 2730847368    │ 1000000 │ 2.730847368    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 27      │ 'B62qjKbNLZQ2ZQHHUooxNURFKShtGmgkibgLLGVzb47sng7wfHr85CG' │ 2662227072    │ 1000000 │ 2.662227072    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 28      │ 'B62qna7SRdnVJgyWqcxBrVpRHcXeYcbTTsvpnuydTjdGYvL5hsB1ofj' │ 2567687496    │ 1000000 │ 2.567687496    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 29      │ 'B62qkA7WVaJEk2TyTTkdXCPbaAT6EiHPHB9SyP2tPtcH8fKexEgt4mH' │ 2529803028    │ 1000000 │ 2.529803028    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 30      │ 'B62qmCimUz8zLKbsZDLSzmrm13G3Eb6c7KKEw1ywHS9Xah4JCqpruei' │ 2529803028    │ 1000000 │ 2.529803028    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 31      │ 'B62qomqB27xwfVxd2KUkDLEmM6DJZcRPPy6ubBkCvjk64EZNgVPBrtK' │ 2529803028    │ 1000000 │ 2.529803028    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 32      │ 'B62qpPBagTeXM9mveDEb9szqFHiBj1NqRNFmTAcVXLZFcK1qwTmUpix' │ 2529751920    │ 1000000 │ 2.52975192     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 33      │ 'B62qqg89aW2Ky4npHUR5YT1RSL4BkmAwibQPurHWRNACBBe5tuPpFAt' │ 2519965116    │ 1000000 │ 2.519965116    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 34      │ 'B62qpKmGZLAymDDTqPvGsSK7ErWxUg2anLoPnm6QX4H1ubiAuwhxmcZ' │ 2435547516    │ 1000000 │ 2.435547516    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 35      │ 'B62qk96mW2hsrALqWoQqnCWyTpkbsKmNpRBqp6YnwoEiaQVvmmfn2ds' │ 2301523872    │ 1000000 │ 2.301523872    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 36      │ 'B62qpXYJFaNaYdP21Qov9UHYBpStE1Rx48gFEn3sAn6hScvvoYnzMgY' │ 2143802964    │ 1000000 │ 2.143802964    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 37      │ 'B62qrF9avbuS1jfdbXvqy6YuhJr7DdjogCWtHcGYEfMi3XGy1QdSVGq' │ 2063765784    │ 1000000 │ 2.063765784    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 38      │ 'B62qjpTbdmeBDuCLofnYUGv3cMZFxKbqu266nLYT45FYzZFLD3iHjsT' │ 1954994640    │ 1000000 │ 1.95499464     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 39      │ 'B62qpjTyiNz1QvNRdAX9WUA7bx8zALSxUsC6AkZz4D54xVbqr915ztB' │ 1632012588    │ 1000000 │ 1.632012588    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 40      │ 'B62qnj1Mtc2qYDXFTAooVaGdt82W9HWu1XnrmtzwM43sLnjJYAdwxwe' │ 1413789888    │ 1000000 │ 1.413789888    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 41      │ 'B62qnmehRBzPWnSFFisurehmi8VTPhipWwu53EShdk9qv2yonXPhQsF' │ 1127570784    │ 1000000 │ 1.127570784    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 42      │ 'B62qp6opXDeizxByVqaj5SKrWHPTmUxvXRCgi35zkGpRwk7T5UEsraC' │ 1117767828    │ 1000000 │ 1.117767828    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 43      │ 'B62qipxYHcDhUnWxQkzWZCQjQueigHkCUCVwU4n3wr3o4cdxxZ91aPX' │ 1027807848    │ 1000000 │ 1.027807848    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 44      │ 'B62qn8tS8E5t6Qs8CLwPkUNCsUqCbX2STza3HXRDoJdXKxx3dyM4aZt' │ 1022929584    │ 1000000 │ 1.022929584    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 45      │ 'B62qrcCp195eiS7TPTN3hgn88EwtMCEbJ9FgdVVJtsiuPyQ9NnVpBZ4' │ 924097176     │ 1000000 │ 0.924097176    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 46      │ 'B62qjRkHdv9eGPAvTJjB1y7qgyLFrBnipZpyoKPzd6bP5La3sJZajRa' │ 916436304     │ 1000000 │ 0.916436304    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 47      │ 'B62qomNdG8BHSxCcgQSF2uv3nrP4S7yrETBNmASQnqL8qroPrSdcRVW' │ 864471120     │ 1000000 │ 0.86447112     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 48      │ 'B62qr38fgeRPnWdXSSrKGwBB9SHTbQ6DYwk7oKMHExWW5fgoK8fHv2B' │ 844407840     │ 1000000 │ 0.84440784     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 49      │ 'B62qq1YJNr1jdxTMCAuQdb4cgu5U91CRLY3AHgnUXtUn6LKx8BcuttT' │ 772072512     │ 1000000 │ 0.772072512    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 50      │ 'B62qowDLdtUzG4VYsTb6JAQsJDx9XxvxfDzatb2ZKCr9DCp3HZKFtKK' │ 682221576     │ 1000000 │ 0.682221576    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 51      │ 'B62qiYS7LJSunkSjiZenPifsqeaBcZ8DivvYAYMiic2iNPfxSHEQHyn' │ 555331392     │ 1000000 │ 0.555331392    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 52      │ 'B62qpDbie83q9m26ejcHhEmtSdbHGuUd9CxSCHGbABhnouvvmJgeCbg' │ 553203948     │ 1000000 │ 0.553203948    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 53      │ 'B62qm38y2SHPx6Qv2nwpRyegPM4TDiuFBjGDfhHqJgZCd1j5m1amoyK' │ 532352772     │ 1000000 │ 0.532352772    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 54      │ 'B62qpUEp5aSkK9MwBJDt7hMTFpS5QN5eYjSm162oGH6M5WuspSnPH7X' │ 521805348     │ 1000000 │ 0.521805348    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 55      │ 'B62qijSsDtum3W8Em9v6qBG1p4ms6f518KDJGzvg4ChDvLLNxuknstC' │ 502406784     │ 1000000 │ 0.502406784    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 56      │ 'B62qrjMZ8HAtzS69hK8UxcHYqNpkzrT8CDR93enhQid8TAP26hksmUN' │ 462108420     │ 1000000 │ 0.46210842     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 57      │ 'B62qqLZqEEQEAu7wjVLurUmEfsKuyhkywBdajEKK8wKcpBWtn9q9gqb' │ 318628956     │ 1000000 │ 0.318628956    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 58      │ 'B62qjf5Bp2SXq3ZhCa8zf68FeXFMpyDibU85MrxxZ97NUdNcqiVQpFA' │ 270993036     │ 1000000 │ 0.270993036    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 59      │ 'B62qjL8reca5GBHSLL56mjRhidNcZbvZ3dDjkcn8udDamV3gBduqdGM' │ 208240488     │ 1000000 │ 0.208240488    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 60      │ 'B62qibE3XXWvJJ2witvF9UHSW5N3YxbnRb4LLwreMPViKEbnaYRjCiN' │ 181488756     │ 1000000 │ 0.181488756    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 61      │ 'B62qqR8ZM8UmL7dZEwD9dR5NnTYu4UrNk663okVgu9KfdhQ9QpjUHf4' │ 154649436     │ 1000000 │ 0.154649436    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 62      │ 'B62qrj8zTWCZAxK2EvVqscM2c1JDQuDm4GWa3uJpveb2oxCyWcRHGsF' │ 110657988     │ 1000000 │ 0.110657988    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 63      │ 'B62qr1iTaiBnMABRYHxNLtXnYzcW3Kr4mojiBg177XC4t33iD7ZXRsp' │ 97381824      │ 1000000 │ 0.097381824    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 64      │ 'B62qjVEYEepC5KM4igHuuw7E5d5sCW7MFGPqRir94CVUCMeiXXHF8aE' │ 93838224      │ 1000000 │ 0.093838224    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 65      │ 'B62qj1VUVZgzoEvCd9GNvbQgkkmeedyHCtf68PKJBCcPZBxEYdDnKUV' │ 87964680      │ 1000000 │ 0.08796468     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 66      │ 'B62qp3ES848GVohMjxLdv768RysY16VNUWBdkdX7H8UKrTx3ZoSMx4V' │ 83434080      │ 1000000 │ 0.08343408     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 67      │ 'B62qrTGqJfwPXLgR9FEosc3CkHCNGVTaQYe2v58hXFTiQeX7AyCsg8z' │ 83180796      │ 1000000 │ 0.083180796    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 68      │ 'B62qmmFAkd55Vzz4f9F6v5zziAiEnBZArQrmumd3giacLNxhJ4ydHuZ' │ 65775792      │ 1000000 │ 0.065775792    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 69      │ 'B62qqWVPmZq7kTPPXir2EQ8GUFF8PDm2mGE5gS9q2NMtEtGknWmoqAa' │ 59455380      │ 1000000 │ 0.05945538     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 70      │ 'B62qqeKZX2etkrguVWr9NQiLVQJBJ48En6SvDVGFyKPghW3QZAVyVNj' │ 54084636      │ 1000000 │ 0.054084636    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 71      │ 'B62qkTDX59fTdZvGVH42yhfUfGaKTJ71FRqkD71p1UGd32tygHGoSiJ' │ 51671328      │ 1000000 │ 0.051671328    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 72      │ 'B62qk7mwRHHqXo9uwHXXb3Lti8rtowwGUcpGQNmqbFb1VggjtCQEKoC' │ 47994876      │ 1000000 │ 0.047994876    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 73      │ 'B62qjxPaAL3NNdFbmxNFDME3xUnwquCsj44AZX6ToevYFsHuRH5Z2nJ' │ 45888852      │ 1000000 │ 0.045888852    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 74      │ 'B62qqr9ekFvzri2LLmHVeH1iquz9EXnkSb3jmrKwZtq4WNLmNn5MeNN' │ 43951848      │ 1000000 │ 0.043951848    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 75      │ 'B62qrHrm23nhXzNdvuimpYzhUVXddzhkVLA1kSkfLhdhyRraYrG25ng' │ 42361896      │ 1000000 │ 0.042361896    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 76      │ 'B62qmp5jc2AHy43qN1To1di3DWmuB4PEk53cFB9A6Rf6MDtLP1jH5Rw' │ 37149876      │ 1000000 │ 0.037149876    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 77      │ 'B62qpbireFMvbNfiwiFEoz44TLB9EYuMHJ71PV89WtjH6iY9ef8pwMn' │ 36526596      │ 1000000 │ 0.036526596    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 78      │ 'B62qkGXYkt4DHG3imcFic5zXRdWfcyQTGFEhbMypVLxmrqP7nsyCTte' │ 35250060      │ 1000000 │ 0.03525006     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 79      │ 'B62qnGBCFuSSw1hPFFhMptFyLcAXg2GpWFNbBYQom7ZDdv6NrrTByzQ' │ 34308504      │ 1000000 │ 0.034308504    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 80      │ 'B62qj4BduTVPQpUWQ6Ge2KiiQoaiujMpSr2pRHx7ZP7YF1V5GBptGzi' │ 30568632      │ 1000000 │ 0.030568632    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 81      │ 'B62qpjEJn5boKL7nqM7G49V4zY3jeE2M3czqG8FXJEbAADstvfF9T7Q' │ 26355336      │ 1000000 │ 0.026355336    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 82      │ 'B62qqjtzsC8Uv5dUhe6mxwecUjJi6UTB82a78onVbEhjbRL4gdVnA7w' │ 24328296      │ 1000000 │ 0.024328296    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 83      │ 'B62qmYFyXMuYE78pPiozBSmEYNfTnurGzSfPjZhjjpumNxM3RyndK1W' │ 23958396      │ 1000000 │ 0.023958396    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 84      │ 'B62qrM4SEK2uM99CkfJCBZcN1xtV4DzWjq9sWpimTEjJD2ZUH9CcDT9' │ 23809392      │ 1000000 │ 0.023809392    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 85      │ 'B62qjQYSDE1gSgFTemZDkSdRPPg8aCoP36VAnS6MrMsq16h29Xfcii5' │ 19332864      │ 1000000 │ 0.019332864    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 86      │ 'B62qofuuZxZpg8fbdE5uV4pwF4RBKHuQsHfvFEp2MVsYu7BxRx39tEY' │ 18484308      │ 1000000 │ 0.018484308    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 87      │ 'B62qpZLKfn3EXhD3HU2QSRUXhJ2fNoDmH83pAk6Th2pxJPyRovV1BkL' │ 14277552      │ 1000000 │ 0.014277552    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 88      │ 'B62qq6UKWhzxrEuyFm46QoxP8fNXrHRJz6N7S2Zhnuww9mDnYzNhfcN' │ 14277552      │ 1000000 │ 0.014277552    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 89      │ 'B62qnaFP3qPgBfyY51ea1c4iSBQD2D3vZ7Ff3F8zb5jgSRxDuMD3h38' │ 14230884      │ 1000000 │ 0.014230884    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 90      │ 'B62qpr7RYckfwA7dxryu6K7StHarRkXQzVDQ1Hq3vPcwL25bNxb526f' │ 12610332      │ 1000000 │ 0.012610332    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 91      │ 'B62qmog4xQjk5a1FKyqNXLbQKwnsTN797EfT7wXT53uCcBpNuyLQpda' │ 11586216      │ 1000000 │ 0.011586216    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 92      │ 'B62qoaxDvGEGYaWAMWG9Qk5uuKykVC3NgbUhudTRRNoTExiVJWH2CdD' │ 11230248      │ 1000000 │ 0.011230248    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 93      │ 'B62qk5BJ7DWW62eTzPamzA1iQNbxwVevjgSqBRrpoSi89pAXuJEhvG1' │ 9970572       │ 1000000 │ 0.009970572    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 94      │ 'B62qihv96NnW2PTuaqyCaiFdqm6fnbQfAYfyb21XnBQeeLvHBAk7fqi' │ 9194760       │ 1000000 │ 0.00919476     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 95      │ 'B62qrMSeLWGB5SkCMiohZLQrd8jPEoxsktLWzeLNtnw7GMh1zykUAQi' │ 9194760       │ 1000000 │ 0.00919476     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 96      │ 'B62qmJrcWKJF4djtGz5zMJPH4bR16PnK18BHTsJgN9YWtQugE2EgLra' │ 8512152       │ 1000000 │ 0.008512152    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 97      │ 'B62qjSu6iy4aVAJ1NDXECvbJW3UziKUoS8QYMzcNgPW3APuAFoioYpJ' │ 8391840       │ 1000000 │ 0.00839184     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 98      │ 'B62qqCY1g6hvhjGQwAR2DAVwBjojvxAgAeRwUkhLMnoH93557bzZnGu' │ 7255680       │ 1000000 │ 0.00725568     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 99      │ 'B62qnyDgWWFHTVKFRJoLCWWgKe4mfRJzBFXMMJ163RjjVxxcgPnqAWT' │ 6740472       │ 1000000 │ 0.006740472    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 100     │ 'B62qoDpMaxGj7W64rEy2Qnn8nWuVeuUzwahBEwg2aw6rZofn6kVUbWG' │ 5149704       │ 1000000 │ 0.005149704    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 101     │ 'B62qpQN96tZ9kQNmUVLt6QmtHe5VTJcM9dsN14rkbnGLEcdawpPYvdY' │ 5056512       │ 1000000 │ 0.005056512    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 102     │ 'B62qmJAmEyc92HwT65SHMmdsV5c9pbZ1jFn1jdCLY5Q2XDYbhZaSddG' │ 4118040       │ 1000000 │ 0.00411804     │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 103     │ 'B62qkSumb4MunaxubL64a5FvXhGjkUDniXfpLJqhAHxL3zbmicy9Z6K' │ 3742476       │ 1000000 │ 0.003742476    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 104     │ 'B62qjoSQPK9nQze84TAeoCsNn7z3dWi6Crxzq1FE6eC7pHQAsbM9VwW' │ 3683124       │ 1000000 │ 0.003683124    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 105     │ 'B62qnVeh96Nx4nLikmjr58p44FR2Q4jrdqX58ARcFCBS7gqEk3baBti' │ 2792112       │ 1000000 │ 0.002792112    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 106     │ 'B62qonXAYHauG3g5LUWF8UkLaoha2gSh292Dixaw6PdLxFTzXzzyGkz' │ 2393964       │ 1000000 │ 0.002393964    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+│ 107     │ 'B62qnMmkrG4EPbfqZtPtpii174hC46MrbXyfE3W9RjLcW1Vm7GMRZwu' │ 2247036       │ 1000000 │ 0.002247036    │ 0.001   │ 'jrwashburn#0765'                  │ 0            │
+└─────────┴───────────────────────────────────────────────────────────┴───────────────┴─────────┴────────────────┴─────────┴────────────────────────────────────┴──────────────┘
+Total Funds Required for Payout = 8099854770228 nanoMINA or 8099.854770228 MINA
+Fund via: mina_ledger_wallet send-payment --offline --network testnet --nonce FUNDERNONCE --fee 0.1 BIP44ACCOUNT FUNDING_FROM_ADDRESS B62qkcjubxpCvKyJvtisJqVrnNcXHE7EeZPbQ9FNJbTbFwXPVcYnjgX 8099.854770228
+writing transactions to ./src/data/payout_transactions_20251108210511326_488279_491393.json
+writing details to ./src/data/payout_details_20251108210511326_488279_491393.json
+finished writing log files
+PAYOUT HASH: 568ce8b6307cc3d4b0109c07d4aa67b5b6ef0e97
+------------------- Summary & Totals ------------------
+Calculations based on entire pool
+[42mNet Coinbase Received: 8644.77875125[0m
+[42mTotal Amounts Due To Payout: 8099.757012288[0m
+[42mTotal Amounts Due To Stakers: 8099.757012288[0m
+[42mTotal Amounts To Burn: 0[0m
+[42mNet MINA to Pool Operator (after send transaction fees): 544.913738962[0m
+Total Coin Base Generated: 8640
+User Transaction Fees Generated (net of snark fees): 4.77875125
+Total Snark Fees Paid From Coinbase: 0
+Total Payout Transaction Fees: 0.108
+------------------- Summary & Totals ------------------
+wrote payout information to ./src/data/payout_summary_20251108210511328_488279_491393.json
