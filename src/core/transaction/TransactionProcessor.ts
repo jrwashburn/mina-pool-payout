@@ -63,20 +63,32 @@ export class TransactionProcessor implements ITransactionProcessor {
 
   private writeJsonObjToFile(stream: WriteStream, data: object[]): void {
     let index = 0;
+    
+    // Write opening bracket
+    stream.write('[');
 
     function writeObjects() {
       let ok = true;
       while (index < data.length && ok) {
+        // Write comma before each object except the first
+        if (index > 0) {
+          ok = stream.write(',');
+          if (!ok) {
+            stream.once('drain', writeObjects);
+            return;
+          }
+        }
         ok = stream.write(JSON.stringify(data[index]));
         index++;
       }
       if (index < data.length) {
         if (!ok) {
-          stream.once('drain', writeObjects)
+          stream.once('drain', writeObjects);
         }
-        else {
-          stream.end();
-        }
+      } else {
+        // Write closing bracket and end stream when done
+        stream.write(']');
+        stream.end();
       }
     }
     writeObjects();
