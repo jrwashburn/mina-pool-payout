@@ -221,7 +221,7 @@ B62qkBqSkXgkirtU3n8HJ9YgwHh3vUD6kGJ5ZRkQYGNPeL5xYL2tL1L|0.0505
 
 ## Adding accounts as Non-Paticipating and burning their supercharged coinbase
 
-You can add accounts as non-participating and burn their supercharged coinbase. This is configured with a file named ".burnSupercharged" which should be placed in the src/data directory. Simply place the public key address in the .burnSupercharged file and the process will treat that key similar to Investor and MF keys and will burn any supercharged coinbase they create, and will put the account in the non-participating payout pool (they will never earn a part of supercharged coinbases.) If you use the standard payout (not isolate supercharged) then they may still be weighted if unlocked, but by default will not receive any supercharged coinbase unless you have changed the code to run the original payout calculator.
+You can add accounts as non-participating and burn their supercharged coinbase. This is configured with a file named ".burnSupercharged" which should be placed in the root directory (same location as your .env file). Simply place the public key address in the .burnSupercharged file and the process will treat that key similar to Investor and MF keys and will burn any supercharged coinbase they create, and will put the account in the non-participating payout pool (they will never earn a part of supercharged coinbases.) If you use the standard payout (not isolate supercharged) then they may still be weighted if unlocked, but by default will not receive any supercharged coinbase unless you have changed the code to run the original payout calculator.
 
 ## Running payout for a full epoch
 
