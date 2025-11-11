@@ -1,5 +1,5 @@
 import { LedgerEntry } from '../../src/core/dataProvider/dataprovider-types';
-import { calculateUntimedSlot } from '../../src/utils/staking-ledger-util';
+import { calculateUntimedSlot, getPublicKeyShareClass } from '../../src/utils/staking-ledger-util';
 
 describe('Should be succesful calculating untimed slot', () => {
   it('when ledger is valid', () => {
@@ -19,5 +19,21 @@ describe('Should be succesful calculating untimed slot', () => {
     const result = calculateUntimedSlot(ledgerMock);
 
     expect(0).toStrictEqual(result);
+  });
+});
+
+describe('getPublicKeyShareClass', () => {
+  it('should return Common shareClass for unknown addresses', () => {
+    const unknownAddress = 'B62qTestUnknownAddressXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+    const result = getPublicKeyShareClass(unknownAddress);
+    
+    expect(result.shareClass).toBe('Common');
+    expect(result.shareOwner).toBe('');
+  });
+
+  it('should handle missing .burnSupercharged file gracefully', () => {
+    // This test verifies that the function doesn't crash when .burnSupercharged doesn't exist
+    const testAddress = 'B62qTestAddressXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+    expect(() => getPublicKeyShareClass(testAddress)).not.toThrow();
   });
 });

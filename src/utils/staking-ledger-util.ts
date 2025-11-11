@@ -10,7 +10,7 @@ export function getPublicKeyShareClass(key: string): ShareClass {
   const foundationAddressesFile = path.join('src', 'data', 'nps-addresses', 'Mina_Foundation_Addresses.csv');
   const labsAddressesFile = path.join('src', 'data', 'nps-addresses', 'O1_Labs_Addresses.csv');
   const investorsAddressesFile = path.join('src', 'data', 'nps-addresses', 'Investors_Addresses.csv');
-  const burnAddressesFile = path.join('src', 'data', '.burnSupercharged');
+  const burnAddressesFile = path.join('.burnSupercharged');
   const foundationAddresses = fs.readFileSync(foundationAddressesFile);
   const o1labsAddresses = fs.readFileSync(labsAddressesFile);
   const investorsAddresses = fs.readFileSync(investorsAddressesFile);

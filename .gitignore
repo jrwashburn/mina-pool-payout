@@ -6,6 +6,7 @@ node_modules
 /src/data/*
 !/src/data/nps-addresses/
 !/src/data/mfSubstitutePayTo
+.burnSupercharged
 package-lock.json
 *.code-workspace
 /documents/*.log
