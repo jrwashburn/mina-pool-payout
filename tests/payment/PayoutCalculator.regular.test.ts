@@ -323,7 +323,7 @@ describe('PayoutCalculator (regular scenarios)', () => {
     ]);
   });
 
-  it('ignores negotiated burn rates entirely', async () => {
+  it('applies negotiated burn rates correctly', async () => {
     const staker = buildStake({ publicKey: 'high-commission', balance: 500, locked: true });
     const burnRates: KeyedRate = {
       'high-commission': { rate: 0.5 },
@@ -339,18 +339,27 @@ describe('PayoutCalculator (regular scenarios)', () => {
     expect(transactions).toStrictEqual([
       {
         publicKey: 'high-commission',
-        amount: 648000000000,
+        amount: 324000000000,
         fee: 0,
         amountMina: 0,
         feeMina: 0,
         memo: DEFAULT_MEMO,
         summaryGroup: 0,
       },
+      {
+        publicKey: 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X',
+        amount: 324000000000,
+        fee: 0,
+        amountMina: 0,
+        feeMina: 0,
+        memo: DEFAULT_MEMO,
+        summaryGroup: 2,
+      },
     ]);
-    expect(details.some((detail) => detail.shareClass.shareClass === 'BURN')).toBe(false);
-    expect(totalPayout).toBe(648000000000);
+    expect(details.some((detail) => detail.shareClass.shareClass === 'BURN')).toBe(true);
+    expect(totalPayout).toBe(324000000000);
     expect(totalSupercharged).toBe(0);
-    expect(totalBurn).toBe(0);
+    expect(totalBurn).toBe(324000000000);
     expect(heights).toStrictEqual([30]);
   });
 
