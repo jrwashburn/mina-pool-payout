@@ -87,11 +87,14 @@ export class ConfigurationManager {
     if (Number.isInteger(this.Setup.epoch) && !Number.isInteger(this.Setup.fork)) {
       msg += `ERROR: Must provide fork number when processing by epoch - e.g. "npm run payout -- -e ${this.Setup.epoch} -f 0"`;
     }
-    if (this.Setup.fork < 0 || this.Setup.fork > 1) {
-      msg += 'ERROR: Fork number must be 0 or 1. Data provider must be updated to be aware of any additional forks.';
+    if (this.Setup.fork < 0 || this.Setup.fork > 2) {
+      msg += 'ERROR: Fork number must be 0, 1, or 2. Data provider must be updated to be aware of any additional forks.';
     }
     if (this.Setup.fork == 1 && (this.Setup.blockDataSource === 'ARCHIVEDB' || this.Setup.blockDataSource === 'MINAEXPLORER')) {
       msg += 'ERROR: Fork 1 is not currently supported by ARCHIVEDB or MINAEXPLORER data sources.';
+    }
+    if (this.Setup.fork == 2 && (this.Setup.blockDataSource === 'ARCHIVEDB' || this.Setup.blockDataSource === 'MINAEXPLORER')) {
+      msg += 'ERROR: Fork 2 is not currently supported by ARCHIVEDB or MINAEXPLORER data sources.';
     }
     if (!['postSuperChargeShareFees', 'postSuperChargeKeepFees', 'postSuperChargeCommonShareFees', 'isolateSuperCharge', 'original'].includes(this.Setup.payoutCalculator)) {
       msg += 'ERROR: Invalid payout calculator specified. Must be one of postSuperChargeShareFees, postSuperChargeKeepFees, postSuperChargeCommonShareFees, isolateSuperCharge, or original';
