@@ -1,8 +1,11 @@
-import { fetchGraphQL } from '../../../infrastructure/graphql-me';
-import { Blocks } from '../dataprovider-types';
-import fs from 'fs';
+import { fetchGraphQL } from '../../../infrastructure/graphql-me.js';
+import { Blocks } from '../dataprovider-types.js';
+import fs from 'node:fs';
 import { parse } from 'csv-parse';
 import { gql } from '@apollo/client/core';
+import { getDirname } from '../../../utils/path-helpers.js';
+
+const __dirname = getDirname(import.meta.url);
 
 type minaExplorerBlock = {
     creatorAccount: { publicKey: string };

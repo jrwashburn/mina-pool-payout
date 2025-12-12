@@ -1,13 +1,13 @@
 import { injectable } from 'inversify';
-import provider from '../../composition/provider-selector';
-import { Blocks } from './dataprovider-types';
-import { IBlockDataProvider } from './Models';
+import provider from '../../composition/provider-selector.js';
+import { Blocks } from './dataprovider-types.js';
+import { IBlockDataProvider } from './Models.js';
 
 @injectable()
 export class ArchiveBlockDataProvider implements IBlockDataProvider {
   //TODO: Refactor the core logic here
-  getMinMaxBlocksByEpoch(epoch: number): Promise<{ min: number; max: number }> {
-    return provider.getMinMaxBlocksByEpoch(epoch);
+  getMinMaxBlocksByEpoch(epoch: number, fork: number): Promise<{ min: number; max: number }> {
+    return provider.getMinMaxBlocksByEpoch(epoch, fork);
   }
   async getLatestHeight(): Promise<number> {
     return await provider.getLatestHeight();

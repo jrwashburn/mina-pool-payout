@@ -1,8 +1,9 @@
-import { IPaymentBuilder, IPaymentProcessor as IPaymentProcessor, ISummarizer, PaymentProcess } from './Model';
-import { PaymentConfiguration } from '../../configuration/Model';
+import type { IPaymentBuilder, IPaymentProcessor as IPaymentProcessor, ISummarizer } from './Model.js';
+import { PaymentProcess } from './Model.js';
+import { PaymentConfiguration } from '../../configuration/Model.js';
 import { inject, injectable } from 'inversify';
-import TYPES from '../../composition/Types';
-import { ISender, ITransactionBuilder, ITransactionProcessor } from '../transaction/Model';
+import TYPES from '../../composition/Types.js';
+import type { ISender, ITransactionBuilder, ITransactionProcessor } from '../transaction/Model.js';
 
 @injectable()
 export class PaymentProcessor implements IPaymentProcessor {

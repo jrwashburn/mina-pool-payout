@@ -1,11 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Client from 'mina-signer'
-import fs from 'fs';
-import { sendPaymentGraphQL, fetchGraphQL } from '../infrastructure/graphql-pay';
-import { PayoutTransaction } from '../core/payoutCalculator/Model';
+import fs from 'node:fs';
+import { sendPaymentGraphQL, fetchGraphQL } from '../infrastructure/graphql-pay.js';
+import { PayoutTransaction } from '../core/payoutCalculator/Model.js';
 import { gql } from '@apollo/client/core';
 import { print } from 'graphql';
-import { SignedLegacy, UInt64, UInt32, } from 'mina-signer/dist/node/mina-signer/src/types';
+
+type UInt64 = string | number | bigint;
+type UInt32 = number | string | bigint;
+interface SignedLegacy<T> {
+  data: T;
+  signature: {
+    field: string;
+    scalar: string;
+  };
+}
 
 const minaClient = new Client({ network: 'mainnet' });
 interface Payment {

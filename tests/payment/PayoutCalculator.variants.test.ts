@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import { KeyedRate } from '../../src/configuration/Model';
-import { Block, Stake } from '../../src/core/dataProvider/dataprovider-types';
-import { PayoutCalculator } from '../../src/core/payoutCalculator/PayoutCalculator';
-import { PayoutCalculatorIsolateSuperCharge } from '../../src/core/payoutCalculator/PayoutCalculatorIsolateSuperCharge';
-import { PayoutCalculatorPostSuperChargeCommonShareFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeCommonShareFees';
-import { PayoutCalculatorPostSuperChargeKeepFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeKeepFees';
-import { PayoutCalculatorPostSuperChargeShareFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeShareFees';
+import { KeyedRate } from '../../src/configuration/Model.js';
+import { Block, Stake } from '../../src/core/dataProvider/dataprovider-types.js';
+import { PayoutCalculator } from '../../src/core/payoutCalculator/PayoutCalculator.js';
+import { PayoutCalculatorIsolateSuperCharge } from '../../src/core/payoutCalculator/PayoutCalculatorIsolateSuperCharge.js';
+import { PayoutCalculatorPostSuperChargeCommonShareFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeCommonShareFees.js';
+import { PayoutCalculatorPostSuperChargeKeepFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeKeepFees.js';
+import { PayoutCalculatorPostSuperChargeShareFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeShareFees.js';
 import {
   DEFAULT_BP_HASH,
   DEFAULT_MEMO,
@@ -15,7 +15,7 @@ import {
   cloneStakes,
   defaultBurnAddress,
   noRates,
-} from './helpers';
+} from './helpers.js';
 
 const FORK_ONE_RATES = {
   defaultCommissionRate: 0.1,

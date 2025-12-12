@@ -1,11 +1,14 @@
-import { sendSignedTransactions } from '../../utils/send-payments';
-import fs from 'fs';
+import { sendSignedTransactions } from '../../utils/send-payments.js';
+import fs from 'node:fs';
 import { createHash } from 'node:crypto';
-import { PaymentConfiguration } from '../../configuration/Model';
+import { PaymentConfiguration } from '../../configuration/Model.js';
 import { injectable } from 'inversify';
-import { ISender } from './Model';
-import { PaymentProcess } from '../payment/Model';
-import { Readable } from 'stream';
+import { ISender } from './Model.js';
+import { PaymentProcess } from '../payment/Model.js';
+import { Readable } from 'node:stream';
+import { getDirname } from '../../utils/path-helpers.js';
+
+const __dirname = getDirname(import.meta.url);
 
 @injectable()
 export class TransactionSender implements ISender {

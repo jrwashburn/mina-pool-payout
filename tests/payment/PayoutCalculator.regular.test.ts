@@ -1,7 +1,7 @@
 import 'reflect-metadata';
-import { KeyedRate } from '../../src/configuration/Model';
-import { Stake } from '../../src/core/dataProvider/dataprovider-types';
-import { PayoutCalculator } from '../../src/core/payoutCalculator/PayoutCalculator';
+import { KeyedRate } from '../../src/configuration/Model.js';
+import { Stake } from '../../src/core/dataProvider/dataprovider-types.js';
+import { PayoutCalculator } from '../../src/core/payoutCalculator/PayoutCalculator.js';
 import {
   DEFAULT_BP_HASH,
   DEFAULT_MEMO,
@@ -11,7 +11,7 @@ import {
   cloneStakes,
   defaultBurnAddress,
   noRates,
-} from './helpers';
+} from './helpers.js';
 
 describe('PayoutCalculator (regular scenarios)', () => {
   const defaultRates = {

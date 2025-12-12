@@ -1,4 +1,4 @@
-import { getLatestHeight, getBlocks } from '../core/dataProvider/dataprovider-archivedb/block-queries-sql';
+import { getLatestHeight, getBlocks } from '../core/dataProvider/dataprovider-archivedb/block-queries-sql.js';
 
 //This tests are not meant to run automatically
 describe('block-queries-sql tests', () => {

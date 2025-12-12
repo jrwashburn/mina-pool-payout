@@ -1,6 +1,6 @@
-import { fetchGraphQL } from '../../../infrastructure/graphql-me';
-import { Ledger, Stake, LedgerEntry } from '../dataprovider-types';
-import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util';
+import { fetchGraphQL } from '../../../infrastructure/graphql-me.js';
+import { Ledger, Stake, LedgerEntry } from '../dataprovider-types.js';
+import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util.js';
 import { gql } from '@apollo/client/core';
 import { Decimal } from 'decimal.js';
 

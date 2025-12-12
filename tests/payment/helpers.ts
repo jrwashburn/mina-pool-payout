@@ -1,6 +1,6 @@
-import { KeyedRate } from '../../src/configuration/Model';
-import { Block, ShareClass, Stake } from '../../src/core/dataProvider/dataprovider-types';
-import { PayoutTransaction } from '../../src/core/payoutCalculator/Model';
+import { KeyedRate } from '../../src/configuration/Model.js';
+import { Block, ShareClass, Stake } from '../../src/core/dataProvider/dataprovider-types.js';
+import { PayoutTransaction } from '../../src/core/payoutCalculator/Model.js';
 
 export const MINA = 1_000_000_000;
 export const DEFAULT_MEMO = 'pool-memo';

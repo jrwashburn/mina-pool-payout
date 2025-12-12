@@ -1,9 +1,10 @@
 import { inject, injectable } from 'inversify';
-import TYPES from '../../composition/Types';
-import { PaymentConfiguration } from '../../configuration/Model';
-import { ISubstituteAndExcludePayToAddresses, PaymentProcess } from '../payment/Model';
-import { PayoutTransaction } from '../payoutCalculator/Model';
-import { ITransactionBuilder } from './Model';
+import TYPES from '../../composition/Types.js';
+import { PaymentConfiguration } from '../../configuration/Model.js';
+import type { ISubstituteAndExcludePayToAddresses } from '../payment/Model.js';
+import { PaymentProcess } from '../payment/Model.js';
+import { PayoutTransaction } from '../payoutCalculator/Model.js';
+import { ITransactionBuilder } from './Model.js';
 
 @injectable()
 export class TransactionBuilder implements ITransactionBuilder {

@@ -1,8 +1,8 @@
 import { Container } from 'inversify';
 import 'reflect-metadata';
-import TYPES from './Types';
+import TYPES from './Types.js';
 
-import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../core/dataProvider/Models';
+import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../core/dataProvider/Models.js';
 import {
   ISubstituteAndExcludePayToAddresses,
   IBlockProcessor,
@@ -10,23 +10,23 @@ import {
   IPaymentProcessor,
   ISummarizer,
   PaymentProcess,
-} from '../core/payment/Model';
-import { IPayoutCalculator } from '../core/payoutCalculator/Model';
-import { BlockProcessor } from '../core/payment/BlockProcessor';
-import { PaymentBuilder } from '../core/payment/PaymentBuilder';
-import { PaymentProcessor } from '../core/payment/PaymentProcessor';
-import { TransactionBuilder } from '../core/transaction/TransactionBuilder';
-import { BlockDataProviderFactory } from '../core/dataProvider/BlockDataProviderFactory';
-import { StakeDataProviderFactory } from '../core/dataProvider/StakeDataProviderFactory';
-import { IFileWriter } from '../shared/Model';
-import { FileWriter } from '../shared/FileWriter';
-import { ISender, ITransactionBuilder, ITransactionProcessor } from '../core/transaction/Model';
-import { TransactionSender } from '../core/transaction/TransactionSender';
-import { TransactionProcessor } from '../core/transaction/TransactionProcessor';
-import { IPayoutCalculatorFactory } from '../core/payoutCalculator/Model';
-import { PayoutCalculatorFactory } from '../core/payoutCalculator/PayoutCalculatorFactory';
-import { SubstituteAndExcludePayToAddressesForSuperCharge } from '../core/payment/SubstituteAndExcludePayToAddressesForSuperCharge';
-import { PaymentSummarizer } from '../core/payment/PaymentSummarizer';
+} from '../core/payment/Model.js';
+import { IPayoutCalculator } from '../core/payoutCalculator/Model.js';
+import { BlockProcessor } from '../core/payment/BlockProcessor.js';
+import { PaymentBuilder } from '../core/payment/PaymentBuilder.js';
+import { PaymentProcessor } from '../core/payment/PaymentProcessor.js';
+import { TransactionBuilder } from '../core/transaction/TransactionBuilder.js';
+import { BlockDataProviderFactory } from '../core/dataProvider/BlockDataProviderFactory.js';
+import { StakeDataProviderFactory } from '../core/dataProvider/StakeDataProviderFactory.js';
+import { IFileWriter } from '../shared/Model.js';
+import { FileWriter } from '../shared/FileWriter.js';
+import { ISender, ITransactionBuilder, ITransactionProcessor } from '../core/transaction/Model.js';
+import { TransactionSender } from '../core/transaction/TransactionSender.js';
+import { TransactionProcessor } from '../core/transaction/TransactionProcessor.js';
+import { IPayoutCalculatorFactory } from '../core/payoutCalculator/Model.js';
+import { PayoutCalculatorFactory } from '../core/payoutCalculator/PayoutCalculatorFactory.js';
+import { SubstituteAndExcludePayToAddressesForSuperCharge } from '../core/payment/SubstituteAndExcludePayToAddressesForSuperCharge.js';
+import { PaymentSummarizer } from '../core/payment/PaymentSummarizer.js';
 
 const container = new Container();
 

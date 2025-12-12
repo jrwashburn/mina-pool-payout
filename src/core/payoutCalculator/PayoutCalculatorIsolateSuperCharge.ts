@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
-import { KeyedRate } from '../../configuration/Model';
-import { stakeIsLocked } from '../../utils/staking-ledger-util';
-import { Block, Stake } from '../dataProvider/dataprovider-types';
-import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
+import { KeyedRate } from '../../configuration/Model.js';
+import { stakeIsLocked } from '../../utils/staking-ledger-util.js';
+import { Block, Stake } from '../dataProvider/dataprovider-types.js';
+import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model.js';
 import { Decimal } from 'decimal.js';
 
 @injectable()

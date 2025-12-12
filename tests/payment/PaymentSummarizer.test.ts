@@ -1,9 +1,10 @@
 import 'reflect-metadata';
-import { IFileWriter } from '../../src/shared/Model';
-import { Block } from '../../src/core/dataProvider/dataprovider-types';
-import { PaymentSummarizer } from '../../src/core/payment/PaymentSummarizer';
-import { PaymentProcess } from '../../src/core/payment/Model';
-import { PayoutTransaction } from '../../src/core/payoutCalculator/Model';
+import { jest } from '@jest/globals';
+import { IFileWriter } from '../../src/shared/Model.js';
+import { Block } from '../../src/core/dataProvider/dataprovider-types.js';
+import { PaymentSummarizer } from '../../src/core/payment/PaymentSummarizer.js';
+import { PaymentProcess } from '../../src/core/payment/Model.js';
+import { PayoutTransaction } from '../../src/core/payoutCalculator/Model.js';
 
 const createSummarizer = () =>
   new PaymentSummarizer({

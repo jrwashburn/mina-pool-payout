@@ -1,10 +1,12 @@
 import { inject, injectable } from 'inversify';
-import TYPES from '../../composition/Types';
-import { Block } from '../dataProvider/dataprovider-types';
-import { IPayoutCalculatorFactory, IPayoutCalculator, PayoutDetails, PayoutTransaction } from '../payoutCalculator/Model';
-import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../dataProvider/Models';
-import { IBlockProcessor, IPaymentBuilder, PaymentProcess } from './Model';
-import { ConfigurationManager } from '../../configuration/ConfigurationManager';
+import TYPES from '../../composition/Types.js';
+import { Block } from '../dataProvider/dataprovider-types.js';
+import type { IPayoutCalculatorFactory, IPayoutCalculator } from '../payoutCalculator/Model.js';
+import { PayoutDetails, PayoutTransaction } from '../payoutCalculator/Model.js';
+import type { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../dataProvider/Models.js';
+import type { IBlockProcessor, IPaymentBuilder } from './Model.js';
+import { PaymentProcess } from './Model.js';
+import { ConfigurationManager } from '../../configuration/ConfigurationManager.js';
 
 @injectable()
 export class PaymentBuilder implements IPaymentBuilder {

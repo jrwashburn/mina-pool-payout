@@ -1,4 +1,4 @@
-import { ForkConstants } from '../../src/core/payoutCalculator/ForkConstants';
+import { ForkConstants } from '../../src/core/payoutCalculator/ForkConstants.js';
 
 describe('ForkConstants', () => {
   describe('getRegularCoinbase', () => {

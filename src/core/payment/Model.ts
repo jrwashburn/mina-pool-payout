@@ -1,6 +1,6 @@
-import { Block } from '../dataProvider/dataprovider-types';
-import { PaymentConfiguration } from '../../configuration/Model';
-import { PayoutDetails, PayoutTransaction } from '../payoutCalculator/Model';
+import { Block } from '../dataProvider/dataprovider-types.js';
+import { PaymentConfiguration } from '../../configuration/Model.js';
+import { PayoutDetails, PayoutTransaction } from '../payoutCalculator/Model.js';
 
 export interface IPaymentProcessor {
   run(args: unknown): Promise<void>;

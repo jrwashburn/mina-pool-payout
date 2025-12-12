@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
-import { KeyedRate } from '../../configuration/Model';
-import { Block, Stake } from '../dataProvider/dataprovider-types';
-import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
+import { KeyedRate } from '../../configuration/Model.js';
+import { Block, Stake } from '../dataProvider/dataprovider-types.js';
+import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model.js';
 import { Decimal } from 'decimal.js';
-import { ForkConstants } from './ForkConstants';
+import { ForkConstants } from './ForkConstants.js';
 
 @injectable()
 export class PayoutCalculatorPostSuperChargeShareFees implements IPayoutCalculator {

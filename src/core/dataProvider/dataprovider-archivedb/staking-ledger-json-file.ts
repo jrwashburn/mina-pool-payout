@@ -1,7 +1,10 @@
-import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util';
-import { Ledger, LedgerEntry, Stake } from '../dataprovider-types';
-import fs from 'fs';
-import path from 'path';
+import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util.js';
+import { Ledger, LedgerEntry, Stake } from '../dataprovider-types.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { getDirname } from '../../../utils/path-helpers.js';
+
+const __dirname = getDirname(import.meta.url);
 
 // for a given key, find all the stakers delegating to the provided public key (according to the provided epoch staking ledger)
 // determine when key will be unlocked and eligible for supercharged coinbase awards

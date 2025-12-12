@@ -1,9 +1,12 @@
-import { PaymentConfiguration, KeyedRate } from './Model';
-import fs from 'fs';
-import Container from '../composition/inversify.config';
-import { IBlockDataProvider, IDataProviderFactory } from '../core/dataProvider/Models';
-import TYPES from '../composition/Types';
+import { PaymentConfiguration, KeyedRate } from './Model.js';
+import fs from 'node:fs';
+import Container from '../composition/inversify.config.js';
+import { IBlockDataProvider, IDataProviderFactory } from '../core/dataProvider/Models.js';
+import TYPES from '../composition/Types.js';
 import { createHash } from 'node:crypto';
+import { getDirname } from '../utils/path-helpers.js';
+
+const __dirname = getDirname(import.meta.url);
 
 export class ConfigurationManager {
   public static Setup: PaymentConfiguration;
