@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import { epoch71Fixture } from './fixtures/epoch-71-isolateSuperCharge';
-import { epoch34PostSuperchargeFixture } from './fixtures/epoch-34-postSuperChargeCommon';
-import { epoch34PostSuperchargeKeepFeesFixture } from './fixtures/epoch-34-postSuperChargeKeepFees';
-import { epoch34PostSuperchargeShareFeesFixture } from './fixtures/epoch-34-postSuperChargeShareFees';
-import { cloneStakes, sortTransactionsByAmount, summarizeTransactions } from './helpers';
-import { PayoutCalculatorFactory } from '../../src/core/payoutCalculator/PayoutCalculatorFactory';
-import { IPayoutCalculator } from '../../src/core/payoutCalculator/Model';
+import { epoch71Fixture } from './fixtures/epoch-71-isolateSuperCharge.js';
+import { epoch34PostSuperchargeFixture } from './fixtures/epoch-34-postSuperChargeCommon.js';
+import { epoch34PostSuperchargeKeepFeesFixture } from './fixtures/epoch-34-postSuperChargeKeepFees.js';
+import { epoch34PostSuperchargeShareFeesFixture } from './fixtures/epoch-34-postSuperChargeShareFees.js';
+import { cloneStakes, sortTransactionsByAmount, summarizeTransactions } from './helpers.js';
+import { PayoutCalculatorFactory } from '../../src/core/payoutCalculator/PayoutCalculatorFactory.js';
+import { IPayoutCalculator } from '../../src/core/payoutCalculator/Model.js';
 
 type RegressionFixture = typeof epoch71Fixture;
 

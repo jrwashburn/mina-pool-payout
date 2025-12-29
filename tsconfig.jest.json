@@ -1,8 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "rootDir": ".",
-    "types": ["reflect-metadata", "node", "jest"]
+    "types": ["reflect-metadata", "node", "jest"],
+    "isolatedModules": false
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"]
 }

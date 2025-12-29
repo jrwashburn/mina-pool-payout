@@ -1,8 +1,8 @@
-import { stakeIsLocked } from '../../utils/staking-ledger-util';
+import { stakeIsLocked } from '../../utils/staking-ledger-util.js';
 import { injectable } from 'inversify';
-import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
-import { Block, Stake } from '../dataProvider/dataprovider-types';
-import { KeyedRate } from '../../configuration/Model';
+import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model.js';
+import { Block, Stake } from '../dataProvider/dataprovider-types.js';
+import { KeyedRate } from '../../configuration/Model.js';
 
 @injectable()
 export class PayoutCalculator implements IPayoutCalculator {

@@ -1,6 +1,6 @@
-import { Ledger } from './dataprovider-types';
-import { IStakeDataProvider as IStakeDataProvider } from './Models';
-import { getStakes } from './dataprovider-minaexplorer/staking-ledger-gql';
+import { Ledger } from './dataprovider-types.js';
+import { IStakeDataProvider as IStakeDataProvider } from './Models.js';
+import { getStakes } from './dataprovider-minaexplorer/staking-ledger-gql.js';
 import { injectable } from 'inversify';
 
 @injectable()

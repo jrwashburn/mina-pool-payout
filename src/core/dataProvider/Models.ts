@@ -1,4 +1,4 @@
-import { Blocks, Ledger } from './dataprovider-types';
+import { Blocks, Ledger } from './dataprovider-types.js';
 
 export interface IDataProviderFactory<T> {
     build(dataSource: string): T;

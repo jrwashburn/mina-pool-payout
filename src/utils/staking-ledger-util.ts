@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { Stake, LedgerEntry, Block, ShareClass } from '../core/dataProvider/dataprovider-types';
+import fs from 'node:fs';
+import path from 'node:path';
+import { Stake, LedgerEntry, Block, ShareClass } from '../core/dataProvider/dataprovider-types.js';
 
 export function stakeIsLocked(stake: Stake, block: Block) {
   return stake.untimedAfterSlot && stake.untimedAfterSlot > block.globalslotsincegenesis;

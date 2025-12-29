@@ -1,10 +1,10 @@
 import { injectable } from 'inversify';
-import { PayoutCalculator } from './PayoutCalculator';
-import { PayoutCalculatorIsolateSuperCharge } from './PayoutCalculatorIsolateSuperCharge';
-import { PayoutCalculatorPostSuperChargeShareFees } from './PayoutCalculatorPostSuperChargeShareFees';
-import { PayoutCalculatorPostSuperChargeCommonShareFees } from './PayoutCalculatorPostSuperChargeCommonShareFees';
-import { PayoutCalculatorPostSuperChargeKeepFees } from './PayoutCalculatorPostSuperChargeKeepFees';
-import { IPayoutCalculatorFactory, IPayoutCalculator } from './Model';
+import { PayoutCalculator } from './PayoutCalculator.js';
+import { PayoutCalculatorIsolateSuperCharge } from './PayoutCalculatorIsolateSuperCharge.js';
+import { PayoutCalculatorPostSuperChargeShareFees } from './PayoutCalculatorPostSuperChargeShareFees.js';
+import { PayoutCalculatorPostSuperChargeCommonShareFees } from './PayoutCalculatorPostSuperChargeCommonShareFees.js';
+import { PayoutCalculatorPostSuperChargeKeepFees } from './PayoutCalculatorPostSuperChargeKeepFees.js';
+import { IPayoutCalculatorFactory, IPayoutCalculator } from './Model.js';
 
 //valid payoutCalculator Values: ['postSuperChargeShareFees', 'postSuperChargeKeepFees', 'postSuperChargeCommonShareFees', 'isolateSuperCharge', 'original']
 @injectable()

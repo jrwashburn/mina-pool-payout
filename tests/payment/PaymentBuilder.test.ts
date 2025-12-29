@@ -1,13 +1,23 @@
 import './test-env';
 import 'reflect-metadata';
-import { ConfigurationManager } from '../../src/configuration/ConfigurationManager';
-import { PaymentConfiguration } from '../../src/configuration/Model';
-import { Block, Stake } from '../../src/core/dataProvider/dataprovider-types';
-import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../../src/core/dataProvider/Models';
-import { IPayoutCalculator, IPayoutCalculatorFactory } from '../../src/core/payoutCalculator/Model';
-import { PaymentBuilder } from '../../src/core/payment/PaymentBuilder';
-import { IBlockProcessor } from '../../src/core/payment/Model';
-import { buildBlock, buildStake, defaultBurnAddress, DEFAULT_BP_HASH, DEFAULT_MEMO } from './helpers';
+import { jest } from '@jest/globals';
+import { ConfigurationManager } from '../../src/configuration/ConfigurationManager.js';
+import { KeyedRate, PaymentConfiguration } from '../../src/configuration/Model.js';
+import { Block, Stake } from '../../src/core/dataProvider/dataprovider-types.js';
+import { IBlockDataProvider, IDataProviderFactory, IStakeDataProvider } from '../../src/core/dataProvider/Models.js';
+import { IPayoutCalculator, IPayoutCalculatorFactory, PayoutDetails, PayoutTransaction } from '../../src/core/payoutCalculator/Model.js';
+import { PaymentBuilder } from '../../src/core/payment/PaymentBuilder.js';
+import { IBlockProcessor } from '../../src/core/payment/Model.js';
+import { buildBlock, buildStake, defaultBurnAddress, DEFAULT_BP_HASH, DEFAULT_MEMO } from './helpers.js';
+
+type PayoutsReturnType = [
+  payoutTransactions: PayoutTransaction[],
+  payoutDetails: PayoutDetails[],
+  blocksIncluded: number[],
+  totalPayout: number,
+  totalSuperchargedToBurn: number,
+  totalNegotiatedBurn: number
+];
 
 const makeConfig = (): PaymentConfiguration => ({
   blockDataSource: 'API',
@@ -46,11 +56,24 @@ const createBuilder = (
   }> = {},
 ) => {
   const blockProcessor: IBlockProcessor = overrides.blockProcessor ?? {
-    determineLastBlockHeightToProcess: jest.fn().mockResolvedValue(350),
+    determineLastBlockHeightToProcess: jest.fn<(max: number, min: number, latestHeight: number) => Promise<number>>().mockResolvedValue(350),
   };
 
   const payoutCalculator: IPayoutCalculator = overrides.payoutCalculator ?? {
-    getPayouts: jest.fn().mockResolvedValue([
+    getPayouts: jest.fn<(
+      blocks: Block[],
+      stakers: Stake[],
+      totalStake: number,
+      commisionRate: number,
+      mfCommissionRate: number,
+      o1CommissionRate: number,
+      investorsCommissionRate: number,
+      comissionRates: KeyedRate,
+      burnRates: KeyedRate,
+      burnAddress: string,
+      bpKeyMd5Hash: string,
+      configuredMemo: string
+    ) => Promise<PayoutsReturnType>>().mockResolvedValue([
       [],
       [],
       [],
@@ -61,28 +84,28 @@ const createBuilder = (
   };
 
   const blockProvider: IBlockDataProvider = overrides.blockProvider ?? {
-    getLatestHeight: jest.fn().mockResolvedValue(400),
-    getBlocks: jest.fn().mockResolvedValue([buildBlock({ blockheight: 150, stakingledgerhash: 'ledger' })]),
-    getMinMaxBlocksByEpoch: jest.fn(),
+    getLatestHeight: jest.fn<() => Promise<number>>().mockResolvedValue(400),
+    getBlocks: jest.fn<(key: string, minHeight: number, maxHeight: number) => Promise<Block[]>>().mockResolvedValue([buildBlock({ blockheight: 150, stakingledgerhash: 'ledger' })]),
+    getMinMaxBlocksByEpoch: jest.fn<(epoch: number, fork: number) => Promise<{ min: number; max: number }>>(),
   };
 
   const stakeProvider: IStakeDataProvider = overrides.stakeProvider ?? {
-    getStakes: jest.fn().mockResolvedValue({
+    getStakes: jest.fn<(ledgerHash: string, key: string) => Promise<{ stakes: Stake[]; totalStakingBalance: number }>>().mockResolvedValue({
       stakes: [buildStake({ publicKey: 'delegate', balance: 100 })],
       totalStakingBalance: 100,
     }),
   };
 
   const payoutCalculatorFactory: IPayoutCalculatorFactory<IPayoutCalculator> = {
-    build: jest.fn().mockReturnValue(payoutCalculator),
+    build: jest.fn<(fork: number, payoutCalculator: string) => IPayoutCalculator>().mockReturnValue(payoutCalculator),
   };
 
   const blockProviderFactory: IDataProviderFactory<IBlockDataProvider> = {
-    build: jest.fn().mockReturnValue(blockProvider),
+    build: jest.fn<(dataSource: string) => IBlockDataProvider>().mockReturnValue(blockProvider),
   };
 
   const stakeProviderFactory: IDataProviderFactory<IStakeDataProvider> = {
-    build: jest.fn().mockReturnValue(stakeProvider),
+    build: jest.fn<(dataSource: string) => IStakeDataProvider>().mockReturnValue(stakeProvider),
   };
 
   return {
@@ -109,24 +132,37 @@ describe('PaymentBuilder', () => {
     ];
 
     const blockProvider: IBlockDataProvider = {
-      getLatestHeight: jest.fn().mockResolvedValue(310),
-      getBlocks: jest.fn().mockResolvedValue(blocks),
-      getMinMaxBlocksByEpoch: jest.fn(),
+      getLatestHeight: jest.fn<() => Promise<number>>().mockResolvedValue(310),
+      getBlocks: jest.fn<(key: string, minHeight: number, maxHeight: number) => Promise<Block[]>>().mockResolvedValue(blocks),
+      getMinMaxBlocksByEpoch: jest.fn<(epoch: number, fork: number) => Promise<{ min: number; max: number }>>(),
     };
 
     const stakeProvider: IStakeDataProvider = {
-      getStakes: jest.fn().mockResolvedValue({
+      getStakes: jest.fn<(ledgerHash: string, key: string) => Promise<{ stakes: Stake[]; totalStakingBalance: number }>>().mockResolvedValue({
         stakes: [buildStake({ publicKey: 'delegate', balance: 200 })],
         totalStakingBalance: 200,
       }),
     };
 
     const payoutCalculator: IPayoutCalculator = {
-      getPayouts: jest.fn().mockResolvedValue([[], [], [], 0, 0, 0]),
+      getPayouts: jest.fn<(
+        blocks: Block[],
+        stakers: Stake[],
+        totalStake: number,
+        commisionRate: number,
+        mfCommissionRate: number,
+        o1CommissionRate: number,
+        investorsCommissionRate: number,
+        comissionRates: KeyedRate,
+        burnRates: KeyedRate,
+        burnAddress: string,
+        bpKeyMd5Hash: string,
+        configuredMemo: string
+      ) => Promise<PayoutsReturnType>>().mockResolvedValue([[], [], [], 0, 0, 0]),
     };
 
     const blockProcessor: IBlockProcessor = {
-      determineLastBlockHeightToProcess: jest.fn().mockResolvedValue(305),
+      determineLastBlockHeightToProcess: jest.fn<(max: number, min: number, latestHeight: number) => Promise<number>>().mockResolvedValue(305),
     };
 
     const {
@@ -157,12 +193,12 @@ describe('PaymentBuilder', () => {
       buildBlock({ blockheight: 135, stakingledgerhash: 'ledger', blockdatetime: 1 }),
     ];
     const blockProvider: IBlockDataProvider = {
-      getLatestHeight: jest.fn().mockResolvedValue(320),
-      getBlocks: jest.fn().mockResolvedValue(unsortedBlocks),
-      getMinMaxBlocksByEpoch: jest.fn(),
+      getLatestHeight: jest.fn<() => Promise<number>>().mockResolvedValue(320),
+      getBlocks: jest.fn<(key: string, minHeight: number, maxHeight: number) => Promise<Block[]>>().mockResolvedValue(unsortedBlocks),
+      getMinMaxBlocksByEpoch: jest.fn<(epoch: number, fork: number) => Promise<{ min: number; max: number }>>(),
     };
     const stakeProvider: IStakeDataProvider = {
-      getStakes: jest.fn().mockResolvedValue({
+      getStakes: jest.fn<(ledgerHash: string, key: string) => Promise<{ stakes: Stake[]; totalStakingBalance: number }>>().mockResolvedValue({
         stakes: [
           buildStake({ publicKey: 'alpha', balance: 50 }),
           buildStake({ publicKey: 'beta', balance: 150 }),
@@ -183,7 +219,7 @@ describe('PaymentBuilder', () => {
         globalSlot: 1,
         publicKeyUntimedAfter: 0,
         winnerShareOwner: '',
-        shareClass: { shareClass: 'Common', shareOwner: '' },
+        shareClass: { shareClass: 'Common' as const, shareOwner: '' as const },
         stateHash: 'state-140',
         effectiveNPSPoolWeighting: 0.5,
         effectiveNPSPoolStakes: 100,
@@ -213,7 +249,7 @@ describe('PaymentBuilder', () => {
         globalSlot: 1,
         publicKeyUntimedAfter: 0,
         winnerShareOwner: '',
-        shareClass: { shareClass: 'Common', shareOwner: '' },
+        shareClass: { shareClass: 'Common' as const, shareOwner: '' as const },
         stateHash: 'state-135',
         effectiveNPSPoolWeighting: 0.5,
         effectiveNPSPoolStakes: 100,
@@ -239,7 +275,20 @@ describe('PaymentBuilder', () => {
     ];
 
     const payoutCalculator: IPayoutCalculator = {
-      getPayouts: jest.fn().mockResolvedValue([
+      getPayouts: jest.fn<(
+        blocks: Block[],
+        stakers: Stake[],
+        totalStake: number,
+        commisionRate: number,
+        mfCommissionRate: number,
+        o1CommissionRate: number,
+        investorsCommissionRate: number,
+        comissionRates: KeyedRate,
+        burnRates: KeyedRate,
+        burnAddress: string,
+        bpKeyMd5Hash: string,
+        configuredMemo: string
+      ) => Promise<PayoutsReturnType>>().mockResolvedValue([
         payoutTransactions,
         payoutDetails,
         [135, 140],

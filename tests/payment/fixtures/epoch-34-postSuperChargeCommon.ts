@@ -1,5 +1,5 @@
-import { KeyedRate } from '../../../src/configuration/Model';
-import { Block, Stake } from '../../../src/core/dataProvider/dataprovider-types';
+import { KeyedRate } from '../../../src/configuration/Model.js';
+import { Block, Stake } from '../../../src/core/dataProvider/dataprovider-types.js';
 
 type FixtureTransaction = { publicKey: string; amount: number; fee: number; memo: string };
 
