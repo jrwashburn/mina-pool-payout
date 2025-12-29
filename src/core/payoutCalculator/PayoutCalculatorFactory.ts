@@ -18,17 +18,17 @@ export class PayoutCalculatorFactory implements IPayoutCalculatorFactory<IPayout
         return new PayoutCalculator();
       }
       throw new Error('Invalid payoutCalculator specified for fork 0');
-    } else if (fork == 1) {
+    } else if (fork == 1 || fork == 2) {
       if (payoutCalculator === 'postSuperChargeKeepFees') {
-        return new PayoutCalculatorPostSuperChargeKeepFees();
+        return new PayoutCalculatorPostSuperChargeKeepFees(fork);
       }
       if (payoutCalculator === 'postSuperChargeShareFees') {
-        return new PayoutCalculatorPostSuperChargeShareFees();
+        return new PayoutCalculatorPostSuperChargeShareFees(fork);
       }
       if (payoutCalculator === 'postSuperChargeCommonShareFees') {
-        return new PayoutCalculatorPostSuperChargeCommonShareFees();
+        return new PayoutCalculatorPostSuperChargeCommonShareFees(fork);
       }
-      throw new Error('Invalid payoutCalculator specified for fork 1');
+      throw new Error(`Invalid payoutCalculator specified for fork ${fork}`);
     } else {
       throw new Error(`Invalid fork value ${fork} not sure which calculator to use.`);
     }
