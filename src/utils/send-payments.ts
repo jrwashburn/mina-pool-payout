@@ -3,7 +3,7 @@ import Client from 'mina-signer'
 import fs from 'node:fs';
 import { sendPaymentGraphQL, fetchGraphQL } from '../infrastructure/graphql-pay.js';
 import { PayoutTransaction } from '../core/payoutCalculator/Model.js';
-import { gql } from '@apollo/client/core';
+import { gql } from '@apollo/client/core/index.js';
 import { print } from 'graphql';
 
 type UInt64 = string | number | bigint;

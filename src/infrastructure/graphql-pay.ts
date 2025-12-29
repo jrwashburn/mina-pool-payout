@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloQueryResult, DocumentNode, InMemoryCache } from '@apollo/client/core';
+import { ApolloClient, ApolloQueryResult, DocumentNode, InMemoryCache } from '@apollo/client/core/index.js';
 import { HttpLink } from '@apollo/client/link/http/index.js';
 
 const mutationClient = new ApolloClient({

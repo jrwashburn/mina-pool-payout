@@ -1,7 +1,7 @@
 import { fetchGraphQL } from '../../../infrastructure/graphql-me.js';
 import { Ledger, Stake, LedgerEntry } from '../dataprovider-types.js';
 import { calculateUntimedSlot, getPublicKeyShareClass } from '../../../utils/staking-ledger-util.js';
-import { gql } from '@apollo/client/core';
+import { gql } from '@apollo/client/core/index.js';
 import { Decimal } from 'decimal.js';
 
 const LEDGERQUERY = gql`
