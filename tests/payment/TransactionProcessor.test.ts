@@ -6,7 +6,7 @@ import { PaymentProcess } from '../../src/core/payment/Model';
 import fs from 'fs';
 import path from 'path';
 
-const makeConfig = (minimumHeight: number = 100): PaymentConfiguration => ({
+const makeConfig = (minimumHeight: number = 100, useLegacyJsonFormat: boolean = false): PaymentConfiguration => ({
   blockDataSource: '',
   bpKeyMd5Hash: '',
   burnAddress: '',
@@ -32,6 +32,7 @@ const makeConfig = (minimumHeight: number = 100): PaymentConfiguration => ({
   stakingPoolPublicKey: '',
   verbose: false,
   payoutCalculator: 'original',
+  useLegacyJsonFormat: useLegacyJsonFormat,
 });
 
 const makePaymentProcess = (maximumHeight: number = 200): PaymentProcess => ({
@@ -273,6 +274,115 @@ describe('TransactionProcessor', () => {
       // Should be an empty array
       expect(Array.isArray(parsedData)).toBe(true);
       expect(parsedData).toHaveLength(0);
+    }
+  });
+
+  it('writes payout_transactions in legacy format when flag is set', async () => {
+    const fileWriter: IFileWriter = {
+      write: jest.fn(),
+    };
+    const processor = new TransactionProcessor(fileWriter);
+    const config = makeConfig(4000, true); // Enable legacy format
+    const paymentProcess = makePaymentProcess(4100);
+
+    await processor.write(config, paymentProcess);
+
+    // Wait a bit for file to be written
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Find the created file
+    const dataDir = path.join(__dirname, '../../src/data');
+    const files = fs.readdirSync(dataDir);
+    const transactionFile = files.find(f => f.startsWith('payout_transactions_') && f.includes('_4000_4100.json'));
+    
+    expect(transactionFile).toBeDefined();
+    
+    if (transactionFile) {
+      const filePath = path.join(dataDir, transactionFile);
+      outputFiles.push(filePath);
+      
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      
+      // Legacy format: concatenated JSON objects without array brackets
+      // Should NOT be valid as a single JSON parse
+      expect(() => {
+        JSON.parse(fileContent);
+      }).toThrow();
+      
+      // Should contain multiple objects concatenated
+      expect(fileContent).toContain('{"publicKey":"B62alice"');
+      expect(fileContent).toContain('{"publicKey":"B62bob"');
+      expect(fileContent).toContain('{"publicKey":"B62charlie"');
+      
+      // Should NOT have array brackets or commas between objects
+      expect(fileContent.startsWith('[')).toBe(false);
+      expect(fileContent.endsWith(']')).toBe(false);
+    }
+  });
+
+  it('writes payout_details in legacy format when flag is set', async () => {
+    const fileWriter: IFileWriter = {
+      write: jest.fn(),
+    };
+    const processor = new TransactionProcessor(fileWriter);
+    const config = makeConfig(5000, true); // Enable legacy format
+    const paymentProcess = makePaymentProcess(5100);
+    paymentProcess.payoutDetails = [
+      {
+        publicKey: 'B62alice',
+        owner: 'alice',
+        blockHeight: 100,
+        globalSlot: 1000,
+        publicKeyUntimedAfter: 0,
+        winnerShareOwner: 'alice',
+        shareClass: { shareClass: 'Common', shareOwner: '' },
+        stateHash: 'state1',
+        effectiveNPSPoolWeighting: 1,
+        effectiveNPSPoolStakes: 100,
+        effectiveCommonPoolWeighting: 1,
+        effectiveCommonPoolStakes: 100,
+        effectiveSuperchargedPoolWeighting: 0,
+        effectiveSuperchargedPoolStakes: 0,
+        stakingBalance: 100,
+        sumEffectiveNPSPoolStakes: 100,
+        sumEffectiveCommonPoolStakes: 100,
+        sumEffectiveSuperchargedPoolStakes: 0,
+        superchargedWeightingDiscount: 0,
+        dateTime: 1000000,
+        coinbase: 720000000000,
+        totalRewards: 720000000000,
+        totalRewardsToBurn: 0,
+        totalRewardsNPSPool: 0,
+        totalRewardsCommonPool: 720000000000,
+        totalRewardsSuperchargedPool: 0,
+        payout: 100000000,
+        isEffectiveSuperCharge: false,
+      },
+    ];
+
+    await processor.write(config, paymentProcess);
+
+    // Wait a bit for file to be written
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Find the created file
+    const dataDir = path.join(__dirname, '../../src/data');
+    const files = fs.readdirSync(dataDir);
+    const detailsFile = files.find(f => f.startsWith('payout_details_') && f.includes('_5000_5100.json'));
+    
+    expect(detailsFile).toBeDefined();
+    
+    if (detailsFile) {
+      const filePath = path.join(dataDir, detailsFile);
+      outputFiles.push(filePath);
+      
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      
+      // Legacy format: should NOT be valid as a single JSON parse (when multiple objects)
+      // With just one object, it should parse, but shouldn't be an array
+      const parsedData = JSON.parse(fileContent);
+      expect(Array.isArray(parsedData)).toBe(false);
+      expect(parsedData.publicKey).toBe('B62alice');
     }
   });
 });

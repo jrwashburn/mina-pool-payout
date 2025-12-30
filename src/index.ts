@@ -21,6 +21,7 @@ const oargs = yargs.options({
   epoch: { type: 'number', alias: ['e'] },
   fork: { type: 'number', alias: ['f'] },
   donottransmit: { type: 'boolean', alias: ['d'], default: false },
+  legacyjsonformat: { type: 'boolean', alias: ['l'], default: false },
 }).argv;
 
 const main = async () => {
