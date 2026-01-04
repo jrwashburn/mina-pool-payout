@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { vi } from 'vitest';
 import { TransactionProcessor } from '../../src/core/transaction/TransactionProcessor';
 import { IFileWriter } from '../../src/shared/Model';
 import { PaymentConfiguration } from '../../src/configuration/Model';

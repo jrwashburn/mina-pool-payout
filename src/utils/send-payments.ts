@@ -82,7 +82,7 @@ export async function getNonce(publicKey: string): Promise<any> {
     console.log(`not able to get the nonce`);
     console.log(errors);
   }
-  return data.account.inferredNonce ?? 0;
+  return (data as { account: { inferredNonce: number } }).account.inferredNonce ?? 0;
 }
 
 export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[], senderKeys: { publicKey: PublicKey, privateKey: PrivateKey }, doNotTransmit: boolean): Promise<any> {
@@ -92,7 +92,7 @@ export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[],
 
   payoutsToSign.reduce(async (previousPromise, payout) => {
     await previousPromise;
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       setTimeout(async () => {
         console.log(`#### Processing nonce ${nonce}...`);
         const paymentTransaction: Payment = {
@@ -114,8 +114,8 @@ export async function sendSignedTransactions(payoutsToSign: PayoutTransaction[],
           //console.log(opsDoc);
           fs.writeFileSync('./src/data/' + nonce + '.gql', print(opsDoc));
           if (continueSending) {
-            const { error, data } = await sendPaymentGraphQL(opsDoc, {});
-            fs.writeFileSync('./src/data/' + nonce + '.json', JSON.stringify(data));
+            const result = await sendPaymentGraphQL(opsDoc, {}) as { data?: unknown };
+            fs.writeFileSync('./src/data/' + nonce + '.json', JSON.stringify(result.data));
           } else {
             console.log(`Generated gql file for nonce ${nonce}; not attempting to send transaction`);
           }

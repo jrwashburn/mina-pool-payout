@@ -11,13 +11,13 @@ const queryClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-export async function sendPaymentGraphQL(mutation: DocumentNode, variables: Record<string, any>): Promise<any> {
+export async function sendPaymentGraphQL(mutation: DocumentNode, variables: Record<string, unknown>): Promise<unknown> {
   return await mutationClient.mutate({ mutation: mutation, variables: variables });
 }
 
 export async function fetchGraphQL(
   query: DocumentNode,
-  variables: Record<string, any>,
-): Promise<ApolloQueryResult<any>> {
+  variables: Record<string, unknown>,
+): Promise<ApolloQueryResult<unknown>> {
   return await queryClient.query({ query: query, variables: variables });
 }

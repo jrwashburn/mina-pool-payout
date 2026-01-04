@@ -31,6 +31,14 @@ export class PaymentBuilder implements IPaymentBuilder {
     const config = ConfigurationManager.Setup;
     const stakesProvider = this.stakeDataProviderFactory.build(config.blockDataSource);
     const blockProvider = this.blockDataProviderFactory.build(config.blockDataSource);
+
+    // Fork should be defined after validation
+    if (config.fork === undefined) {
+      throw new Error('Fork must be defined. This should have been caught by validation.');
+    }
+    if (config.minimumHeight === undefined || config.configuredMaximum === undefined) {
+      throw new Error('Minimum and maximum height must be defined. This should have been caught by validation.');
+    }
     const payoutCalculator = this.payoutCalculatorFactory.build(config.fork, config.payoutCalculator);
 
     const {

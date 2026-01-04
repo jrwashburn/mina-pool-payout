@@ -10,14 +10,14 @@ const __dirname = getDirname(import.meta.url);
 
 export class ConfigurationManager {
   public static Setup: PaymentConfiguration;
-  public static async build(args: any) {
+  public static async build(args: { epoch?: number; fork?: number | null; payouthash?: string; minheight?: number; maxheight?: number; verbose?: boolean; donottransmit?: boolean; legacyjsonformat?: boolean }) {
     this.Setup = {
       defaultCommissionRate: Number(process.env.COMMISSION_RATE),
       mfCommissionRate: Number(process.env.MF_COMMISSION_RATE || 0.08),
       o1CommissionRate: Number(process.env.O1_COMMISSION_RATE || 0.05),
       investorsCommissionRate: Number(process.env.INVESTORS_COMMISSION_RATE || 0.08),
-      epoch: args.epoch ?? Number(args.epoch),
-      fork: args.fork ?? null,
+      epoch: args.epoch,
+      fork: args.fork ?? undefined,
       slotsInEpoch: Number(process.env.NUM_SLOTS_IN_EPOCH),
       commissionRatesByPublicKey: await getComissionRates(),
       burnRatesByPublicKey: await getBurnRates(),
@@ -33,14 +33,14 @@ export class ConfigurationManager {
       minimumHeight: args.minheight,
       configuredMaximum: args.maxheight,
       blockDataSource: process.env.BLOCK_DATA_SOURCE || 'ARCHIVEDB',
-      verbose: args.verbose,
+      verbose: args.verbose ?? false,
       payoutHash: args.payouthash,
       payoutThreshold: Number(process.env.SEND_PAYOUT_THRESHOLD) * 1000000000 || 0,
       burnAddress: 'B62qiburnzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzmp7r7UN6X',
-      doNotTransmit: args.donottransmit || false,
+      doNotTransmit: args.donottransmit ?? false,
       doNotSaveTransactionDetails: (process.env.DO_NOT_SAVE_TRANSACTION_DETAILS?.toLowerCase() === 'true') || false,
       payoutCalculator: process.env.PAYOUT_CALCULATOR || '',
-      useLegacyJsonFormat: args.legacyjsonformat || false,
+      useLegacyJsonFormat: args.legacyjsonformat ?? false,
     };
 
     await this.validate();
@@ -51,13 +51,17 @@ export class ConfigurationManager {
   }
 
   private static async setupEpochMode() {
+    if (this.Setup.fork === undefined) {
+      throw new Error('Fork must be defined when using epoch mode. This should have been caught by validation.');
+    }
+
     console.log(`Working for configured Epoch: ${this.Setup.epoch} for Fork: ${this.Setup.fork}`);
 
     const dataProvider = Container.get<IDataProviderFactory<IBlockDataProvider>>(TYPES.BlockDataProviderFactory);
 
     const provider = dataProvider.build(this.Setup.blockDataSource);
 
-    const { min, max } = await provider.getMinMaxBlocksByEpoch(this.Setup.epoch, this.Setup.fork);
+    const { min, max } = await provider.getMinMaxBlocksByEpoch(this.Setup.epoch!, this.Setup.fork);
 
     this.Setup.minimumHeight = min;
 
@@ -88,10 +92,10 @@ export class ConfigurationManager {
     if (!Number.isInteger(this.Setup.epoch) && (!this.Setup.minimumHeight || !this.Setup.configuredMaximum)) {
       msg += 'ERROR: Minimum or maximum block height not provided.';
     }
-    if (Number.isInteger(this.Setup.epoch) && !Number.isInteger(this.Setup.fork)) {
+    if (Number.isInteger(this.Setup.epoch) && (this.Setup.fork === undefined || !Number.isInteger(this.Setup.fork))) {
       msg += `ERROR: Must provide fork number when processing by epoch - e.g. "npm run payout -- -e ${this.Setup.epoch} -f 0"`;
     }
-    if (this.Setup.fork < 0 || this.Setup.fork > 2) {
+    if (this.Setup.fork !== undefined && (this.Setup.fork < 0 || this.Setup.fork > 2)) {
       msg += 'ERROR: Fork number must be 0, 1, or 2. Data provider must be updated to be aware of any additional forks.';
     }
     if (this.Setup.fork == 1 && (this.Setup.blockDataSource === 'ARCHIVEDB' || this.Setup.blockDataSource === 'MINAEXPLORER')) {

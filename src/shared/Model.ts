@@ -1,3 +1,3 @@
 export interface IFileWriter {
-    write(fileName: string, jsonObject: any): Promise<void>;
+    write(fileName: string, jsonObject: string): Promise<void>;
 }

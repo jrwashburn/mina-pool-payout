@@ -20,7 +20,7 @@ export class SubstituteAndExcludePayToAddressesForSuperCharge implements ISubsti
     const mfSubstitutePayToFile = path.join('src', 'data', 'mfSubstitutePayTo');
     const substitutePayToFile = path.join('src', 'data', '.substitutePayTo');
 
-    const filterPayouts = (filterFile: any) => {
+    const filterPayouts = (filterFile: string) => {
       return new Promise((resolve, reject) => {
         fs.createReadStream(filterFile)
           .pipe(parse({ delimiter: '|', relax_column_count: true }))

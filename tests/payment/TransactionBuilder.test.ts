@@ -3,6 +3,7 @@ import { vi } from 'vitest';
 import { PaymentConfiguration } from '../../src/configuration/Model.js';
 import { TransactionBuilder } from '../../src/core/transaction/TransactionBuilder.js';
 import { ISubstituteAndExcludePayToAddresses, PaymentProcess } from '../../src/core/payment/Model.js';
+import { PayoutTransaction } from '../../src/core/payoutCalculator/Model.js';
 
 const makeConfig = (): PaymentConfiguration => ({
   blockDataSource: '',
@@ -36,7 +37,7 @@ const makeConfig = (): PaymentConfiguration => ({
 describe('TransactionBuilder', () => {
   it('aggregates transactions and leaves the process state intact when thresholds are met', async () => {
     const addressRemover: ISubstituteAndExcludePayToAddresses = {
-      run: vi.fn(async (transactions: any) => transactions) as any,
+      run: vi.fn(async (transactions: PayoutTransaction[]) => transactions),
     };
     const builder = new TransactionBuilder(addressRemover);
 
