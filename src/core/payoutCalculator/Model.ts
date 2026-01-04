@@ -1,5 +1,5 @@
-import { KeyedRate } from '../../configuration/Model';
-import { Block, Stake, ShareClass } from '../dataProvider/dataprovider-types';
+import { KeyedRate } from '../../configuration/Model.js';
+import { Block, Stake, ShareClass } from '../dataProvider/dataprovider-types.js';
 
 export type PayoutDetails = {
     publicKey: string;

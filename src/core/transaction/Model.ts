@@ -1,6 +1,6 @@
-import { PaymentConfiguration } from '../../configuration/Model';
-import { PaymentProcess } from '../payment/Model';
-import { PayoutTransaction } from '../payoutCalculator/Model';
+import { PaymentConfiguration } from '../../configuration/Model.js';
+import { PaymentProcess } from '../payment/Model.js';
+import { PayoutTransaction } from '../payoutCalculator/Model.js';
 
 export interface ITransactionBuilder {
     build(paymentProcess: PaymentProcess, config: PaymentConfiguration): Promise<PayoutTransaction[]>;

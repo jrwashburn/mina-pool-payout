@@ -1,9 +1,9 @@
-import { PayoutTransaction } from '../payoutCalculator/Model';
-import { ISubstituteAndExcludePayToAddresses } from './Model';
-import fs from 'fs';
+import { PayoutTransaction } from '../payoutCalculator/Model.js';
+import { ISubstituteAndExcludePayToAddresses } from './Model.js';
+import fs from 'node:fs';
 import { parse } from 'csv-parse';
 import { injectable } from 'inversify';
-import path from 'path'
+import path from 'node:path'
 
 @injectable()
 export class SubstituteAndExcludePayToAddresses implements ISubstituteAndExcludePayToAddresses {

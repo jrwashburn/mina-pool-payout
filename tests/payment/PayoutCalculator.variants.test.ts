@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import { KeyedRate } from '../../src/configuration/Model';
-import { Block, Stake } from '../../src/core/dataProvider/dataprovider-types';
-import { PayoutCalculator } from '../../src/core/payoutCalculator/PayoutCalculator';
-import { PayoutCalculatorIsolateSuperCharge } from '../../src/core/payoutCalculator/PayoutCalculatorIsolateSuperCharge';
-import { PayoutCalculatorPostSuperChargeCommonShareFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeCommonShareFees';
-import { PayoutCalculatorPostSuperChargeKeepFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeKeepFees';
-import { PayoutCalculatorPostSuperChargeShareFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeShareFees';
+import { KeyedRate } from '../../src/configuration/Model.js';
+import { Block, Stake } from '../../src/core/dataProvider/dataprovider-types.js';
+import { PayoutCalculator } from '../../src/core/payoutCalculator/PayoutCalculator.js';
+import { PayoutCalculatorIsolateSuperCharge } from '../../src/core/payoutCalculator/PayoutCalculatorIsolateSuperCharge.js';
+import { PayoutCalculatorPostSuperChargeCommonShareFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeCommonShareFees.js';
+import { PayoutCalculatorPostSuperChargeKeepFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeKeepFees.js';
+import { PayoutCalculatorPostSuperChargeShareFees } from '../../src/core/payoutCalculator/PayoutCalculatorPostSuperChargeShareFees.js';
 import {
   DEFAULT_BP_HASH,
   DEFAULT_MEMO,
@@ -15,7 +15,7 @@ import {
   cloneStakes,
   defaultBurnAddress,
   noRates,
-} from './helpers';
+} from './helpers.js';
 
 const FORK_ONE_RATES = {
   defaultCommissionRate: 0.1,
@@ -65,7 +65,7 @@ describe('PayoutCalculator variants', () => {
     ];
     const stakes = [buildStake({ publicKey: 'one', balance: 100 }), buildStake({ publicKey: 'three', balance: 300 })];
 
-    const calculator = new PayoutCalculatorPostSuperChargeShareFees();
+    const calculator = new PayoutCalculatorPostSuperChargeShareFees(1);
 
     const [transactions] = await runPostForkCalculator(calculator, blocks, stakes);
 
@@ -100,8 +100,8 @@ describe('PayoutCalculator variants', () => {
     ];
     const stakes = [buildStake({ publicKey: 'one', balance: 100 }), buildStake({ publicKey: 'three', balance: 300 })];
 
-    const shareFeesCalculator = new PayoutCalculatorPostSuperChargeShareFees();
-    const keepFeesCalculator = new PayoutCalculatorPostSuperChargeKeepFees();
+    const shareFeesCalculator = new PayoutCalculatorPostSuperChargeShareFees(1);
+    const keepFeesCalculator = new PayoutCalculatorPostSuperChargeKeepFees(1);
 
     const [shareFeeTransactions] = await runPostForkCalculator(shareFeesCalculator, blocks, stakes);
     const [keepFeeTransactions] = await runPostForkCalculator(keepFeesCalculator, blocks, stakes);
@@ -140,7 +140,7 @@ describe('PayoutCalculator variants', () => {
         feetransfertoreceiver: 0.4 * MINA,
       }),
     ];
-    const calculator = new PayoutCalculatorPostSuperChargeCommonShareFees();
+    const calculator = new PayoutCalculatorPostSuperChargeCommonShareFees(1);
 
     const [transactions] = await runPostForkCalculator(calculator, blocks, [common, mf]);
 
@@ -215,5 +215,92 @@ describe('PayoutCalculator variants', () => {
     expect(isolateResult[0]).toStrictEqual(originalResult[0]);
     expect(isolateResult[1].length).toBe(originalResult[1].length);
     expect(isolateResult[3]).toBe(originalResult[3]);
+  });
+
+  describe('fork 2 (Mesa) support', () => {
+    it('accepts 360 MINA coinbase for fork 2', async () => {
+      const blocks = [
+        buildBlock({
+          blockheight: 200,
+          coinbase: 360 * MINA,
+          feetransfertoreceiver: 0.5 * MINA,
+        }),
+      ];
+      const stakes = [buildStake({ publicKey: 'one', balance: 100 }), buildStake({ publicKey: 'two', balance: 100 })];
+
+      const calculator = new PayoutCalculatorPostSuperChargeShareFees(2);
+
+      const [transactions] = await runPostForkCalculator(calculator, blocks, stakes);
+
+      expect(transactions.length).toBe(2);
+      expect(transactions[0].publicKey).toBe('one');
+      expect(transactions[1].publicKey).toBe('two');
+    });
+
+    it('rejects 720 MINA coinbase for fork 2', async () => {
+      const blocks = [
+        buildBlock({
+          blockheight: 201,
+          coinbase: 720 * MINA,
+        }),
+      ];
+      const stakes = [buildStake({ publicKey: 'one', balance: 100 })];
+
+      const calculator = new PayoutCalculatorPostSuperChargeShareFees(2);
+
+      await expect(runPostForkCalculator(calculator, blocks, stakes)).rejects.toThrow(
+        'Coinbase must be equal to 360000000000 for fork 2 but is 720000000000',
+      );
+    });
+
+    it('calculates correct payout amounts for 360 MINA (50% of fork 1)', async () => {
+      const blocks = [
+        buildBlock({
+          blockheight: 202,
+          coinbase: 360 * MINA,
+          feetransfertoreceiver: 0,
+        }),
+      ];
+      const stakes = [buildStake({ publicKey: 'one', balance: 100 }), buildStake({ publicKey: 'three', balance: 300 })];
+
+      const fork1Calculator = new PayoutCalculatorPostSuperChargeShareFees(1);
+      const fork2Calculator = new PayoutCalculatorPostSuperChargeShareFees(2);
+
+      const [fork1Transactions] = await runPostForkCalculator(
+        fork1Calculator,
+        [buildBlock({ blockheight: 202, coinbase: 720 * MINA, feetransfertoreceiver: 0 })],
+        stakes,
+      );
+      const [fork2Transactions] = await runPostForkCalculator(fork2Calculator, blocks, stakes);
+
+      expect(fork2Transactions[0].amount).toBe(fork1Transactions[0].amount / 2);
+      expect(fork2Transactions[1].amount).toBe(fork1Transactions[1].amount / 2);
+    });
+
+    it('all three calculator types work with fork 2', async () => {
+      const blocks = [
+        buildBlock({
+          blockheight: 203,
+          coinbase: 360 * MINA,
+          feetransfertoreceiver: 0.2 * MINA,
+        }),
+      ];
+      const stakes = [buildStake({ publicKey: 'one', balance: 200 }), buildStake({ publicKey: 'two', balance: 200 })];
+
+      const shareFeesCalculator = new PayoutCalculatorPostSuperChargeShareFees(2);
+      const keepFeesCalculator = new PayoutCalculatorPostSuperChargeKeepFees(2);
+      const commonShareFeesCalculator = new PayoutCalculatorPostSuperChargeCommonShareFees(2);
+
+      const [shareFeeTransactions] = await runPostForkCalculator(shareFeesCalculator, blocks, stakes);
+      const [keepFeeTransactions] = await runPostForkCalculator(keepFeesCalculator, blocks, stakes);
+      const [commonShareFeeTransactions] = await runPostForkCalculator(commonShareFeesCalculator, blocks, stakes);
+
+      expect(shareFeeTransactions.length).toBe(2);
+      expect(keepFeeTransactions.length).toBe(2);
+      expect(commonShareFeeTransactions.length).toBe(2);
+
+      expect(shareFeeTransactions[0].amount).toBeGreaterThan(keepFeeTransactions[0].amount);
+      expect(shareFeeTransactions[1].amount).toBeGreaterThan(keepFeeTransactions[1].amount);
+    });
   });
 });

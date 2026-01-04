@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
-import { IBlockDataProvider, IDataProviderFactory } from './Models';
-import { ArchiveBlockDataProvider } from './ArchiveBlockDataProvider';
-import { MinaExplorerBlockDataProvider } from './MinaExplorerBlockDataProvider';
-import { ApiBlockDataProvider } from './ApiBlockDataProvider';
+import { IBlockDataProvider, IDataProviderFactory } from './Models.js';
+import { ArchiveBlockDataProvider } from './ArchiveBlockDataProvider.js';
+import { MinaExplorerBlockDataProvider } from './MinaExplorerBlockDataProvider.js';
+import { ApiBlockDataProvider } from './ApiBlockDataProvider.js';
 
 @injectable()
 export class BlockDataProviderFactory implements IDataProviderFactory<IBlockDataProvider> {

@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
-import provider from '../../composition/provider-selector';
-import { Blocks } from './dataprovider-types';
-import { IBlockDataProvider } from './Models';
+import provider from '../../composition/provider-selector.js';
+import { Blocks } from './dataprovider-types.js';
+import { IBlockDataProvider } from './Models.js';
 
 @injectable()
 export class ApiBlockDataProvider implements IBlockDataProvider {

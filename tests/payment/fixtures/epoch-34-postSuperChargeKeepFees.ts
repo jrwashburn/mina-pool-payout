@@ -1,4 +1,4 @@
-import { epoch34PostSuperchargeFixture } from './epoch-34-postSuperChargeCommon';
+import { epoch34PostSuperchargeFixture } from './epoch-34-postSuperChargeCommon.js';
 
 type FixtureTransaction = { publicKey: string; amount: number; fee: number; memo: string };
 

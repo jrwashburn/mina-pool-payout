@@ -1,6 +1,7 @@
-import { resendSignedPaymentFromFile } from './utils/resend-payment';
+import { resendSignedPaymentFromFile } from './utils/resend-payment.js';
 import yargs from 'yargs';
-const args = yargs.options({
+import { hideBin } from 'yargs/helpers';
+const args = yargs(hideBin(process.argv)).options({
   fromNonce: { type: 'number', alias: ['f'] },
   toNonce: { type: 'number', alias: ['t'] },
 }).argv;

@@ -1,8 +1,11 @@
-import { fetchGraphQL } from '../../../infrastructure/graphql-me';
-import { Blocks } from '../dataprovider-types';
-import fs from 'fs';
+import { fetchGraphQL } from '../../../infrastructure/graphql-me.js';
+import { Blocks } from '../dataprovider-types.js';
+import fs from 'node:fs';
 import { parse } from 'csv-parse';
-import { gql } from '@apollo/client/core';
+import { gql } from '@apollo/client/core/index.js';
+import { getDirname } from '../../../utils/path-helpers.js';
+
+const __dirname = getDirname(import.meta.url);
 
 type minaExplorerBlock = {
     creatorAccount: { publicKey: string };
@@ -123,78 +126,78 @@ const EPOCHHEIGHTQUERY = gql`
 `;
 
 export async function getLatestHeight(): Promise<number> {
-  const { errors, data } = await fetchGraphQL(TIPQUERY, {});
-  if (errors) {
-    console.log(errors);
-    throw new Error('could not get latest height from MinaExplorer');
-  }
-  JSON.stringify(data);
-  return data.blocks[0].blockHeight;
+    const { errors, data } = await fetchGraphQL(TIPQUERY, {});
+    if (errors) {
+        console.log(errors);
+        throw new Error('could not get latest height from MinaExplorer');
+    }
+    JSON.stringify(data);
+    return data.blocks[0].blockHeight;
 }
 
 export async function getMinMaxBlocksByEpoch(epoch: number): Promise<{ min: number; max: number }> {
-  const { errors, data } = await fetchGraphQL(EPOCHHEIGHTQUERY, { epoch: epoch });
-  if (errors) {
-    console.log(errors);
-    throw new Error('could not get epoch min/max range from MinaExplorer');
-  }
-  return {
-    min: data.minFromBlocks[0].protocolState.consensusState.blockHeight,
-    max: data.maxFromBlocks[0].protocolState.consensusState.blockHeight,
-  };
+    const { errors, data } = await fetchGraphQL(EPOCHHEIGHTQUERY, { epoch: epoch });
+    if (errors) {
+        console.log(errors);
+        throw new Error('could not get epoch min/max range from MinaExplorer');
+    }
+    return {
+        min: data.minFromBlocks[0].protocolState.consensusState.blockHeight,
+        max: data.maxFromBlocks[0].protocolState.consensusState.blockHeight,
+    };
 }
 
 export async function getBlocks(key: string, minHeight: number, maxHeight: number): Promise<Blocks> {
-  let flatBlocks: Blocks = [];
-  const { errors, data } = await fetchGraphQL(BLOCKQUERY, {
-    creator: key,
-    blockHeight_gte: minHeight,
-    blockHeight_lte: maxHeight,
-  });
-  if (errors) {
-    console.log(errors);
-    throw new Error('could not get block from mina explorer');
-  } else {
-    data.blocks.map((meBlock: minaExplorerBlock) => {
-      flatBlocks.push({
-        blockheight: meBlock.protocolState.consensusState.blockHeight,
-        statehash: meBlock.stateHash,
-        stakingledgerhash: meBlock.protocolState.consensusState.stakingEpochData.ledger.hash,
-        blockdatetime: +meBlock.protocolState.blockchainState.date,
-        slot: meBlock.protocolState.consensusState.slot,
-        globalslotsincegenesis: meBlock.protocolState.consensusState.slotSinceGenesis,
-        creatorpublickey: meBlock.creatorAccount.publicKey,
-        winnerpublickey: meBlock.winnerAccount.publicKey,
-        receiverpublickey: meBlock.transactions.coinbaseReceiverAccount?.publicKey,
-        coinbase: +meBlock.transactions.coinbase,
-        feetransfertoreceiver: meBlock.transactions.feeTransfer
-          .filter((x) => x.recipient === meBlock.transactions.coinbaseReceiverAccount.publicKey)
-          .reduce((sum, y) => sum + +y.fee, 0),
-        feetransferfromcoinbase: meBlock.transactions.feeTransfer
-          .filter((x) => x.type === 'Fee_transfer_via_coinbase')
-          .reduce((sum, y) => sum + +y.fee, 0),
-        usercommandtransactionfees: +meBlock.txFees,
-      });
+    let flatBlocks: Blocks = [];
+    const { errors, data } = await fetchGraphQL(BLOCKQUERY, {
+        creator: key,
+        blockHeight_gte: minHeight,
+        blockHeight_lte: maxHeight,
     });
-  }
-  // TODO move this up a layer to a helper / werapper - identical code in block-queries-sql.ts for archivedb.
-  const blockFile = `${__dirname}/../../../data/.paidblocks`;
+    if (errors) {
+        console.log(errors);
+        throw new Error('could not get block from mina explorer');
+    } else {
+        data.blocks.map((meBlock: minaExplorerBlock) => {
+            flatBlocks.push({
+                blockheight: meBlock.protocolState.consensusState.blockHeight,
+                statehash: meBlock.stateHash,
+                stakingledgerhash: meBlock.protocolState.consensusState.stakingEpochData.ledger.hash,
+                blockdatetime: +meBlock.protocolState.blockchainState.date,
+                slot: meBlock.protocolState.consensusState.slot,
+                globalslotsincegenesis: meBlock.protocolState.consensusState.slotSinceGenesis,
+                creatorpublickey: meBlock.creatorAccount.publicKey,
+                winnerpublickey: meBlock.winnerAccount.publicKey,
+                receiverpublickey: meBlock.transactions.coinbaseReceiverAccount?.publicKey,
+                coinbase: +meBlock.transactions.coinbase,
+                feetransfertoreceiver: meBlock.transactions.feeTransfer
+                    .filter((x) => x.recipient === meBlock.transactions.coinbaseReceiverAccount.publicKey)
+                    .reduce((sum, y) => sum + +y.fee, 0),
+                feetransferfromcoinbase: meBlock.transactions.feeTransfer
+                    .filter((x) => x.type === 'Fee_transfer_via_coinbase')
+                    .reduce((sum, y) => sum + +y.fee, 0),
+                usercommandtransactionfees: +meBlock.txFees,
+            });
+        });
+    }
+    // TODO move this up a layer to a helper / werapper - identical code in block-queries-sql.ts for archivedb.
+    const blockFile = `${__dirname}/../../../data/.paidblocks`;
 
-  const filterBlocks = () => {
-    return new Promise((resolve, reject) => {
-      fs.createReadStream(blockFile)
-        .pipe(parse({ delimiter: '|' }))
-        .on('data', (record) => {
-          flatBlocks = flatBlocks.filter(
-            (block) => !(block.blockheight == record[0] && block.statehash == record[1]),
-          );
-        })
-        .on('end', resolve)
-        .on('error', reject);
-    });
-  };
-  if (fs.existsSync(blockFile)) {
-    await filterBlocks();
-  }
-  return flatBlocks;
+    const filterBlocks = () => {
+        return new Promise((resolve, reject) => {
+            fs.createReadStream(blockFile)
+                .pipe(parse({ delimiter: '|' }))
+                .on('data', (record) => {
+                    flatBlocks = flatBlocks.filter(
+                        (block) => !(block.blockheight == record[0] && block.statehash == record[1]),
+                    );
+                })
+                .on('end', resolve)
+                .on('error', reject);
+        });
+    };
+    if (fs.existsSync(blockFile)) {
+        await filterBlocks();
+    }
+    return flatBlocks;
 }

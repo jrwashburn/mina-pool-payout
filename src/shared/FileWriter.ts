@@ -1,5 +1,5 @@
-import { IFileWriter } from './Model';
-import fs from 'fs';
+import { IFileWriter } from './Model.js';
+import fs from 'node:fs';
 import { injectable } from 'inversify';
 @injectable()
 export class FileWriter implements IFileWriter {

@@ -1,6 +1,9 @@
-import fs from 'fs';
-import { Blocks } from '../dataprovider-types';
+import fs from 'node:fs';
+import { Blocks } from '../dataprovider-types.js';
 import { parse } from 'csv-parse';
+import { getDirname } from '../../../utils/path-helpers.js';
+
+const __dirname = getDirname(import.meta.url);
 
 const baseUrl = process.env.PAYOUT_DATA_PROVIDER_API_ENDPOINT;
 if (!baseUrl) {

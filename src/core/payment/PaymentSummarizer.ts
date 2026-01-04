@@ -1,10 +1,10 @@
 import { inject, injectable } from 'inversify';
-import { Block } from '../dataProvider/dataprovider-types';
-import { PayoutTransaction } from '../payoutCalculator/Model';
-import { IFileWriter } from '../../shared/Model';
-import { ISummarizer, PaymentProcess } from './Model';
-import { PaymentConfiguration } from '../../configuration/Model';
-import TYPES from '../../composition/Types';
+import { Block } from '../dataProvider/dataprovider-types.js';
+import { PayoutTransaction } from '../payoutCalculator/Model.js';
+import type { IFileWriter } from '../../shared/Model.js';
+import { ISummarizer, PaymentProcess } from './Model.js';
+import { PaymentConfiguration } from '../../configuration/Model.js';
+import TYPES from '../../composition/Types.js';
 
 @injectable()
 export class PaymentSummarizer implements ISummarizer<PaymentProcess> {

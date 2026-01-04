@@ -1,4 +1,4 @@
-import { Ledger } from '../dataprovider-types';
+import { Ledger } from '../dataprovider-types.js';
 
 const baseUrl = process.env.PAYOUT_DATA_PROVIDER_API_ENDPOINT;
 if (!baseUrl) {

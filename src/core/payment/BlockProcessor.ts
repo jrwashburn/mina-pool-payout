@@ -1,4 +1,4 @@
-import { IBlockProcessor as IBlockProcessor } from './Model';
+import { IBlockProcessor as IBlockProcessor } from './Model.js';
 import { injectable } from 'inversify';
 
 @injectable()

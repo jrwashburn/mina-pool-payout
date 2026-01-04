@@ -1,9 +1,12 @@
-import { PaymentConfiguration, KeyedRate } from './Model';
-import fs from 'fs';
-import Container from '../composition/inversify.config';
-import { IBlockDataProvider, IDataProviderFactory } from '../core/dataProvider/Models';
-import TYPES from '../composition/Types';
+import { PaymentConfiguration, KeyedRate } from './Model.js';
+import fs from 'node:fs';
+import Container from '../composition/inversify.config.js';
+import { IBlockDataProvider, IDataProviderFactory } from '../core/dataProvider/Models.js';
+import TYPES from '../composition/Types.js';
 import { createHash } from 'node:crypto';
+import { getDirname } from '../utils/path-helpers.js';
+
+const __dirname = getDirname(import.meta.url);
 
 export class ConfigurationManager {
   public static Setup: PaymentConfiguration;
@@ -88,11 +91,14 @@ export class ConfigurationManager {
     if (Number.isInteger(this.Setup.epoch) && !Number.isInteger(this.Setup.fork)) {
       msg += `ERROR: Must provide fork number when processing by epoch - e.g. "npm run payout -- -e ${this.Setup.epoch} -f 0"`;
     }
-    if (this.Setup.fork < 0 || this.Setup.fork > 1) {
-      msg += 'ERROR: Fork number must be 0 or 1. Data provider must be updated to be aware of any additional forks.';
+    if (this.Setup.fork < 0 || this.Setup.fork > 2) {
+      msg += 'ERROR: Fork number must be 0, 1, or 2. Data provider must be updated to be aware of any additional forks.';
     }
     if (this.Setup.fork == 1 && (this.Setup.blockDataSource === 'ARCHIVEDB' || this.Setup.blockDataSource === 'MINAEXPLORER')) {
       msg += 'ERROR: Fork 1 is not currently supported by ARCHIVEDB or MINAEXPLORER data sources.';
+    }
+    if (this.Setup.fork == 2 && (this.Setup.blockDataSource === 'ARCHIVEDB' || this.Setup.blockDataSource === 'MINAEXPLORER')) {
+      msg += 'ERROR: Fork 2 is not currently supported by ARCHIVEDB or MINAEXPLORER data sources.';
     }
     if (!['postSuperChargeShareFees', 'postSuperChargeKeepFees', 'postSuperChargeCommonShareFees', 'isolateSuperCharge', 'original'].includes(this.Setup.payoutCalculator)) {
       msg += 'ERROR: Invalid payout calculator specified. Must be one of postSuperChargeShareFees, postSuperChargeKeepFees, postSuperChargeCommonShareFees, isolateSuperCharge, or original';

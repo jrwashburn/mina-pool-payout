@@ -1,10 +1,10 @@
-import { IFileWriter } from '../../shared/Model';
-import { PaymentConfiguration } from '../../configuration/Model';
+import type { IFileWriter } from '../../shared/Model.js';
+import { PaymentConfiguration } from '../../configuration/Model.js';
 import { inject, injectable } from 'inversify';
-import TYPES from '../../composition/Types';
-import { ITransactionProcessor } from './Model';
-import { PaymentProcess } from '../payment/Model';
-import { createWriteStream, WriteStream } from 'fs';
+import TYPES from '../../composition/Types.js';
+import { ITransactionProcessor } from './Model.js';
+import { PaymentProcess } from '../payment/Model.js';
+import { createWriteStream, WriteStream } from 'node:fs';
 
 @injectable()
 export class TransactionProcessor implements ITransactionProcessor {

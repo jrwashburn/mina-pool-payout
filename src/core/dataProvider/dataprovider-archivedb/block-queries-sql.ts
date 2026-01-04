@@ -1,7 +1,10 @@
-import { db } from '../../../infrastructure/database';
-import fs from 'fs';
+import { db } from '../../../infrastructure/database.js';
+import fs from 'node:fs';
 import { parse } from 'csv-parse';
-import { Blocks } from '../dataprovider-types';
+import { Blocks } from '../dataprovider-types.js';
+import { getDirname } from '../../../utils/path-helpers.js';
+
+const __dirname = getDirname(import.meta.url);
 
 const blockQuery = `
     SELECT

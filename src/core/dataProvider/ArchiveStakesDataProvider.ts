@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
-import { getStakes } from './dataprovider-archivedb/staking-ledger-json-file';
-import { Ledger } from './dataprovider-types';
-import { IStakeDataProvider } from './Models';
+import { getStakes } from './dataprovider-archivedb/staking-ledger-json-file.js';
+import { Ledger } from './dataprovider-types.js';
+import { IStakeDataProvider } from './Models.js';
 
 @injectable()
 export class ArchiveStakeDataProvider implements IStakeDataProvider {

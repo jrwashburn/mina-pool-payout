@@ -1,11 +1,18 @@
 import { injectable } from 'inversify';
-import { KeyedRate } from '../../configuration/Model';
-import { Block, Stake } from '../dataProvider/dataprovider-types';
-import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model';
+import { KeyedRate } from '../../configuration/Model.js';
+import { Block, Stake } from '../dataProvider/dataprovider-types.js';
+import { IPayoutCalculator, PayoutDetails, PayoutTransaction } from './Model.js';
 import { Decimal } from 'decimal.js';
+import { ForkConstants } from './ForkConstants.js';
 
 @injectable()
 export class PayoutCalculatorPostSuperChargeCommonShareFees implements IPayoutCalculator {
+  private fork: number;
+
+  constructor(fork: number) {
+    this.fork = fork;
+  }
+
   async getPayouts(
     blocks: Block[],
     stakers: Stake[],
@@ -30,7 +37,7 @@ export class PayoutCalculatorPostSuperChargeCommonShareFees implements IPayoutCa
     console.log('Using Post Super Charge Payout Calculator');
     //TODO: JC - Shared Logic must be moved into its own class, then isolate change in behaviors
     // Initialize some stuff
-    const REGULARCOINBASE = 720000000000;
+    const REGULARCOINBASE = ForkConstants.getRegularCoinbase(this.fork);
     const blocksIncluded: number[] = [];
     const payoutDetails: PayoutDetails[] = [];
     let totalNegotiatedBurn = 0;
@@ -62,9 +69,7 @@ export class PayoutCalculatorPostSuperChargeCommonShareFees implements IPayoutCa
         if (npsPoolStakes.toNumber() !== totalStake || commonPoolStakes.toNumber() > totalStake) {
           throw new Error(`Sum of pool shares must be equal to total staked amount: npsPoolStakes: ${npsPoolStakes.toNumber()} commonPoolStakes: ${commonPoolStakes.toNumber()} totalStake: ${totalStake}`);
         }
-        if (block.coinbase != REGULARCOINBASE) {
-          throw new Error(`Coinbase must be equal to ${REGULARCOINBASE} but is ${block.coinbase}`);
-        }
+        ForkConstants.validateCoinbase(this.fork, block.coinbase);
 
         stakers.forEach((staker: Stake) => {
           const stakerNpsPoolWeight = npsPoolStakes.greaterThan(0) ? poolStakes[staker.publicKey].stake / npsPoolStakes.toNumber() : 0;
