@@ -30,6 +30,7 @@ const makeConfig = (): PaymentConfiguration => ({
   stakingPoolPublicKey: '',
   verbose: false,
   payoutCalculator: 'original',
+  useLegacyJsonFormat: false,
 });
 
 describe('TransactionBuilder', () => {

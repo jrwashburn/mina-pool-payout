@@ -40,6 +40,7 @@ export class ConfigurationManager {
       doNotTransmit: args.donottransmit || false,
       doNotSaveTransactionDetails: (process.env.DO_NOT_SAVE_TRANSACTION_DETAILS?.toLowerCase() === 'true') || false,
       payoutCalculator: process.env.PAYOUT_CALCULATOR || '',
+      useLegacyJsonFormat: args.legacyjsonformat || false,
     };
 
     await this.validate();

@@ -24,6 +24,7 @@ export interface PaymentConfiguration {
   verbose: boolean;
   doNotSaveTransactionDetails: boolean;
   payoutCalculator: string;
+  useLegacyJsonFormat: boolean;
 }
 
 export interface KeyedRate {

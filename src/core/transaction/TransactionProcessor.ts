@@ -35,10 +35,10 @@ export class TransactionProcessor implements ITransactionProcessor {
 
     try {
       console.log(`writing transactions to ${payoutTransactionsFileName}`);
-      this.writeJsonObjToFile(payoutTransactionsStream, payoutTransactions);
+      this.writeJsonObjToFile(payoutTransactionsStream, payoutTransactions, config.useLegacyJsonFormat);
       if (!config.doNotSaveTransactionDetails) {
         console.log(`writing details to ${payoutDetailsFileName}`);
-        this.writeJsonObjToFile(payoutDetailsStream, payoutDetails);
+        this.writeJsonObjToFile(payoutDetailsStream, payoutDetails, config.useLegacyJsonFormat);
       } else {
         console.log('skipping writing details to file due to DO_NOT_SAVE_TRANSACTION_DETAILS environment setting');
       }
@@ -61,22 +61,38 @@ export class TransactionProcessor implements ITransactionProcessor {
     return d.toISOString().replace(/\D/g, '');
   }
 
-  private writeJsonObjToFile(stream: WriteStream, data: object[]): void {
+  private writeJsonObjToFile(stream: WriteStream, data: object[], useLegacyFormat: boolean = false): void {
     let index = 0;
+    
+    if (!useLegacyFormat) {
+      // Write opening bracket for JSON array format
+      stream.write('[');
+    }
 
     function writeObjects() {
       let ok = true;
       while (index < data.length && ok) {
+        if (!useLegacyFormat && index > 0) {
+          // Write comma before each object except the first (JSON array format)
+          ok = stream.write(',');
+          if (!ok) {
+            stream.once('drain', writeObjects);
+            return;
+          }
+        }
         ok = stream.write(JSON.stringify(data[index]));
         index++;
       }
       if (index < data.length) {
         if (!ok) {
-          stream.once('drain', writeObjects)
+          stream.once('drain', writeObjects);
         }
-        else {
-          stream.end();
+      } else {
+        if (!useLegacyFormat) {
+          // Write closing bracket for JSON array format
+          stream.write(']');
         }
+        stream.end();
       }
     }
     writeObjects();
