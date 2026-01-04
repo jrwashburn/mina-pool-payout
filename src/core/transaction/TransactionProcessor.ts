@@ -21,14 +21,14 @@ export class TransactionProcessor implements ITransactionProcessor {
     const payoutTransactionsFileName = this.generateOutputFileName(
       'payout_transactions',
       runDateTime,
-      minimumHeight,
+      minimumHeight!,
       maximumHeight,
     );
     const payoutTransactionsStream = createWriteStream(payoutTransactionsFileName);
     const payoutDetailsFileName = this.generateOutputFileName(
       'payout_details',
       runDateTime,
-      minimumHeight,
+      minimumHeight!,
       maximumHeight,
     );
     const payoutDetailsStream = createWriteStream(payoutDetailsFileName);
@@ -63,7 +63,7 @@ export class TransactionProcessor implements ITransactionProcessor {
 
   private writeJsonObjToFile(stream: WriteStream, data: object[], useLegacyFormat: boolean = false): void {
     let index = 0;
-    
+
     if (!useLegacyFormat) {
       // Write opening bracket for JSON array format
       stream.write('[');

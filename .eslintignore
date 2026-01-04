@@ -1,1 +1,8 @@
 dist/*
+lib/
+bin/
+include/
+*.json
+*.md
+node_modules/
+coverage/

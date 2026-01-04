@@ -31,7 +31,8 @@ const oargs = yargs(hideBin(process.argv)).options({
 const main = async () => {
   console.log(`*** MINAPOOL PAYOUT ${version} ***\n`);
 
-  await ConfigurationManager.build(oargs);
+  const args = await oargs;
+  await ConfigurationManager.build(args);
   const configuration = ConfigurationManager.Setup;
   await isValid(configuration)
 

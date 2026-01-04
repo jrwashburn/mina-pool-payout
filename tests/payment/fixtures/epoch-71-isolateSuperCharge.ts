@@ -1,4 +1,3 @@
-import { KeyedRate } from '../../../src/configuration/Model.js';
 import { Block, Stake } from '../../../src/core/dataProvider/dataprovider-types.js';
 
 type FixtureTransaction = { publicKey: string; amount: number; fee: number; memo: string };
@@ -852,6 +851,6 @@ export const epoch71Fixture = {
   bpKeyMd5Hash: 'aa6e6ee40b7c72a7d744596dfa628be3',
   payoutCalculator: 'isolateSuperCharge',
   expectedTransactions,
-  expectedBlockHeights: [328228,328328,328780,329140,329445,329826,329927,330730,331677],
+  expectedBlockHeights: [328228, 328328, 328780, 329140, 329445, 329826, 329927, 330730, 331677],
   expectedTotalPayout: 12318160164555,
 };

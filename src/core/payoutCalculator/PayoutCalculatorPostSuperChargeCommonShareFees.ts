@@ -37,7 +37,6 @@ export class PayoutCalculatorPostSuperChargeCommonShareFees implements IPayoutCa
     console.log('Using Post Super Charge Payout Calculator');
     //TODO: JC - Shared Logic must be moved into its own class, then isolate change in behaviors
     // Initialize some stuff
-    const REGULARCOINBASE = ForkConstants.getRegularCoinbase(this.fork);
     const blocksIncluded: number[] = [];
     const payoutDetails: PayoutDetails[] = [];
     let totalNegotiatedBurn = 0;

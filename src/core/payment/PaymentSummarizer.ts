@@ -101,7 +101,7 @@ export class PaymentSummarizer implements ISummarizer<PaymentProcess> {
     const payoutSummaryFileName = this.generateOutputFileName(
       'payout_summary',
       runDateTime,
-      minimumHeight,
+      minimumHeight!,
       maximumHeight,
     );
 

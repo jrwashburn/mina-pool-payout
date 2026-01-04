@@ -3,9 +3,9 @@ import { epoch34PostSuperchargeFixture } from './epoch-34-postSuperChargeCommon.
 type FixtureTransaction = { publicKey: string; amount: number; fee: number; memo: string };
 
 const {
-  expectedTransactions: _commonTransactions,
-  expectedTotalPayout: _commonTotal,
-  payoutCalculator: _commonCalculator,
+  expectedTransactions: _,  // eslint-disable-line @typescript-eslint/no-unused-vars
+  expectedTotalPayout: __,  // eslint-disable-line @typescript-eslint/no-unused-vars
+  payoutCalculator: ___,  // eslint-disable-line @typescript-eslint/no-unused-vars
   ...epoch34Base
 } = epoch34PostSuperchargeFixture;
 
