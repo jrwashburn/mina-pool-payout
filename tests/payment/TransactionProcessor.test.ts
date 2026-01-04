@@ -1,10 +1,15 @@
 import 'reflect-metadata';
+import { vi } from 'vitest';
 import { TransactionProcessor } from '../../src/core/transaction/TransactionProcessor';
 import { IFileWriter } from '../../src/shared/Model';
 import { PaymentConfiguration } from '../../src/configuration/Model';
 import { PaymentProcess } from '../../src/core/payment/Model';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const makeConfig = (minimumHeight: number = 100, useLegacyJsonFormat: boolean = false): PaymentConfiguration => ({
   blockDataSource: '',
@@ -65,7 +70,7 @@ describe('TransactionProcessor', () => {
 
   it('writes payout_transactions as valid JSON array', async () => {
     const fileWriter: IFileWriter = {
-      write: jest.fn(),
+      write: async () => { },
     };
     const processor = new TransactionProcessor(fileWriter);
     const config = makeConfig(1000);
@@ -80,27 +85,27 @@ describe('TransactionProcessor', () => {
     const dataDir = path.join(__dirname, '../../src/data');
     const files = fs.readdirSync(dataDir);
     const transactionFile = files.find(f => f.startsWith('payout_transactions_') && f.includes('_1000_1100.json'));
-    
+
     expect(transactionFile).toBeDefined();
-    
+
     if (transactionFile) {
       const filePath = path.join(dataDir, transactionFile);
       outputFiles.push(filePath);
-      
+
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      
+
       // Should be valid JSON
       let parsedData;
       expect(() => {
         parsedData = JSON.parse(fileContent);
       }).not.toThrow();
-      
+
       // Should be an array
       expect(Array.isArray(parsedData)).toBe(true);
-      
+
       // Should have the expected number of elements
       expect(parsedData).toHaveLength(3);
-      
+
       // Should have the expected data
       if (parsedData) {
         expect(parsedData[0]).toMatchObject({
@@ -112,7 +117,7 @@ describe('TransactionProcessor', () => {
           memo: 'test1',
           summaryGroup: 0,
         });
-        
+
         expect(parsedData[1]).toMatchObject({
           publicKey: 'B62bob',
           amount: 2000000000,
@@ -122,7 +127,7 @@ describe('TransactionProcessor', () => {
           memo: 'test2',
           summaryGroup: 1,
         });
-        
+
         expect(parsedData[2]).toMatchObject({
           publicKey: 'B62charlie',
           amount: 3000000000,
@@ -138,7 +143,7 @@ describe('TransactionProcessor', () => {
 
   it('writes payout_details as valid JSON array when not disabled', async () => {
     const fileWriter: IFileWriter = {
-      write: jest.fn(),
+      write: async () => { },
     };
     const processor = new TransactionProcessor(fileWriter);
     const config = makeConfig(2000);
@@ -215,24 +220,24 @@ describe('TransactionProcessor', () => {
     const dataDir = path.join(__dirname, '../../src/data');
     const files = fs.readdirSync(dataDir);
     const detailsFile = files.find(f => f.startsWith('payout_details_') && f.includes('_2000_2100.json'));
-    
+
     expect(detailsFile).toBeDefined();
-    
+
     if (detailsFile) {
       const filePath = path.join(dataDir, detailsFile);
       outputFiles.push(filePath);
-      
+
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      
+
       // Should be valid JSON
       let parsedData;
       expect(() => {
         parsedData = JSON.parse(fileContent);
       }).not.toThrow();
-      
+
       // Should be an array
       expect(Array.isArray(parsedData)).toBe(true);
-      
+
       // Should have the expected number of elements
       expect(parsedData).toHaveLength(2);
     }
@@ -240,7 +245,7 @@ describe('TransactionProcessor', () => {
 
   it('handles empty transaction array', async () => {
     const fileWriter: IFileWriter = {
-      write: jest.fn(),
+      write: async () => { },
     };
     const processor = new TransactionProcessor(fileWriter);
     const config = makeConfig(3000);
@@ -256,21 +261,21 @@ describe('TransactionProcessor', () => {
     const dataDir = path.join(__dirname, '../../src/data');
     const files = fs.readdirSync(dataDir);
     const transactionFile = files.find(f => f.startsWith('payout_transactions_') && f.includes('_3000_3100.json'));
-    
+
     expect(transactionFile).toBeDefined();
-    
+
     if (transactionFile) {
       const filePath = path.join(dataDir, transactionFile);
       outputFiles.push(filePath);
-      
+
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      
+
       // Should be valid JSON
       let parsedData;
       expect(() => {
         parsedData = JSON.parse(fileContent);
       }).not.toThrow();
-      
+
       // Should be an empty array
       expect(Array.isArray(parsedData)).toBe(true);
       expect(parsedData).toHaveLength(0);
@@ -279,7 +284,7 @@ describe('TransactionProcessor', () => {
 
   it('writes payout_transactions in legacy format when flag is set', async () => {
     const fileWriter: IFileWriter = {
-      write: jest.fn(),
+      write: async () => { },
     };
     const processor = new TransactionProcessor(fileWriter);
     const config = makeConfig(4000, true); // Enable legacy format
@@ -294,26 +299,26 @@ describe('TransactionProcessor', () => {
     const dataDir = path.join(__dirname, '../../src/data');
     const files = fs.readdirSync(dataDir);
     const transactionFile = files.find(f => f.startsWith('payout_transactions_') && f.includes('_4000_4100.json'));
-    
+
     expect(transactionFile).toBeDefined();
-    
+
     if (transactionFile) {
       const filePath = path.join(dataDir, transactionFile);
       outputFiles.push(filePath);
-      
+
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      
+
       // Legacy format: concatenated JSON objects without array brackets
       // Should NOT be valid as a single JSON parse
       expect(() => {
         JSON.parse(fileContent);
       }).toThrow();
-      
+
       // Should contain multiple objects concatenated
       expect(fileContent).toContain('{"publicKey":"B62alice"');
       expect(fileContent).toContain('{"publicKey":"B62bob"');
       expect(fileContent).toContain('{"publicKey":"B62charlie"');
-      
+
       // Should NOT have array brackets or commas between objects
       expect(fileContent.startsWith('[')).toBe(false);
       expect(fileContent.endsWith(']')).toBe(false);
@@ -322,7 +327,7 @@ describe('TransactionProcessor', () => {
 
   it('writes payout_details in legacy format when flag is set', async () => {
     const fileWriter: IFileWriter = {
-      write: jest.fn(),
+      write: async () => { },
     };
     const processor = new TransactionProcessor(fileWriter);
     const config = makeConfig(5000, true); // Enable legacy format
@@ -369,15 +374,15 @@ describe('TransactionProcessor', () => {
     const dataDir = path.join(__dirname, '../../src/data');
     const files = fs.readdirSync(dataDir);
     const detailsFile = files.find(f => f.startsWith('payout_details_') && f.includes('_5000_5100.json'));
-    
+
     expect(detailsFile).toBeDefined();
-    
+
     if (detailsFile) {
       const filePath = path.join(dataDir, detailsFile);
       outputFiles.push(filePath);
-      
+
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      
+
       // Legacy format: should NOT be valid as a single JSON parse (when multiple objects)
       // With just one object, it should parse, but shouldn't be an array
       const parsedData = JSON.parse(fileContent);

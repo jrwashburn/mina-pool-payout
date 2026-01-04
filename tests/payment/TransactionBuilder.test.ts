@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 import { PaymentConfiguration } from '../../src/configuration/Model.js';
 import { TransactionBuilder } from '../../src/core/transaction/TransactionBuilder.js';
 import { ISubstituteAndExcludePayToAddresses, PaymentProcess } from '../../src/core/payment/Model.js';
@@ -36,7 +36,7 @@ const makeConfig = (): PaymentConfiguration => ({
 describe('TransactionBuilder', () => {
   it('aggregates transactions and leaves the process state intact when thresholds are met', async () => {
     const addressRemover: ISubstituteAndExcludePayToAddresses = {
-      run: jest.fn(async (transactions: any) => transactions) as any,
+      run: vi.fn(async (transactions: any) => transactions) as any,
     };
     const builder = new TransactionBuilder(addressRemover);
 

@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 import { IFileWriter } from '../../src/shared/Model.js';
 import { Block } from '../../src/core/dataProvider/dataprovider-types.js';
 import { PaymentSummarizer } from '../../src/core/payment/PaymentSummarizer.js';
@@ -8,7 +8,7 @@ import { PayoutTransaction } from '../../src/core/payoutCalculator/Model.js';
 
 const createSummarizer = () =>
   new PaymentSummarizer({
-    write: jest.fn(),
+    write: vi.fn(),
   } as unknown as IFileWriter);
 
 describe('PaymentSummarizer', () => {

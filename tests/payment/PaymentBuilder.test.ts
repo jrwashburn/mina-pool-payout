@@ -1,6 +1,6 @@
 import './test-env';
 import 'reflect-metadata';
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 import { ConfigurationManager } from '../../src/configuration/ConfigurationManager.js';
 import { KeyedRate, PaymentConfiguration } from '../../src/configuration/Model.js';
 import { Block, Stake } from '../../src/core/dataProvider/dataprovider-types.js';
@@ -57,11 +57,11 @@ const createBuilder = (
   }> = {},
 ) => {
   const blockProcessor: IBlockProcessor = overrides.blockProcessor ?? {
-    determineLastBlockHeightToProcess: jest.fn<(max: number, min: number, latestHeight: number) => Promise<number>>().mockResolvedValue(350),
+    determineLastBlockHeightToProcess: vi.fn<(max: number, min: number, latestHeight: number) => Promise<number>>().mockResolvedValue(350),
   };
 
   const payoutCalculator: IPayoutCalculator = overrides.payoutCalculator ?? {
-    getPayouts: jest.fn<(
+    getPayouts: vi.fn<(
       blocks: Block[],
       stakers: Stake[],
       totalStake: number,
@@ -85,28 +85,28 @@ const createBuilder = (
   };
 
   const blockProvider: IBlockDataProvider = overrides.blockProvider ?? {
-    getLatestHeight: jest.fn<() => Promise<number>>().mockResolvedValue(400),
-    getBlocks: jest.fn<(key: string, minHeight: number, maxHeight: number) => Promise<Block[]>>().mockResolvedValue([buildBlock({ blockheight: 150, stakingledgerhash: 'ledger' })]),
-    getMinMaxBlocksByEpoch: jest.fn<(epoch: number, fork: number) => Promise<{ min: number; max: number }>>(),
+    getLatestHeight: vi.fn<() => Promise<number>>().mockResolvedValue(400),
+    getBlocks: vi.fn<(key: string, minHeight: number, maxHeight: number) => Promise<Block[]>>().mockResolvedValue([buildBlock({ blockheight: 150, stakingledgerhash: 'ledger' })]),
+    getMinMaxBlocksByEpoch: vi.fn<(epoch: number, fork: number) => Promise<{ min: number; max: number }>>(),
   };
 
   const stakeProvider: IStakeDataProvider = overrides.stakeProvider ?? {
-    getStakes: jest.fn<(ledgerHash: string, key: string) => Promise<{ stakes: Stake[]; totalStakingBalance: number }>>().mockResolvedValue({
+    getStakes: vi.fn<(ledgerHash: string, key: string) => Promise<{ stakes: Stake[]; totalStakingBalance: number }>>().mockResolvedValue({
       stakes: [buildStake({ publicKey: 'delegate', balance: 100 })],
       totalStakingBalance: 100,
     }),
   };
 
   const payoutCalculatorFactory: IPayoutCalculatorFactory<IPayoutCalculator> = {
-    build: jest.fn<(fork: number, payoutCalculator: string) => IPayoutCalculator>().mockReturnValue(payoutCalculator),
+    build: vi.fn<(fork: number, payoutCalculator: string) => IPayoutCalculator>().mockReturnValue(payoutCalculator),
   };
 
   const blockProviderFactory: IDataProviderFactory<IBlockDataProvider> = {
-    build: jest.fn<(dataSource: string) => IBlockDataProvider>().mockReturnValue(blockProvider),
+    build: vi.fn<(dataSource: string) => IBlockDataProvider>().mockReturnValue(blockProvider),
   };
 
   const stakeProviderFactory: IDataProviderFactory<IStakeDataProvider> = {
-    build: jest.fn<(dataSource: string) => IStakeDataProvider>().mockReturnValue(stakeProvider),
+    build: vi.fn<(dataSource: string) => IStakeDataProvider>().mockReturnValue(stakeProvider),
   };
 
   return {
@@ -133,20 +133,20 @@ describe('PaymentBuilder', () => {
     ];
 
     const blockProvider: IBlockDataProvider = {
-      getLatestHeight: jest.fn<() => Promise<number>>().mockResolvedValue(310),
-      getBlocks: jest.fn<(key: string, minHeight: number, maxHeight: number) => Promise<Block[]>>().mockResolvedValue(blocks),
-      getMinMaxBlocksByEpoch: jest.fn<(epoch: number, fork: number) => Promise<{ min: number; max: number }>>(),
+      getLatestHeight: vi.fn<() => Promise<number>>().mockResolvedValue(310),
+      getBlocks: vi.fn<(key: string, minHeight: number, maxHeight: number) => Promise<Block[]>>().mockResolvedValue(blocks),
+      getMinMaxBlocksByEpoch: vi.fn<(epoch: number, fork: number) => Promise<{ min: number; max: number }>>(),
     };
 
     const stakeProvider: IStakeDataProvider = {
-      getStakes: jest.fn<(ledgerHash: string, key: string) => Promise<{ stakes: Stake[]; totalStakingBalance: number }>>().mockResolvedValue({
+      getStakes: vi.fn<(ledgerHash: string, key: string) => Promise<{ stakes: Stake[]; totalStakingBalance: number }>>().mockResolvedValue({
         stakes: [buildStake({ publicKey: 'delegate', balance: 200 })],
         totalStakingBalance: 200,
       }),
     };
 
     const payoutCalculator: IPayoutCalculator = {
-      getPayouts: jest.fn<(
+      getPayouts: vi.fn<(
         blocks: Block[],
         stakers: Stake[],
         totalStake: number,
@@ -163,7 +163,7 @@ describe('PaymentBuilder', () => {
     };
 
     const blockProcessor: IBlockProcessor = {
-      determineLastBlockHeightToProcess: jest.fn<(max: number, min: number, latestHeight: number) => Promise<number>>().mockResolvedValue(305),
+      determineLastBlockHeightToProcess: vi.fn<(max: number, min: number, latestHeight: number) => Promise<number>>().mockResolvedValue(305),
     };
 
     const {
@@ -194,12 +194,12 @@ describe('PaymentBuilder', () => {
       buildBlock({ blockheight: 135, stakingledgerhash: 'ledger', blockdatetime: 1 }),
     ];
     const blockProvider: IBlockDataProvider = {
-      getLatestHeight: jest.fn<() => Promise<number>>().mockResolvedValue(320),
-      getBlocks: jest.fn<(key: string, minHeight: number, maxHeight: number) => Promise<Block[]>>().mockResolvedValue(unsortedBlocks),
-      getMinMaxBlocksByEpoch: jest.fn<(epoch: number, fork: number) => Promise<{ min: number; max: number }>>(),
+      getLatestHeight: vi.fn<() => Promise<number>>().mockResolvedValue(320),
+      getBlocks: vi.fn<(key: string, minHeight: number, maxHeight: number) => Promise<Block[]>>().mockResolvedValue(unsortedBlocks),
+      getMinMaxBlocksByEpoch: vi.fn<(epoch: number, fork: number) => Promise<{ min: number; max: number }>>(),
     };
     const stakeProvider: IStakeDataProvider = {
-      getStakes: jest.fn<(ledgerHash: string, key: string) => Promise<{ stakes: Stake[]; totalStakingBalance: number }>>().mockResolvedValue({
+      getStakes: vi.fn<(ledgerHash: string, key: string) => Promise<{ stakes: Stake[]; totalStakingBalance: number }>>().mockResolvedValue({
         stakes: [
           buildStake({ publicKey: 'alpha', balance: 50 }),
           buildStake({ publicKey: 'beta', balance: 150 }),
@@ -276,7 +276,7 @@ describe('PaymentBuilder', () => {
     ];
 
     const payoutCalculator: IPayoutCalculator = {
-      getPayouts: jest.fn<(
+      getPayouts: vi.fn<(
         blocks: Block[],
         stakers: Stake[],
         totalStake: number,
