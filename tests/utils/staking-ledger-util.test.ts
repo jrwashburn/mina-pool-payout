@@ -1,7 +1,7 @@
 import { LedgerEntry } from '../../src/core/dataProvider/dataprovider-types.js';
 import { calculateUntimedSlot, getPublicKeyShareClass } from '../../src/utils/staking-ledger-util.js';
 
-describe('Should be succesful calculating untimed slot', () => {
+describe('Should be successful calculating untimed slot', () => {
   it('when ledger is valid', () => {
     const ledgerMock: LedgerEntry = {
       balance: 0,
