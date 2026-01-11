@@ -44,6 +44,7 @@ For more details, see [In Depth](#In Depth Configuration & Operation) below
 ```bash
 git clone https://github.com/jrwashburn/mina-pool-payout.git
 cd mina-pool-payout
+git submodule update --init --recursive
 npm install
 cp sample.env .env
 ```
