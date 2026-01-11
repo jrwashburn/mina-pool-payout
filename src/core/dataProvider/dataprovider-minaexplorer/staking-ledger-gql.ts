@@ -32,18 +32,19 @@ export async function getStakes(ledgerHash: string, key: string): Promise<Ledger
     console.log(errors);
     throw new Error('could not get ledger from MinaExplorer');
   } else {
-    stakes = data.stakes.map((stake: LedgerEntry) => {
+    stakes = [];
+    for (const stake of data.stakes as LedgerEntry[]) {
       const balance = Number(stake.balance);
       totalStakingBalance = totalStakingBalance.plus(balance);
-      return {
+      stakes.push({
         publicKey: stake.pk,
         total: 0,
         totalToBurn: 0,
         stakingBalance: balance,
         untimedAfterSlot: calculateUntimedSlot(stake),
-        shareClass: getPublicKeyShareClass(stake.pk),
-      };
-    });
+        shareClass: await getPublicKeyShareClass(stake.pk),
+      });
+    }
   }
   return { stakes: stakes, totalStakingBalance: totalStakingBalance.toNumber() };
 }

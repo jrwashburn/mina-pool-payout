@@ -1,3 +1,5 @@
+import type { ShareClass } from '../../data/mina-addresses/minaAddressShareClass.js';
+
 export type Block = {
     blockheight: number;
     statehash: string;
@@ -44,4 +46,4 @@ export type LedgerEntry = {
     };
 };
 
-export type ShareClass = { shareClass: 'NPS' | 'Common' | 'BURN'; shareOwner: '' | 'MF' | 'O1' | 'INVEST' | 'BURN' };
+export type { ShareClass };
