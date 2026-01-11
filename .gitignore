@@ -4,7 +4,7 @@ dist
 node_modules
 .env*
 /src/data/*
-!/src/data/nps-addresses/
+!/src/data/mina-addresses
 !/src/data/mfSubstitutePayTo
 package-lock.json
 *.code-workspace
