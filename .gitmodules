@@ -1,0 +1,3 @@
+[submodule "src/data/mina-addresses"]
+	path = src/data/mina-addresses
+	url = https://github.com/jrwashburn/mina-addresses

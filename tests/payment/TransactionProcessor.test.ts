@@ -91,6 +91,12 @@ describe('TransactionProcessor', () => {
       const filePath = path.join(dataDir, transactionFile);
       outputFiles.push(filePath);
 
+      // Also add payout_details file for cleanup
+      const detailsFile = files.find(f => f.startsWith('payout_details_') && f.includes('_1000_1100.json'));
+      if (detailsFile) {
+        outputFiles.push(path.join(dataDir, detailsFile));
+      }
+
       const fileContent = fs.readFileSync(filePath, 'utf-8');
 
       // Should be valid JSON
@@ -226,6 +232,12 @@ describe('TransactionProcessor', () => {
       const filePath = path.join(dataDir, detailsFile);
       outputFiles.push(filePath);
 
+      // Also add payout_transactions file for cleanup
+      const transactionFile = files.find(f => f.startsWith('payout_transactions_') && f.includes('_2000_2100.json'));
+      if (transactionFile) {
+        outputFiles.push(path.join(dataDir, transactionFile));
+      }
+
       const fileContent = fs.readFileSync(filePath, 'utf-8');
 
       // Should be valid JSON
@@ -267,6 +279,12 @@ describe('TransactionProcessor', () => {
       const filePath = path.join(dataDir, transactionFile);
       outputFiles.push(filePath);
 
+      // Also add payout_details file for cleanup
+      const detailsFile = files.find(f => f.startsWith('payout_details_') && f.includes('_3000_3100.json'));
+      if (detailsFile) {
+        outputFiles.push(path.join(dataDir, detailsFile));
+      }
+
       const fileContent = fs.readFileSync(filePath, 'utf-8');
 
       // Should be valid JSON
@@ -304,6 +322,12 @@ describe('TransactionProcessor', () => {
     if (transactionFile) {
       const filePath = path.join(dataDir, transactionFile);
       outputFiles.push(filePath);
+
+      // Also add payout_details file for cleanup
+      const detailsFile = files.find(f => f.startsWith('payout_details_') && f.includes('_4000_4100.json'));
+      if (detailsFile) {
+        outputFiles.push(path.join(dataDir, detailsFile));
+      }
 
       const fileContent = fs.readFileSync(filePath, 'utf-8');
 
@@ -379,6 +403,12 @@ describe('TransactionProcessor', () => {
     if (detailsFile) {
       const filePath = path.join(dataDir, detailsFile);
       outputFiles.push(filePath);
+
+      // Also add payout_transactions file for cleanup
+      const transactionFile = files.find(f => f.startsWith('payout_transactions_') && f.includes('_5000_5100.json'));
+      if (transactionFile) {
+        outputFiles.push(path.join(dataDir, transactionFile));
+      }
 
       const fileContent = fs.readFileSync(filePath, 'utf-8');
 

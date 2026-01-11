@@ -356,7 +356,7 @@ describe('PayoutCalculator (regular scenarios)', () => {
         summaryGroup: 2,
       },
     ]);
-    expect(details.some((detail) => detail.shareClass.shareClass === 'BURN')).toBe(true);
+    expect(details.some((detail) => detail.shareClass.shareOwner === 'BURN')).toBe(true);
     expect(totalPayout).toBe(324000000000);
     expect(totalSupercharged).toBe(0);
     expect(totalBurn).toBe(324000000000);
