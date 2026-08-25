@@ -1,6 +1,6 @@
 {
   "name": "mina-payout",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "description": "",
   "type": "module",
   "engines": {
@@ -39,7 +39,7 @@
     "dotenv": "^16.4.7",
     "graphql": "^16.5.0",
     "inversify": "^6.2.0",
-    "mina-signer": "^3.0.7",
+    "mina-signer": "^4.1.0",
     "pg-promise": "^11.5.5",
     "reflect-metadata": "^0.2.2",
     "ts-node": "^10.9.1",
