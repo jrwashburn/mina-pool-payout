@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",
-    "csv-parse": "^5.5.3",
+    "csv-parse": "^7.0.2",
     "decimal.js": "^10.4.3",
     "dotenv": "^16.4.7",
     "graphql": "^16.5.0",
